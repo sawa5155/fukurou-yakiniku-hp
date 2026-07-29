@@ -89,7 +89,8 @@
   /* ---- レイアウト ------------------------------------------------------
      参考サイトはセクション間の余白が非常に大きい                       */
   --container:        1180px;
-  --container-narrow: 680px;
+  /* 問い合わせフォームのみが使う幅。2 カラム化に合わせて 680 → 920px。 */
+  --container-narrow: 920px;
   --gutter:      clamp(1.5rem, 5vw, 5rem);
   /* ---- 余白のリズム ----------------------------------------------------
      セクション間の余白は --sec-gap ひとつで決まり、
@@ -105,8 +106,10 @@
   --head-gap:    clamp(2.75rem, 6vw, 5.5rem);  /* 見出し〜本文の間 */
   --block-gap:   clamp(4rem, 9vw, 8.5rem);     /* ブロック間 */
   /* お問い合わせ〜フッターの間隔だけ、セクション間の標準（--sec-gap）に
-     この分を足して広く取る。本文が終わったことをはっきり示すため。 */
-  --footer-lead: clamp(3.5rem, 9vw, 8rem);
+     この分を足して広く取る。本文が終わったことをはっきり示すため。
+     ただし 8rem（PC 128px）だと --sec-py 115px と合わせて 243px になり
+     送信ボタンとフッターが離れすぎるので、約半分に落としている。      */
+  --footer-lead: clamp(1.75rem, 4.5vw, 4rem);
   --nav-h:       88px;
   --nav-h-sm:    64px;
   --hero-h:      100svh;
@@ -1744,17 +1747,42 @@ html.js [data-reveal].is-in {
 /* ------------------------------ フォーム --------------------------------
    薄い面と枠線で 入力欄の位置がはっきり分かるようにしている。
    濃さは --panel-bg / --field-bg で調整可能。                          */
+/* PC では 2 カラム。左列に短い入力欄、右列にお問い合わせ内容と送信まわり。
+   680px 幅の 1 カラムだとフォームだけで 1153px（1.3 画面分）あり、横スペースが
+   完全に遊んでいた。900px 以下では下のメディアクエリで 1 カラムに戻す。       */
 .form {
   display: grid;
-  gap: var(--sp-6);
-  padding: clamp(1.5rem, 4vw, 3rem);
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--sp-7);
+  row-gap: var(--sp-5);
+  padding: clamp(1.5rem, 3vw, 2rem);
   background: var(--panel-bg);
   border: var(--line-w) solid var(--c-line-faint);
 }
+/* align-content: start がないと、行数の少ない列の項目が上下に散らばる */
+.form__col {
+  display: grid;
+  gap: var(--sp-5);
+  align-content: start;
+}
+/* 右列は最初の行（お問い合わせ内容）だけを 1fr にし、残りは暗黙の行に任せる。
+   行数を固定して書くと、空になった行の gap だけが下端に残ってずれる
+   （.form__status:empty は absolute、.field__err:empty は display:none なので
+   グリッドのアイテム数が状況で変わる）。1fr が余りを全部吸うので
+   右列の下端＝左列の下端、つまり送信ボタンと店舗欄の下端が揃う。        */
+.form__col--side { grid-template-rows: 1fr; }
+.field--msg { grid-template-rows: auto 1fr; }
+/* min-height は「左列がこれより低くなったとき」の下限としてだけ効かせる。
+   通常は上の 1fr が左列の高さに合わせて textarea を伸ばすので、
+   ここを手で詰める必要はない。1 カラムに戻る 900px 以下では 7em に戻す。
+   .field を重ねているのは、後方の .field textarea { min-height: 7em } と
+   特異性を並べると打ち負けるため（記述順に依存させない）。               */
+.field.field--msg textarea { height: 100%; min-height: 10em; }
+
 .form__row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--sp-6);
+  gap: var(--sp-5);
 }
 
 .field { display: grid; gap: var(--sp-2); }
@@ -1779,7 +1807,7 @@ html.js [data-reveal].is-in {
 .field textarea,
 .field select {
   width: 100%;
-  padding: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
   background: var(--field-bg);
   border: var(--line-w) solid var(--c-line);
   border-radius: var(--radius-sm);
@@ -1792,7 +1820,7 @@ html.js [data-reveal].is-in {
               background-color var(--dur-fast) var(--ease);
   appearance: none;
 }
-.field textarea { resize: vertical; min-height: 8em; }
+.field textarea { resize: vertical; min-height: 7em; }
 .field input::placeholder,
 .field textarea::placeholder { color: var(--c-ink-3); opacity: .6; }
 .field input:hover, .field textarea:hover, .field select:hover {
@@ -1823,6 +1851,10 @@ html.js [data-reveal].is-in {
   color: var(--c-accent-hover);
   letter-spacing: var(--ls-ja);
 }
+/* エラーが無いときは要素自体を消す。中身が空でも .field のグリッドギャップ
+   8px が入力欄の下に残り、全欄合わせて 40px を無駄にしていた。
+   main.js は textContent = msg || '' で空文字を入れるので :empty が効く。   */
+.field__err:empty { display: none; }
 .field.is-invalid input,
 .field.is-invalid textarea,
 .field.is-invalid select { border-color: var(--c-accent-hover); }
@@ -1883,6 +1915,20 @@ html.js [data-reveal].is-in {
   font-size: var(--fs-xs);
   line-height: 2;
   min-height: 2em;
+}
+/* メッセージが入るまでは見せない。
+   display:none は使えない。これは aria-live のライブリージョンで、
+   空のうちにアクセシビリティツリーから消えると、文字が入った瞬間に
+   スクリーンリーダーが読み上げない（リージョンは中身が変わる前から
+   存在している必要がある）。そこで .form__honey と同じ手法で
+   「ツリーには残すが画面とレイアウトからは外す」状態にする。
+   absolute なのでグリッドの行を作らず、上の 24px のギャップも消える。 */
+.form__status:empty {
+  position: absolute;
+  width: 1px; height: 1px;
+  min-height: 0;          /* 上の min-height: 2em を打ち消して 1px に潰す */
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 .form__status.is-ok    { color: var(--c-accent-2); }
 .form__status.is-error { color: var(--c-accent-hover); }
@@ -2043,6 +2089,14 @@ html.js [data-reveal].is-in {
   .shop + .shop { padding-inline-start: 0; border-inline-start: 0; }
 
   .site-footer__top { grid-template-columns: 1fr; }
+
+  /* フォーム：横並びの余裕がなくなるので 1 カラムに戻す。
+     form__col が縦に積まれ、DOM 順どおり
+     お名前 → … → 店舗 → 内容 → 同意 → 送信 の 1 列になる。 */
+  .form { grid-template-columns: 1fr; }
+  .form__col--side { grid-template-rows: none; }
+  .field--msg { grid-template-rows: none; }
+  .field.field--msg textarea { height: auto; min-height: 7em; }
 }
 
 /* --------------------------------------------------------------------------

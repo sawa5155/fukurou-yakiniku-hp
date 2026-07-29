@@ -630,6 +630,13 @@
          ============================================================ -->
     <form class="form" id="contactForm" data-endpoint="" novalidate data-reveal data-reveal-delay="1">
 
+      <!-- ============================================================
+           左列：短い入力欄（PC のみ 2 カラムの左側になる）
+           900px 以下では form__col が縦に積まれ、現状と同じ 1 カラムに戻る。
+           DOM 順は変えていないので Tab 順序も現状のまま。
+           ============================================================ -->
+      <div class="form__col form__col--main">
+
       <div class="form__row">
         <div class="field">
           <label for="f-name">お名前 <span class="req">必須</span></label>
@@ -688,18 +695,27 @@
         </div>
       </div>
 
-      <div class="field">
-        <label for="f-msg">お問い合わせ内容 <span class="req">必須</span></label>
-        <textarea id="f-msg" name="message" rows="7" required
-                  placeholder="ご希望の日時・人数・ご相談内容などをご記入ください。"></textarea>
-        <p class="field__err" data-err></p>
-      </div>
+      </div><!-- /.form__col--main -->
 
-      <!-- スパム対策（人には見えません） -->
+      <!-- スパム対策（人には見えません）
+           絶対配置なのでグリッドの列を作らない。列ラッパーの外に置く。 -->
       <p class="form__honey" aria-hidden="true">
         <label for="f-hp">この欄は入力しないでください</label>
         <input type="text" id="f-hp" name="_gotcha" tabindex="-1" autocomplete="off">
       </p>
+
+      <!-- ============================================================
+           右列：お問い合わせ内容と送信まわり
+           field--msg が 1fr で伸び、textarea が左列の高さに合わせて伸縮する。
+           ============================================================ -->
+      <div class="form__col form__col--side">
+
+      <div class="field field--msg">
+        <label for="f-msg">お問い合わせ内容 <span class="req">必須</span></label>
+        <textarea id="f-msg" name="message" rows="4" required
+                  placeholder="ご希望の日時・人数・ご相談内容などをご記入ください。"></textarea>
+        <p class="field__err" data-err></p>
+      </div>
 
       <div class="field field--check">
         <label class="check" for="f-agree">
@@ -721,6 +737,8 @@
       </div>
 
       <p class="form__status" id="formStatus" role="status" aria-live="polite"></p>
+
+      </div><!-- /.form__col--side -->
     </form>
 
   </div>
