@@ -2082,8 +2082,20 @@ html.js [data-reveal].is-in {
     padding-inline: 0;
   }
   .section--kodawari .media-row--rev .media-row__media { order: 0; }
-  /* 1 カラムでは画像の高さを比率で決める */
-  .media-row__media { min-height: 0; aspect-ratio: var(--ratio-photo); }
+  /* 1 カラムでは画像の高さを比率で決める。
+     このとき align-items: stretch（.media-row）は必ず外すこと。
+     枠の中身は position: absolute の img だけなので中身由来の高さが 0 で、
+     stretch のままだと「行の高さ＝中身の高さ」を先に決める WebKit
+     （iOS Safari / macOS Safari）で行が 0 になり、aspect-ratio が
+     使われる前に枠ごと潰れて写真が消える。Chromium は aspect-ratio から
+     行の高さを求めるので潰れず、検証ツールでは再現しない。
+     枠が潰れるとセクションが約 517px 縮み、割合指定の煙（下の 8/41/94%）が
+     本文に対して 42〜486px ずれる。 */
+  .media-row__media {
+    min-height: 0;
+    aspect-ratio: var(--ratio-photo);
+    align-self: start;
+  }
 
   .shop:first-child { padding-inline-end: 0; }
   .shop + .shop { padding-inline-start: 0; border-inline-start: 0; }
