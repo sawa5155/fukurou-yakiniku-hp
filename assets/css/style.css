@@ -648,7 +648,7 @@ body.is-opening { overflow: hidden; }
 
    修飾子は2つだけ。
      .sec-head--sub       … セクション内の中見出し（旨さの秘訣）。和文が一段小さい
-     .sec-head--on-media  … 写真の上に置く見出し（ご予約）。文字と罫線が白系      */
+     .sec-head--on-media  … 写真の上に置く見出し（ご予約）。和文と補足文が白系    */
 .sec-head {
   margin-bottom: var(--head-gap);
   text-align: center;
@@ -669,11 +669,6 @@ body.is-opening { overflow: hidden; }
   letter-spacing: var(--ls-ja-wide);
   text-align: inherit;   /* h2/h3 の既定（左）を打ち消して .sec-head に従わせる */
 }
-/* 下線と補足文を出すのは、ご予約とお問い合わせだけ */
-.sec-head--rule .sec-head__ja {
-  padding-bottom: var(--sp-5);
-  border-bottom: var(--line-w) solid var(--c-line);
-}
 .sec-head__lead {
   max-width: 44em;
   margin: var(--sp-7) auto 0;
@@ -682,17 +677,12 @@ body.is-opening { overflow: hidden; }
   line-height: var(--lh-loose);
 }
 
-/* ご予約セクションだけ左揃えのまま（写真の上で左に寄せる構成） */
-.sec-head--left { text-align: left; }
-.sec-head--left .sec-head__lead { margin-inline: 0; }
-
 /* 中見出し（セクション内の小分類） */
 .sec-head--sub .sec-head__ja { font-size: var(--fs-2xl); }
 
-/* 写真の上に置く見出し（ご予約）は文字色と罫線だけ白系に差し替える */
-.sec-head--on-media .sec-head__en   { color: var(--c-on-media-3); }
+/* 写真の上に置く見出し（ご予約）。欧文ラベルは他セクションと同じ淡金のままにし、
+   和文と補足文だけ白系へ差し替える */
 .sec-head--on-media .sec-head__ja   { color: var(--c-on-media); }
-.sec-head--on-media.sec-head--rule .sec-head__ja { border-bottom-color: var(--c-on-media-line); }
 .sec-head--on-media .sec-head__lead { color: var(--c-on-media-2); }
 
 .h3 {
@@ -1685,8 +1675,8 @@ html.js [data-reveal].is-in {
   min-height: var(--reserve-min-h);
   display: grid;
   align-items: center;
-  /* 見出しを他セクションと同じ左揃えにしたため、中身も左寄せに揃える */
-  text-align: left;
+  /* 見出し・本文・ボタンとも他セクションと同じ中央揃え */
+  text-align: center;
   /* mask で透けた部分に出る地色 */
   background-color: var(--c-bg);
 }
@@ -1733,7 +1723,7 @@ html.js [data-reveal].is-in {
 .reserve__actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: center;
   gap: var(--sp-4);
 }
 /* 予約導線内のリンクは枠付きのまま維持（写真の上なので白で固定） */
