@@ -181,7 +181,7 @@
   --dur-fast: 200ms;
   --dur-mid:  420ms;
   /* --dur-slow は出現アニメーション専用（他では使っていない） */
-  --dur-slow: 1800ms;
+  --dur-slow: 1350ms;
   --ease:      cubic-bezier(.22, .61, .36, 1);
   --ease-out:  cubic-bezier(.16, 1, .3, 1);
   /* 出現アニメーション（下からふわっと）
@@ -193,7 +193,7 @@
                        （あちらを緩めるとボタンの反応が鈍く感じる）。 */
   --reveal-y:     40px;
   --reveal-blur:  9px;
-  --reveal-step:  220ms;
+  --reveal-step:  170ms;
   --ease-reveal:  cubic-bezier(.22, .68, .18, 1);
 
   /* オープニング（初回・リロード時の黒幕とロゴ）
@@ -1244,7 +1244,23 @@ html.js [data-reveal].is-in {
   grid-column: 8 / 10;
   grid-row: 1;
   position: relative;
-  margin: clamp(3.5rem, 8vw, 6.5rem) 0 0;
+  /* 罫線の長さと、罫線〜見出しの間隔。
+     otowa は 6.6rem / 3rem（96 - 66）だが、こちらは見出しが大きく字間も
+     広いぶん間隔が詰まって見えるので 3.5rem まで開けている。 */
+  --omoi-line-h: clamp(2.5rem, 4.5vw, 4.125rem);
+  --omoi-line-gap: clamp(2.25rem, 3.8vw, 3.5rem);
+  /* 縦組み（vertical-rl）は 1 行目が右端から始まるので、右マージンを負にして
+     グリッド領域を右へ広げると、見出しと罫線がまとまって右へ寄る。
+     罫線も右端基準（下の ::before）なので追従する。
+     1 カラム分（約 100px）寄せると右上の写真と罫線が接近しすぎるため、
+     半カラム程度に抑えている。02（--rev）には効かせない。 */
+  --omoi-title-shift: clamp(1.5rem, 3.5vw, 3.25rem);
+  /* 上マージンを「罫線の長さ＋間隔」と同値にすると、罫線の上端が
+     見出しのマージンボックス上端＝グリッド 1 行目の上端に一致する。
+     大きな縦長写真（.omoi__main）も同じ行の先頭にあるので、
+     写真の上端と罫線の上端が幅に関係なく揃う。 */
+  margin: calc(var(--omoi-line-h) + var(--omoi-line-gap))
+          calc(var(--omoi-title-shift) * -1) 0 0;
   writing-mode: vertical-rl;
   text-orientation: upright;
   font-size: clamp(1.375rem, 1.05rem + 1.2vw, 2.25rem);
@@ -1254,13 +1270,19 @@ html.js [data-reveal].is-in {
   color: var(--c-ink);
 }
 .omoi__title span { display: block; white-space: nowrap; }
+/* 罫線は「見出しの真上」に立てる（otowa の title_H2::before と同じ）。
+   ここは vertical-rl なので論理プロパティを使うと軸が 90 度回り、
+   inset-block-start が right、inset-inline-end が bottom に解決されて
+   見出しの右下へ逃げてしまう。参考サイトと同様に物理プロパティで置く。
+     otowa: top -9.6rem / right 2rem / height 6.6rem（1rem = 10px）
+   right は文字サイズ基準（2rem ÷ font-size 3.2rem ≒ .6em）にして、
+   縦組み 1 行目の中心へ罫線が乗るようにしている。 */
 .omoi__title::before {
   content: "";
   position: absolute;
-  inset-block-start: clamp(-4.5rem, -6vw, -2.5rem);
-  inset-inline-end: 0;
+  inset: calc((var(--omoi-line-h) + var(--omoi-line-gap)) * -1) .6em auto auto;
   width: var(--line-w);
-  height: clamp(2.5rem, 4.5vw, 4.125rem);
+  height: var(--omoi-line-h);
   background: var(--c-accent-2);
 }
 
@@ -1310,7 +1332,8 @@ html.js [data-reveal].is-in {
 /* 02 は左右を反転させる（写真は main + accent--b の2枚のみ。
    01 の accent--b と左側で近接するため accent--a は置かない） */
 .omoi--rev .omoi__main  { grid-column: 7 / 13; }
-.omoi--rev .omoi__title { grid-column: 4 / 6; }
+/* 02 の見出しは右寄せしない（--title-shift を打ち消す） */
+.omoi--rev .omoi__title { grid-column: 4 / 6; margin-right: 0; }
 .omoi--rev .omoi__paras { grid-column: 1 / 6; }
 .omoi--rev .omoi__accent--b {
   grid-column: 8 / 13;
