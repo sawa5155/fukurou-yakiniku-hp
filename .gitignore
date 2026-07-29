@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# 原本素材（サイト未参照・ローカル管理）
+assets/images/fukurou_images/
+assets/images/_stock-backup/
+
+# クライアント提供資料・制作用スクリプト（非公開）
+資料/
+
+# 設計書・作業メモ（検証環境の構成情報を含むため非公開・ローカル管理）
+docs/superpowers/

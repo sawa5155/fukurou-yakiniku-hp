@@ -1,0 +1,2344 @@
+@charset "UTF-8";
+/* ==========================================================================
+   焼肉 福朗 — style.css
+   --------------------------------------------------------------------------
+   デザイン方針
+     参考サイト https://otowa-net.com/ の設計言語に準拠。
+       ・漆黒（#000）の地に白文字、差し色は淡い金 #cebb93
+       ・見出しは明朝・ウェイト軽め・小さめ・字間を広く（0.12〜0.3em）
+       ・本文は 13–14px / 行間 2.0–2.4 / 字間 0.12em
+       ・欧文ラベルは EB Garamond
+       ・枠線・カード・角丸は使わず、髪の毛のような細い罫線と余白だけで構造化
+       ・ナビは PC でもハンバーガーのみ。縦組みはヒーローとレールとメニューに限定
+       ・写真は非対称に散らし、間の余白を大きく取る
+
+   構成
+     1. DESIGN TOKENS
+     2. THEME PRESETS      … data-theme の切り替えで別デザインへ
+     3. RESET / BASE
+     4. UTILITIES
+     5. COMPONENTS
+     6. RESPONSIVE
+     7. MOTION / PRINT
+
+   ▼ ホバー演出について
+     リンク・ボタン（a / button）以外にはホバー演出を付けていません。
+     図版やカードは静止したままです。
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. DESIGN TOKENS（テーマ非依存 = 骨格）
+   ========================================================================== */
+:root {
+
+  /* ---- 書体 ------------------------------------------------------------ */
+  /* 参考サイトの筑紫Aオールド明朝に近い、無償のオールドスタイル明朝 */
+  --ff-serif: "Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN",
+              "Noto Serif JP", serif;
+  --ff-sans:  "YuGothic", "Yu Gothic", "Zen Kaku Gothic New", "Hiragino Sans",
+              "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --ff-en:    "EB Garamond", "Times New Roman", Times, serif;
+
+  --ff-heading: var(--ff-serif);
+  --ff-body:    var(--ff-sans);
+  --ff-accent:  var(--ff-en);
+
+  /* 見出しのウェイト（参考サイトは 300／要所のみ 500） */
+  --fw-heading: 300;
+  --fw-heading-strong: 500;
+
+  /* ---- 文字サイズ ------------------------------------------------------
+     参考サイトは総じて小さい。セクション見出しでも 26–31px 程度。       */
+  --fs-3xs: 0.625rem;                                          /* 10px */
+  --fs-2xs: 0.6875rem;                                         /* 11px */
+  --fs-xs:  0.75rem;                                           /* 12px */
+  --fs-sm:  0.8125rem;                                         /* 13px 本文 */
+  --fs-md:  0.875rem;                                          /* 14px */
+  --fs-lg:  clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);       /* 15–17px */
+  --fs-xl:  clamp(1.0625rem, 1rem + 0.35vw, 1.375rem);         /* 17–22px 小見出し */
+  --fs-2xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);          /* 20–26px 中見出し */
+  --fs-3xl: clamp(1.375rem, 1.15rem + 0.9vw, 1.9375rem);       /* 22–31px セクション見出し */
+  --fs-hero: clamp(1.25rem, 1rem + 1.1vw, 2rem);               /* 20–32px ヒーロー縦組み */
+
+  /* ---- 行間・字間 ------------------------------------------------------ */
+  --lh-tight: 1.5;
+  --lh-snug:  1.9;
+  --lh-body:  2.2;
+  --lh-loose: 2.55;
+  --ls-ja:       0.12em;
+  --ls-ja-wide:  0.18em;
+  --ls-ja-hero:  0.3em;
+  --ls-en:       0.16em;
+  --ls-en-wide:  0.34em;
+
+  /* ---- 余白スケール ---------------------------------------------------- */
+  --space-unit: 8px;
+  --sp-1:  calc(var(--space-unit) * 0.5);
+  --sp-2:  var(--space-unit);
+  --sp-3:  calc(var(--space-unit) * 1.5);
+  --sp-4:  calc(var(--space-unit) * 2);
+  --sp-5:  calc(var(--space-unit) * 3);
+  --sp-6:  calc(var(--space-unit) * 4);
+  --sp-7:  calc(var(--space-unit) * 5);
+  --sp-8:  calc(var(--space-unit) * 7);
+  --sp-9:  calc(var(--space-unit) * 10);
+  --sp-10: calc(var(--space-unit) * 14);
+  --sp-11: calc(var(--space-unit) * 18);
+
+  /* ---- レイアウト ------------------------------------------------------
+     参考サイトはセクション間の余白が非常に大きい                       */
+  --container:        1180px;
+  --container-narrow: 680px;
+  --gutter:      clamp(1.5rem, 5vw, 5rem);
+  /* ---- 余白のリズム ----------------------------------------------------
+     セクション間の余白は --sec-gap ひとつで決まり、
+     各セクションはその半分を上下に持つ（隣り合うと合計 = --sec-gap）。
+     これで全セクションの間隔が自動的に揃う。
+
+       --head-gap   見出し〜本文     44–88px
+       --block-gap  ブロック間       64–136px
+       --sec-gap    セクション間     112–256px
+     の順に約 1 : 1.5 : 3 の階層になるよう調整している。           */
+  --sec-gap:     clamp(7rem, 16vw, 16rem);     /* セクション間（合計） */
+  --sec-py:      calc(var(--sec-gap) / 2);     /* 各セクションの上下 */
+  --head-gap:    clamp(2.75rem, 6vw, 5.5rem);  /* 見出し〜本文の間 */
+  --block-gap:   clamp(4rem, 9vw, 8.5rem);     /* ブロック間 */
+  /* お問い合わせ〜フッターの間隔だけ、セクション間の標準（--sec-gap）に
+     この分を足して広く取る。本文が終わったことをはっきり示すため。 */
+  --footer-lead: clamp(3.5rem, 9vw, 8rem);
+  --nav-h:       88px;
+  --nav-h-sm:    64px;
+  --hero-h:      100svh;
+  --hero-h-min:  580px;
+  --rail-inset:  clamp(1rem, 2.6vw, 2.75rem);  /* 画面端〜レール */
+  /* 予約導線：セクションの最低の高さと、写真の上下が溶け込む幅。
+     --reserve-fade を大きくすると、より広い範囲でゆっくり溶け込む。 */
+  --reserve-min-h: min(92vh, 900px);
+  --reserve-fade:  30%;
+
+  /* 固定背景の帯（空間セクション）の高さ。
+     参考サイトの .bg-parallax に合わせ PC 550px、中間幅 450px、
+     スマホ 80vw（下のブレイクポイントで上書き）。 */
+  --band-h: clamp(320px, 38vw, 550px);
+  /* ヒーロー写真の固定＋暗転演出。
+     --veil-end は「想い」セクション高さに対する割合で、
+     ここで完全に地色（黒）になる。02 のブロックの直後に来るよう調整。 */
+  /* 実測：02 のブロックはセクション高さの 59.1%〜75.1% を占めるため、
+     それを通り過ぎた直後（= pullquote の手前）で暗転しきるよう 80% に設定。 */
+  --veil-end:    80%;
+  /* 見出しが現れるまでの助走。セクション上端は幕がほぼ透明なので、
+     ここで少し送ってから文字を出すことで写真の上でも読めるようにする。
+     （小さくすると写真がよく見えるが文字は読みにくくなる） */
+  --veil-lead:   42vh;
+
+  /* ---- 角丸（参考サイトは全て直角） ------------------------------------ */
+  --radius-none: 0px;
+  --radius-sm:   0px;
+  --radius-md:   0px;
+  --radius-lg:   0px;
+  --radius-pill: 999px;
+  --radius-img:  var(--radius-none);
+  --radius-card: var(--radius-none);
+  --radius-btn:  var(--radius-none);
+
+  /* ---- 写真の上に載る文字 ----------------------------------------------
+     ヒーローと予約導線は写真を敷くため、テーマ（明暗）に関わらず
+     常に白系で表示する。テーマの --c-ink を使うと明るいテーマで
+     暗い文字になり読めなくなるため、専用トークンを用意している。   */
+  --c-on-media:      #ffffff;
+  --c-on-media-2:    rgb(255 255 255 / .76);
+  --c-on-media-3:    rgb(255 255 255 / .58);
+  --c-on-media-line: rgb(255 255 255 / .38);
+
+  /* ---- 背景の煙（こだわりセクション） ------------------------------------
+     「黒地に白い煙」の写真をスクリーン合成で重ね、
+     黒い部分を透過させて煙だけを浮かせる。
+     --smoke-size で大きさ、--smoke-opacity で濃さが変わる。          */
+  --smoke-size:    clamp(26rem, 52vw, 54rem);
+  --smoke-opacity: .40;   /* 参考サイトの 0.412 に合わせた濃さ */
+  --smoke-blend:   screen;
+  --smoke-blur:    2px;   /* JPEG のノイズを消す程度。大きくすると煙の形が崩れる */
+
+  /* ---- フォームの面 ------------------------------------------------------
+     地色に対して --c-ink（文字色）をごく薄く混ぜて面を作るため、
+     暗いテーマでは「薄い白」、明るいテーマでは「薄い墨」になり、
+     どちらでも枠が見える。数値を上げるとコントラストが強くなる。   */
+  --panel-bg:       color-mix(in srgb, var(--c-ink) 3%,  transparent);
+  --field-bg:       color-mix(in srgb, var(--c-ink) 5%,  transparent);
+  --field-bg-focus: color-mix(in srgb, var(--c-ink) 9%,  transparent);
+
+  /* ---- 罫線 ------------------------------------------------------------ */
+  --line-w: 1px;
+
+  /* ---- 画像比率 -------------------------------------------------------- */
+  --ratio-wide:   16 / 9;
+  --ratio-photo:  4 / 3;
+  --ratio-square: 1 / 1;
+  --ratio-tall:   3 / 4;
+
+  /* ---- 動き ------------------------------------------------------------ */
+  --dur-fast: 200ms;
+  --dur-mid:  420ms;
+  /* --dur-slow は出現アニメーション専用（他では使っていない） */
+  --dur-slow: 1800ms;
+  --ease:      cubic-bezier(.22, .61, .36, 1);
+  --ease-out:  cubic-bezier(.16, 1, .3, 1);
+  /* 出現アニメーション（下からふわっと）
+       --reveal-y      持ち上げる距離
+       --reveal-blur   ぼかし。0 にすると純粋なフェードアップになる
+       --reveal-step   data-reveal-delay 1 あたりの遅れ（ずらして出す量）
+       --ease-reveal   --ease-out より初速を抑え、長く滑らせる曲線。
+                       ホバー演出に使う --ease-out とは分けている
+                       （あちらを緩めるとボタンの反応が鈍く感じる）。 */
+  --reveal-y:     40px;
+  --reveal-blur:  9px;
+  --reveal-step:  220ms;
+  --ease-reveal:  cubic-bezier(.22, .68, .18, 1);
+
+  /* オープニング（初回・リロード時の黒幕とロゴ）
+     --opening-total を変えると全体の尺が伸縮する。
+     内訳は @keyframes の % で決まる（ロゴ 0-40% 出現／40-62% 保持／
+     62-82% 退出、黒幕 62-100% 退出）。 */
+  --opening-total: 2900ms;
+
+  /* ---- 影（参考サイトは影を使わない） ---------------------------------- */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+
+  /* ---- z-index --------------------------------------------------------- */
+  --z-base: 1;
+  --z-nav: 100;
+  --z-nav-top: 101;
+  --z-header: 110;
+  --z-skip: 200;
+  --z-opening: 300;
+}
+
+
+/* ==========================================================================
+   2. THEME PRESETS
+   --------------------------------------------------------------------------
+   <html data-theme="sumi">   … 既定（漆黒 × 淡金／参考サイト準拠・現在の納品仕様）
+   <html data-theme="kinari"> … 明るい和モダン（生成り × 墨）
+   <html data-theme="ebicha"> … 艶やか（海老茶 × 金）
+
+   ★ テーマを増やす場合は [data-theme="xxx"] ブロックをコピーして
+     色トークンだけ書き換えてください。HTML 側は data-theme の値を変えるだけ。
+   ========================================================================== */
+
+/* ---------- 既定：漆黒（SUMI）／参考サイト準拠 ---------- */
+:root,
+[data-theme="sumi"] {
+  color-scheme: dark;
+
+  /* 面 */
+  --c-bg:       #000000;
+  --c-bg-2:     #000000;
+  --c-bg-3:     #0a0a0a;
+  --c-bg-inset: #000000;
+
+  /* 文字 */
+  --c-ink:      #ffffff;
+  --c-ink-2:    rgb(255 255 255 / .74);
+  --c-ink-3:    #8d8d8d;
+  --c-ink-on-accent: #ffffff;
+
+  /* アクセント */
+  --c-accent:      #a8332a;   /* 予約ボタンなどの朱 */
+  --c-accent-hover:#c04034;
+  --c-accent-2:    #cebb93;   /* 罫線・欧文ラベルの淡金 */
+
+  /* 罫線 */
+  --c-line:        rgb(255 255 255 / .20);
+  --c-line-strong: rgb(255 255 255 / .42);
+  --c-line-faint:  rgb(255 255 255 / .10);
+
+  /* 画像に重ねる幕 */
+  --scrim-top:    rgb(0 0 0 / .55);
+  --scrim-mid:    rgb(0 0 0 / .28);
+  --scrim-bottom: rgb(0 0 0 / .80);
+  --img-brightness: .95;
+  /* ヒーローは中央に文字を重ねるため、参考サイト同様しっかり落とす */
+  --hero-img-brightness: .62;
+  --hero-img-saturate: .88;
+
+  /* 背景テクスチャ（参考サイトは無地のため既定で無効） */
+  --texture-opacity: 0;
+  --texture-blend: soft-light;
+}
+
+/* ---------- 明るい和モダン：生成り（KINARI） ---------- */
+[data-theme="kinari"] {
+  color-scheme: light;
+
+  --c-bg:       #f6f2ea;
+  --c-bg-2:     #f1ece2;
+  --c-bg-3:     #ffffff;
+  --c-bg-inset: #ffffff;
+
+  --c-ink:      #1a1917;
+  --c-ink-2:    rgb(26 25 23 / .74);
+  --c-ink-3:    #8b8478;
+  --c-ink-on-accent: #fffdf9;
+
+  --c-accent:      #96271f;
+  --c-accent-hover:#b03328;
+  --c-accent-2:    #9a7c3c;
+
+  --c-line:        rgb(26 25 23 / .20);
+  --c-line-strong: rgb(26 25 23 / .42);
+  --c-line-faint:  rgb(26 25 23 / .10);
+
+  --scrim-top:    rgb(20 18 16 / .48);
+  --scrim-mid:    rgb(20 18 16 / .24);
+  --scrim-bottom: rgb(20 18 16 / .72);
+  --img-brightness: 1;
+  /* 煙の素材は「黒地に白い煙」でスクリーン合成が前提のため、
+     明るい地色では使えない。明るいテーマでは非表示にしている。
+     使う場合は「白地に黒い煙」の素材を用意し multiply に変更してください。 */
+  --smoke-opacity: 0;
+  /* ヒーロー見出しは白固定なので、明るいテーマでも写真は暗く落とす */
+  --hero-img-brightness: .52;
+  --hero-img-saturate: .85;
+  /* 明るいテーマは本文が暗色なので、写真の上に文字が乗らないよう
+     見出しが現れる前に地色へ到達させる（助走も短くする） */
+  --veil-end: 20%;
+  --veil-lead: 16vh;
+
+  --texture-opacity: 0;
+  --texture-blend: multiply;
+}
+
+/* ---------- 艶やか：海老茶（EBICHA） ---------- */
+[data-theme="ebicha"] {
+  color-scheme: dark;
+
+  --c-bg:       #150c0c;
+  --c-bg-2:     #190e0e;
+  --c-bg-3:     #22110f;
+  --c-bg-inset: #0f0808;
+
+  --c-ink:      #f6ece2;
+  --c-ink-2:    rgb(246 236 226 / .74);
+  --c-ink-3:    #a08476;
+  --c-ink-on-accent: #1a0d0c;
+
+  --c-accent:      #c9a227;
+  --c-accent-hover:#dcb63c;
+  --c-accent-2:    #c9a227;
+
+  --c-line:        rgb(246 236 226 / .20);
+  --c-line-strong: rgb(246 236 226 / .42);
+  --c-line-faint:  rgb(246 236 226 / .10);
+
+  --scrim-top:    rgb(21 12 12 / .58);
+  --scrim-mid:    rgb(21 12 12 / .30);
+  --scrim-bottom: rgb(21 12 12 / .84);
+  --img-brightness: .95;
+  --smoke-opacity: .32;
+  --hero-img-brightness: .60;
+  --hero-img-saturate: .88;
+
+  --texture-opacity: .18;
+  --texture-blend: soft-light;
+}
+
+
+/* ==========================================================================
+   3. RESET / BASE
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--ff-body);
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-ja);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* clip は hidden と違いスクロールコンテナを作らないため、
+     ヒーロー写真の position: fixed を壊さずに横はみ出しを抑えられる。 */
+  overflow-x: clip;
+}
+html { overflow-x: clip; }
+
+body.is-locked { overflow: hidden; }
+
+/* 紙のテクスチャ（既定テーマでは --texture-opacity: 0 のため非表示） */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("../images/texture.jpg");
+  background-size: 620px;
+  opacity: var(--texture-opacity);
+  mix-blend-mode: var(--texture-blend);
+}
+body > * { position: relative; z-index: 1; }
+
+h1, h2, h3, h4, h5 {
+  margin: 0;
+  font-family: var(--ff-heading);
+  font-weight: var(--fw-heading);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-ja);
+  text-align: left;
+}
+
+p { margin: 0 0 var(--sp-5); }
+p:last-child { margin-bottom: 0; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease),
+              opacity var(--dur-fast) var(--ease);
+}
+
+ul, ol, dl, dd { margin: 0; padding: 0; }
+li { list-style: none; }
+
+img, svg, video { display: block; max-width: 100%; }
+img { height: auto; }
+
+/* <picture> は表示上の箱を持たせず、中の img を親の直接の子として扱う。
+   こうしないと img の height:100% や親の aspect-ratio が解決できず、
+   画像が縮んだり枠を埋めなかったりする。 */
+picture { display: contents; }
+
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+input, select, textarea { font: inherit; color: inherit; }
+
+address { font-style: normal; }
+
+:focus-visible {
+  outline: 1px solid var(--c-accent-2);
+  outline-offset: 4px;
+}
+
+::selection { background: var(--c-accent-2); color: #000; }
+
+/* 日本語を文節単位で折り返すためのまとまり。
+   inline-block なので、この内部では改行されない。
+   「当店だ／けです。」のように語の途中で切れるのを防ぐ用途で使う。
+   使うときは <span> 同士の間に空白を入れないこと（半角スペースが出る）。 */
+.phrase { display: inline-block; }
+
+/* 画面には出さないが読み上げには残す（見出しを非表示にする箇所で使用） */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--sp-2);
+  left: var(--sp-2);
+  z-index: var(--z-skip);
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--c-accent);
+  color: var(--c-ink-on-accent);
+  font-size: var(--fs-xs);
+  transform: translateY(-160%);
+  transition: transform var(--dur-fast) var(--ease);
+}
+.skip-link:focus-visible { transform: translateY(0); }
+
+/* ---- オープニング（初回・リロード時）------------------------------------
+   真っ暗 → 中央にロゴがフェードイン → 保持 → 黒幕が抜けて
+   ファーストビューが現れる。参考サイト（otowa-net.com）と同じ流れ。
+
+   ▼ 設計の要点
+   ・**CSS アニメーションだけで完結**させている。JS でクラスを付けて
+     動かす作り方だと、JS が落ちたときに黒幕が残ってサイトが使えなくなる。
+     forwards で最終キーフレーム（visibility: hidden）に留まるので、
+     何があっても必ず消える。
+   ・JS が無効な環境ではそもそも黒幕を出さない（html:not(.js) で display:none）。
+     head のインライン script が .js を付けている。
+   ・尺は --opening-total ひとつで伸縮する。内訳は下の % を参照。
+
+   ▼ 尺の内訳（--opening-total = 2900ms のとき）
+       0 –  40%   1160ms  ロゴがぼけながら下から浮かび上がる
+      40 –  62%    640ms  ロゴを保持
+      62 –  82%    580ms  ロゴが抜ける
+      62 – 100%   1100ms  黒幕が抜ける（ロゴの退出と重ねている）        */
+.opening { display: none; }
+
+html.js .opening {
+  display: grid;
+  place-items: center;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-opening);
+  background: var(--c-bg);
+  animation: opening-veil var(--opening-total) var(--ease) forwards;
+}
+
+html.js .opening__brand {
+  margin: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--sp-4);
+  font-family: var(--ff-heading);
+  line-height: 1;
+  color: var(--c-ink);
+  animation: opening-logo var(--opening-total) var(--ease) forwards;
+}
+/* オープニングのロゴはページ内のロゴより大きく見せる */
+html.js .opening__brand .brand__mark {
+  font-size: clamp(1.75rem, 1.4rem + 2vw, 3rem);
+  font-weight: var(--fw-heading-strong);
+  letter-spacing: .22em;
+}
+html.js .opening__brand .brand__sub {
+  font-size: clamp(var(--fs-3xs), 0.45rem + 0.5vw, var(--fs-xs));
+  letter-spacing: .34em;
+  color: var(--c-ink-3);
+  white-space: nowrap;
+}
+html.js .opening__brand .brand__sub i { font-style: normal; opacity: .5; }
+
+@keyframes opening-logo {
+  0%          { opacity: 0; filter: blur(12px); transform: translateY(18px); }
+  40%, 62%    { opacity: 1; filter: blur(0);    transform: none; }
+  82%, 100%   { opacity: 0; filter: blur(4px);  transform: translateY(-10px); }
+}
+@keyframes opening-veil {
+  0%, 62% { opacity: 1; visibility: visible; }
+  100%    { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+
+/* 演出中はスクロールを止める（JS が付け外しする）。
+   position: fixed ではなく overflow: hidden なので、
+   ヒーローの固定レイヤーを壊さない。 */
+body.is-opening { overflow: hidden; }
+
+.ico {
+  width: 1.05em;
+  height: 1.05em;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+/* ==========================================================================
+   4. UTILITIES
+   ========================================================================== */
+.container {
+  width: 100%;
+  max-width: calc(var(--container) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.container--narrow { max-width: calc(var(--container-narrow) + var(--gutter) * 2); }
+
+.section {
+  padding-block: var(--sec-py);
+  /* 固定したヒーローの上に重なるよう、本文側を必ず前面に置く */
+  position: relative;
+  z-index: 1;
+}
+.section--kodawari,
+.section--kukan,
+.section--shops,
+.section--contact { background: var(--c-bg); }
+
+/* こだわりセクション：背景に煙を敷くため、はみ出しを切って
+   中身を煙より前面に置く（参考サイト section03 と同じ構成）。 */
+.section--kodawari { overflow: hidden; }
+.section--kodawari > .container { position: relative; z-index: 1; }
+
+/* 本文の最後（お問い合わせ）とフッターのあいだだけ、間隔を広げる。
+   セクション間の標準は --sec-gap（= 上下の --sec-py の合計）だが、
+   ここはそれに --footer-lead を足す。 */
+.section--contact { padding-bottom: calc(var(--sec-py) + var(--footer-lead)); }
+
+/* 空間セクションは全幅スライドショーで終わるため、下端まで写真を密着させる
+   （参考サイト sec12 と同じ扱い）。その分の余白は次のセクション側で持たせ、
+   セクション間の間隔が他と揃うようにする。 */
+.section--kukan { padding-bottom: 0; }
+.section--kukan + .section,
+.section--kukan + .reserve { padding-top: var(--sec-gap); }
+
+/* ---- 想いセクション：固定されたヒーロー写真の上へ重なり、徐々に暗転する ----
+   ヒーローの写真は position: fixed で画面に残り、このセクションが上を流れる。
+   背景グラデーションが「透明 → 地色」へ変わることで、
+   スクロールにつれて写真が黒へ沈んでいくように見える。
+
+   ▼ 境目を見せないための工夫
+     セクション上端で少しでも色が付いていると、その境界が
+     横一本の線として動いて見えてしまう。そのため
+       ・開始は完全な transparent
+       ・最初の数%はほぼ透明のまま（0 → 1 → 3 → 7%）
+     という緩やかな立ち上がりにして、境目を知覚できないようにしている。
+     以降は S 字カーブで濃くなり、--veil-end で地色に到達する。
+
+   停止位置は % 指定＝このセクション自身の高さ基準なので、
+   文章量が変わっても「02 のブロックを通過したあたりで真っ黒」を保てる。
+   --veil-end を小さくすると早く、大きくすると遅く暗転します。 */
+.section--omoi {
+  padding-top: calc(var(--sec-py) + var(--veil-lead));
+  background-color: transparent;
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--c-bg) 1%, transparent) calc(var(--veil-end) * 0.020),
+    color-mix(in srgb, var(--c-bg) 3%, transparent) calc(var(--veil-end) * 0.045),
+    color-mix(in srgb, var(--c-bg) 7%, transparent) calc(var(--veil-end) * 0.075),
+    color-mix(in srgb, var(--c-bg) 12%, transparent) calc(var(--veil-end) * 0.110),
+    color-mix(in srgb, var(--c-bg) 19%, transparent) calc(var(--veil-end) * 0.150),
+    color-mix(in srgb, var(--c-bg) 27%, transparent) calc(var(--veil-end) * 0.200),
+    color-mix(in srgb, var(--c-bg) 36%, transparent) calc(var(--veil-end) * 0.260),
+    color-mix(in srgb, var(--c-bg) 46%, transparent) calc(var(--veil-end) * 0.330),
+    color-mix(in srgb, var(--c-bg) 56%, transparent) calc(var(--veil-end) * 0.410),
+    color-mix(in srgb, var(--c-bg) 66%, transparent) calc(var(--veil-end) * 0.500),
+    color-mix(in srgb, var(--c-bg) 76%, transparent) calc(var(--veil-end) * 0.600),
+    color-mix(in srgb, var(--c-bg) 85%, transparent) calc(var(--veil-end) * 0.700),
+    color-mix(in srgb, var(--c-bg) 92%, transparent) calc(var(--veil-end) * 0.800),
+    color-mix(in srgb, var(--c-bg) 97%, transparent) calc(var(--veil-end) * 0.900),
+    var(--c-bg) var(--veil-end)
+  );
+  background-repeat: no-repeat;
+}
+
+/* 縦組み（ヒーロー・レール・ラベル限定） */
+.vert {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: var(--ls-ja-wide);
+}
+
+/* ---- セクション見出し（全セクション共通） --------------------------------
+   こだわりセクションの見出しを基準に、全セクションで同じ構成・書式・
+   余白・揃え方に統一している。
+
+     <header class="sec-head">
+       <p class="sec-head__en">Our Commitment</p>  … 欧文ラベル（EB Garamond 斜体・淡金）
+       <h2 class="sec-head__ja">こだわり</h2>       … 和文見出し（明朝・細め・下に細い罫線）
+       <p class="sec-head__lead">…</p>             … 補足文（任意）
+     </header>
+
+   修飾子は2つだけ。
+     .sec-head--sub       … セクション内の中見出し（旨さの秘訣）。和文が一段小さい
+     .sec-head--on-media  … 写真の上に置く見出し（ご予約）。文字と罫線が白系      */
+.sec-head {
+  margin-bottom: var(--head-gap);
+  text-align: center;
+}
+.sec-head__en {
+  margin: 0 0 var(--sp-3);
+  font-family: var(--ff-accent);
+  font-size: var(--fs-xs);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: var(--ls-en-wide);
+  color: var(--c-accent-2);
+}
+.sec-head__ja {
+  margin: 0;
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-ja-wide);
+  text-align: inherit;   /* h2/h3 の既定（左）を打ち消して .sec-head に従わせる */
+}
+/* 下線と補足文を出すのは、ご予約とお問い合わせだけ */
+.sec-head--rule .sec-head__ja {
+  padding-bottom: var(--sp-5);
+  border-bottom: var(--line-w) solid var(--c-line);
+}
+.sec-head__lead {
+  max-width: 44em;
+  margin: var(--sp-7) auto 0;
+  color: var(--c-ink-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-loose);
+}
+
+/* ご予約セクションだけ左揃えのまま（写真の上で左に寄せる構成） */
+.sec-head--left { text-align: left; }
+.sec-head--left .sec-head__lead { margin-inline: 0; }
+
+/* 中見出し（セクション内の小分類） */
+.sec-head--sub .sec-head__ja { font-size: var(--fs-2xl); }
+
+/* 写真の上に置く見出し（ご予約）は文字色と罫線だけ白系に差し替える */
+.sec-head--on-media .sec-head__en   { color: var(--c-on-media-3); }
+.sec-head--on-media .sec-head__ja   { color: var(--c-on-media); }
+.sec-head--on-media.sec-head--rule .sec-head__ja { border-bottom-color: var(--c-on-media-line); }
+.sec-head--on-media .sec-head__lead { color: var(--c-on-media-2); }
+
+.h3 {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-heading);
+  line-height: 1.9;
+  letter-spacing: var(--ls-ja-wide);
+  margin-bottom: var(--sp-6);
+}
+.num {
+  font-family: var(--ff-accent);
+  font-size: var(--fs-md);
+  font-style: italic;
+  letter-spacing: var(--ls-en-wide);
+  color: var(--c-accent-2);
+  margin-bottom: var(--sp-3);
+}
+
+/* ---- ボタン／テキストリンク ----
+   参考サイトは塗りのボタンをほぼ使わず、罫線と矢印のテキストリンク。
+   ただし予約導線のみ視認性を優先して塗りを残しています。            */
+.btn {
+  --btn-py: var(--sp-4);
+  --btn-px: var(--sp-6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--btn-py) var(--btn-px);
+  border-radius: var(--radius-btn);
+  font-family: var(--ff-body);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  letter-spacing: var(--ls-ja-wide);
+  line-height: 1;
+  text-align: center;
+  border: var(--line-w) solid transparent;
+  transition: background-color var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+.btn .ico { transition: transform var(--dur-mid) var(--ease-out); }
+.btn:hover .ico { transform: translateX(5px); }
+
+.btn--accent {
+  background: var(--c-accent);
+  color: var(--c-ink-on-accent);
+  border-color: var(--c-accent);
+}
+.btn--accent:hover { background: var(--c-accent-hover); border-color: var(--c-accent-hover); }
+
+.btn--ghost {
+  border-color: var(--c-line-strong);
+  color: var(--c-ink);
+}
+.btn--ghost:hover { border-color: var(--c-ink); }
+
+/* 罫線＋矢印のテキストリンク（参考サイトの「WEB予約 →」に相当） */
+.btn--line {
+  --btn-py: var(--sp-3);
+  --btn-px: 0;
+  justify-content: space-between;
+  min-width: 13rem;
+  padding-block: var(--sp-4);
+  border: 0;
+  border-bottom: var(--line-w) solid var(--c-line);
+  color: var(--c-ink-2);
+  font-size: var(--fs-xs);
+}
+.btn--line:hover { color: var(--c-ink); border-bottom-color: var(--c-accent-2); }
+
+.btn--sm { --btn-py: var(--sp-3); --btn-px: var(--sp-5); font-size: var(--fs-2xs); }
+.btn--lg { --btn-py: var(--sp-5); --btn-px: var(--sp-7); font-size: var(--fs-sm); }
+
+.tbd { color: var(--c-ink-3); }
+
+/* ---- スクロール表示アニメーション ----------------------------------------
+   「下からふわっと」= 持ち上げ（translateY）＋フェード＋ぼかしの解除。
+   ぼかしは --reveal-blur で、0 にすれば純粋なフェードアップになる。
+
+   data-reveal-delay="1" のように整数を入れると --reveal-step ずつ遅れて出る。
+   同じブロック内の要素に 0,1,2… と振ると順番に立ち上がる。
+
+   ※ filter は合成レイヤーを作るため、transform / opacity と一緒に
+     アニメーションさせても再レイアウトは起きない。
+     .is-in で filter: none に戻し、ぼかしを残さないこと。
+
+   ※ html.js を条件にしているのは、**JS が無いと本文が永久に透明のまま**に
+     なるのを防ぐため。.is-in を付けるのは JS だけなので、
+     条件を外すと JS 無効の環境やスクリプトを実行しないクローラーから見て
+     ページが真っ白になる。html への .js 付与は head のインライン script。 */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(var(--reveal-y));
+  filter: blur(var(--reveal-blur));
+  transition: opacity var(--dur-slow) var(--ease-reveal),
+              transform var(--dur-slow) var(--ease-reveal),
+              filter var(--dur-slow) var(--ease-reveal);
+  transition-delay: calc(var(--reveal-delay, 0) * var(--reveal-step));
+  will-change: opacity, transform, filter;
+}
+html.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  /* 出終わったら合成レイヤーの予約を解放する */
+  will-change: auto;
+}
+
+
+/* ==========================================================================
+   5. COMPONENTS
+   ========================================================================== */
+
+/* ------------------------------ ブランドロゴ ----------------------------- */
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  font-family: var(--ff-heading);
+  line-height: 1;
+  margin: 0;
+}
+.brand__mark {
+  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+  font-weight: var(--fw-heading-strong);
+  letter-spacing: .18em;
+}
+.brand__sub {
+  font-size: var(--fs-3xs);
+  letter-spacing: .34em;
+  color: var(--c-ink-3);
+  white-space: nowrap;
+}
+.brand__sub i { font-style: normal; opacity: .5; }
+.brand--footer .brand__mark { font-size: clamp(1.5rem, 1.3rem + 0.8vw, 2rem); }
+
+/* ------------------------------ ヘッダー --------------------------------
+   参考サイトに合わせ、PC でもロゴとハンバーガーのみ。                   */
+/* スクロールによる背景色の付与は行わず、常に透明のまま。
+   文字の可読性は上端のごく淡いグラデーションだけで確保する。 */
+.site-header {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: var(--z-header);
+}
+/* 背景色の面は持たせず、上端のグラデーションのみ。
+   ヘッダー高さより下まで伸ばして、後ろを流れる本文がロゴと
+   ぶつかって見えないよう和らげる。 */
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: calc(var(--nav-h) * 2);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--c-bg) 92%, transparent) 0%,
+    color-mix(in srgb, var(--c-bg) 55%, transparent) 45%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.site-header__inner {
+  height: var(--nav-h);
+  padding-inline: var(--rail-inset);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+}
+
+/* ドロワーは .site-header の内側にあるため、ロゴとボタンを上に重ねる */
+.site-header__inner > .brand,
+.nav-toggle {
+  position: relative;
+  z-index: var(--z-nav-top);
+}
+
+/* ハンバーガー（参考サイトは 2 本線） */
+.nav-toggle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-inline-end: calc(var(--sp-2) * -1);
+}
+.nav-toggle__bars { display: grid; gap: 7px; width: 26px; }
+.nav-toggle__bars i {
+  display: block;
+  height: var(--line-w);
+  background: var(--c-ink);
+  transition: transform var(--dur-mid) var(--ease), width var(--dur-mid) var(--ease);
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle__bars i:nth-child(1) { transform: translateY(4px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .nav-toggle__bars i:nth-child(2) { transform: translateY(-4px) rotate(-45deg); }
+
+/* ------------------------------ ドロワー -------------------------------- */
+.gnav {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-nav);
+  display: grid;
+  /* safe を付けると、中身が画面より高いときだけ中央揃えをやめて上端に寄る。
+     付けないと上端がはみ出し、スクロールしても戻れなくなる。 */
+  align-items: safe center;
+  justify-items: center;
+  padding: calc(var(--nav-h) + var(--sp-6)) var(--gutter) var(--sp-8);
+  background: color-mix(in srgb, var(--c-bg) 97%, transparent);
+  backdrop-filter: blur(18px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--dur-mid) var(--ease),
+              visibility var(--dur-mid) step-end;
+  overflow-y: auto;
+}
+.gnav.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--dur-mid) var(--ease), visibility 0s;
+}
+.gnav__inner {
+  width: 100%;
+  max-width: var(--container);
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: clamp(2rem, 8vw, 7rem);
+  align-items: start;
+}
+
+.gnav__list { display: grid; }
+.gnav__list li { border-bottom: var(--line-w) solid var(--c-line-faint); }
+.gnav__list li:first-child { border-top: var(--line-w) solid var(--c-line-faint); }
+.gnav__list a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  padding-block: clamp(1rem, 2.4vw, 1.6rem);
+}
+.gnav__ja {
+  font-family: var(--ff-heading);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-ja-wide);
+  white-space: nowrap;
+}
+.gnav__en {
+  font-family: var(--ff-accent);
+  font-size: var(--fs-2xs);
+  font-style: italic;
+  letter-spacing: var(--ls-en);
+  color: var(--c-ink-3);
+  transition: color var(--dur-fast) var(--ease);
+}
+.gnav__list a:hover .gnav__ja { color: var(--c-accent-2); }
+.gnav__list a:hover .gnav__en { color: var(--c-accent-2); }
+
+.gnav__tel {
+  display: block;
+  font-family: var(--ff-accent);
+  font-size: clamp(1.35rem, 1.1rem + 1vw, 1.9rem);
+  letter-spacing: var(--ls-en);
+  color: var(--c-ink);
+}
+.gnav__tel:hover { color: var(--c-accent-2); }
+.gnav__hours {
+  margin: var(--sp-3) 0 var(--sp-6);
+  font-size: var(--fs-2xs);
+  line-height: 2.2;
+  letter-spacing: var(--ls-ja);
+  color: var(--c-ink-3);
+}
+/* 上のナビ（.gnav__list）と同じ、罫線で区切った行。
+   アイコン＋名称＋補足＋外部リンクの矢印、という並びに揃えている。 */
+.gnav__sns { display: grid; }
+.gnav__sns li { border-bottom: var(--line-w) solid var(--c-line-faint); }
+.gnav__sns li:first-child { border-top: var(--line-w) solid var(--c-line-faint); }
+.gnav__sns a {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: var(--sp-4);
+  padding-block: var(--sp-4);
+  color: var(--c-ink-2);
+}
+.gnav__sns-name {
+  font-family: var(--ff-accent);
+  font-size: var(--fs-sm);
+  letter-spacing: var(--ls-en);
+  color: var(--c-ink);
+}
+.gnav__sns-sub {
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--ls-ja-wide);
+  color: var(--c-ink-3);
+}
+.gnav__sns .ico { width: 1.05em; height: 1.05em; }
+.gnav__sns-arrow { color: var(--c-ink-3); transition: color var(--dur-fast) var(--ease); }
+.gnav__sns a:hover { color: var(--c-ink); }
+.gnav__sns a:hover .gnav__sns-name,
+.gnav__sns a:hover .gnav__sns-sub,
+.gnav__sns a:hover .gnav__sns-arrow { color: var(--c-accent-2); }
+
+/* ------------------------------ ヒーロー --------------------------------
+   中央に縦組みのキャッチ、左右に縦組みのレール。参考サイトの構成。      */
+/* ヒーロー自体は通常の流れ。見出しやレールは普通にスクロールして消える。
+   固定するのは「写真」と「その上に重ねる幕」だけ。 */
+.hero {
+  position: relative;
+  z-index: 0;
+  min-height: var(--hero-h-min);
+  height: var(--hero-h);
+  display: grid;
+  place-items: center;
+}
+
+/* 写真を画面に貼り付けたままにし、後続セクションがその上を流れていく。
+   position: fixed なので祖先の overflow では切られない。 */
+.hero__media,
+.hero__scrim {
+  position: fixed;
+  inset: 0;
+}
+.hero__media { z-index: 0; }
+.hero__scrim { z-index: 1; }
+
+/* 動画とポスター画像のどちらも同じ扱いにする
+   （object-fit は <video> の poster にも効く） */
+.hero__media video,
+.hero__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(var(--hero-img-brightness)) saturate(var(--hero-img-saturate));
+}
+.hero__scrim {
+  background:
+    linear-gradient(to bottom, var(--scrim-top) 0%, transparent 30%, transparent 72%, var(--scrim-mid) 100%),
+    radial-gradient(58% 62% at 50% 46%, rgb(0 0 0 / .62), rgb(0 0 0 / .18) 62%, transparent 82%);
+}
+
+/* 暗転しきったら固定レイヤーの描画を止めて負荷を下げる（JS が付与） */
+.hero.is-covered .hero__media,
+.hero.is-covered .hero__scrim { visibility: hidden; }
+
+/* 縦組みでは inline 軸＝縦、block 軸＝右→左。
+   flex を使うと row が縦方向になり列が折り返すため、素の block で組む。 */
+.hero__title {
+  position: relative;
+  z-index: 2;
+  display: block;
+  margin: 0;
+  color: var(--c-on-media);
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-size: var(--fs-hero);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-ja-hero);
+  line-height: 1;
+}
+.hero__title span {
+  display: block;
+  white-space: nowrap;        /* 列の折り返しを防ぐ */
+}
+/* 2 列目（＝縦組みでは左側）。block-start = 右側の間隔、inline-start = 上の余白 */
+.hero__title span + span {
+  margin-block-start: clamp(1.5rem, 4vw, 3.25rem);
+  margin-inline-start: clamp(2rem, 7vh, 5rem);
+  font-size: .82em;
+  color: var(--c-on-media-2);
+}
+
+/* 左右のレール */
+.hero__rail {
+  position: absolute;
+  z-index: 3;
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-5);
+  color: var(--c-on-media);
+}
+.hero__rail .vert {
+  font-family: var(--ff-heading);
+  font-size: var(--fs-xs);
+  letter-spacing: .28em;
+  line-height: 1;
+}
+.hero__rail--left {
+  inset-inline-start: var(--rail-inset);
+  inset-block-end: clamp(2.5rem, 8vh, 5rem);
+}
+.hero__rail--left .hero__rail-icon { color: var(--c-on-media-2); }
+.hero__rail--left .hero__rail-icon:hover { color: var(--c-accent-2); }
+.hero__rail-link {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-4);
+  color: var(--c-on-media);
+}
+/* ご予約の上下に短い罫線 */
+.hero__rail-link::before,
+.hero__rail-link::after {
+  content: "";
+  width: 18px;
+  height: var(--line-w);
+  background: var(--c-on-media-line);
+  transition: background-color var(--dur-fast) var(--ease);
+}
+.hero__rail-link:hover { color: var(--c-accent-2); }
+.hero__rail-link:hover::before,
+.hero__rail-link:hover::after { background: var(--c-accent-2); }
+
+.hero__rail--right {
+  inset-inline-end: var(--rail-inset);
+  inset-block-end: clamp(3.5rem, 11vh, 7rem);
+  color: var(--c-on-media-2);
+}
+.hero__rail-dot {
+  width: 5px;
+  height: 5px;
+  border: var(--line-w) solid var(--c-on-media-line);
+  border-radius: 50%;
+}
+
+/* 右側に落ちる縦のヘアライン（参考サイトの構造線） */
+.hero__hairline {
+  position: absolute;
+  z-index: 2;
+  inset-block: 0 0;
+  inset-inline-end: calc(var(--rail-inset) + 3.25rem);
+  width: var(--line-w);
+  background: linear-gradient(transparent, var(--c-on-media-line) 22%,
+                              var(--c-on-media-line) 78%, transparent);
+}
+
+/* ---- 背景の煙 ------------------------------------------------------------
+   参考サイト（otowa-net.com の section03）と同じ考え方で、
+   大きな煙を左右の端から半分はみ出させ、低い不透明度で重ねる。
+   置いたセクション側に overflow: hidden が必要。 */
+.smoke {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.smoke__puff {
+  position: absolute;
+  width: var(--smoke-size);
+  height: var(--smoke-size);
+  background-image: url("../images/smoke.jpg");
+  background-image: image-set(
+    url("../images/smoke.webp") type("image/webp"),
+    url("../images/smoke.jpg")  type("image/jpeg")
+  );
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: var(--smoke-opacity);
+  mix-blend-mode: var(--smoke-blend);
+  filter: blur(var(--smoke-blur));
+}
+
+/* 右上から流れ込む */
+.smoke__puff--tr {
+  inset-inline-end: calc(var(--smoke-size) * -.34);
+  inset-block-start: 1%;
+}
+/* 左下寄りから流れ込む（左右反転） */
+.smoke__puff--bl {
+  inset-inline-start: calc(var(--smoke-size) * -.38);
+  inset-block-start: 44%;
+  transform: scaleX(-1) rotate(6deg);
+}
+/* 右下から立ちのぼる（回転させて流れの向きを変え、少し小さく・薄く） */
+.smoke__puff--br {
+  --smoke-size: clamp(21rem, 42vw, 44rem);
+  inset-inline-end: calc(var(--smoke-size) * -.26);
+  inset-block-end: calc(var(--smoke-size) * -.30);
+  opacity: calc(var(--smoke-opacity) * .82);
+  transform: rotate(168deg);
+}
+
+/* ------------------------------ 想い ------------------------------------ */
+/* ---- 画像とテキストの横並び --------------------------------------------
+   テキストが画像より高くならないよう、行の高さは
+   「テキストの実高さ」と「画像の最低高さ」の大きい方で決まり、
+   画像はその行いっぱいまで伸びる（＝常に画像 ≧ テキスト）。      */
+.media-row {
+  display: grid;
+  align-items: stretch;
+}
+/* 写真は絶対配置で高さ計算から外す。こうすると行の高さは
+   「テキストの高さ」か「--media-min-h」の大きい方だけで決まり、
+   縦長・横長どの写真でも枠いっぱいに収まる。 */
+.media-row__media {
+  margin: 0;
+  position: relative;
+  min-height: var(--media-min-h, clamp(17rem, 27vw, 27rem));
+  overflow: hidden;
+}
+.media-row__media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(var(--img-brightness));
+}
+/* テキスト側は自身の高さのまま、縦中央に置く */
+.media-row__body { align-self: center; }
+
+/* 写真と本文を入れ替える */
+.media-row--rev .media-row__media { order: 2; }
+
+/* ---- 想い：参考サイト section01 のレイアウト ----------------------------
+   実測（1440px / セクション内の位置）を12カラムに置き換えたもの。
+
+     大きな縦長写真   513×647  left 182   top 243
+     縦組みの見出し   166×200  left 841   top 343
+     段落             306×314  left 841   top 596
+     小さな写真A      271×230  left 1169（右端まで） top 125
+     中くらいの写真B  450×304  left 0（左端から）    top 1070
+
+   12カラムの明示配置＋負のマージンで、この非対称な散らし方を再現している。 */
+.omoi {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: clamp(1rem, 2.2vw, 1.75rem);
+  align-items: start;
+  margin-bottom: 12rem;
+}
+
+/* 大きな縦長写真（otowa img01 = 513×647 ≒ 4:5） */
+.omoi__main {
+  grid-column: 1 / 7;
+  grid-row: 1 / 4;
+  margin: 0;
+  overflow: hidden;
+}
+.omoi__main img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  filter: brightness(var(--img-brightness));
+}
+
+/* 縦組みの見出し。上に細い縦罫線を添える（otowa の ::before と同じ） */
+.omoi__title {
+  grid-column: 8 / 10;
+  grid-row: 1;
+  position: relative;
+  margin: clamp(3.5rem, 8vw, 6.5rem) 0 0;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-size: clamp(1.375rem, 1.05rem + 1.2vw, 2.25rem);
+  font-weight: 600;                 /* 本文と揃えて太く */
+  letter-spacing: .26em;
+  line-height: 2.1;
+  color: var(--c-ink);
+}
+.omoi__title span { display: block; white-space: nowrap; }
+.omoi__title::before {
+  content: "";
+  position: absolute;
+  inset-block-start: clamp(-4.5rem, -6vw, -2.5rem);
+  inset-inline-end: 0;
+  width: var(--line-w);
+  height: clamp(2.5rem, 4.5vw, 4.125rem);
+  background: var(--c-accent-2);
+}
+
+/* 段落（見出しの下） */
+.omoi__paras {
+  grid-column: 8 / 13;
+  grid-row: 2;
+  margin-top: clamp(2.5rem, 6vw, 5rem);
+}
+/* サイトの導入なので、本文ではなくリード文として組む。
+   明朝の中太・大きめ・行間を広く取り、字数を絞って余白で見せる。 */
+.omoi__paras p {
+  margin: 0 0 clamp(1.75rem, 4vw, 3rem);
+  color: var(--c-ink);
+  font-family: var(--ff-heading);
+  font-size: clamp(.9rem, 0.8rem + 0.4vw, .3rem);
+  font-weight: 600;                 /* 導入なので明確に太く */
+  line-height: 2.8;                 /* 行間を広く取って余白で見せる */
+  letter-spacing: var(--ls-ja-wide);
+}
+.omoi__paras p:last-child { margin-bottom: 0; }
+
+/* 散らした写真A：右上、コンテナの外へ抜けて画面端まで */
+.omoi__accent { margin: 0; overflow: hidden; }
+.omoi__accent img {
+  width: 100%;
+  object-fit: cover;
+  filter: brightness(var(--img-brightness));
+}
+.omoi__accent--a {
+  grid-column: 11 / 13;
+  grid-row: 1;
+  margin-inline-end: calc(var(--gutter) * -1);
+  margin-block-start: calc(clamp(3rem, 7vw, 6rem) * -1);
+}
+.omoi__accent--a img { aspect-ratio: 271 / 230; }
+
+/* 散らした写真B：左下、コンテナの外へ抜けて画面端まで */
+.omoi__accent--b {
+  grid-column: 1 / 6;
+  grid-row: 3;
+  margin-inline-start: calc(var(--gutter) * -1);
+  margin-block-start: clamp(4rem, 10vw, 9rem);
+}
+.omoi__accent--b img { aspect-ratio: 450 / 304; }
+
+/* 02 は左右を反転させる（写真は main + accent--b の2枚のみ。
+   01 の accent--b と左側で近接するため accent--a は置かない） */
+.omoi--rev .omoi__main  { grid-column: 7 / 13; }
+.omoi--rev .omoi__title { grid-column: 4 / 6; }
+.omoi--rev .omoi__paras { grid-column: 1 / 6; }
+.omoi--rev .omoi__accent--b {
+  grid-column: 8 / 13;
+  margin-inline: 0 calc(var(--gutter) * -1);
+}
+
+.pullquote {
+  margin: 0;
+  padding: clamp(6rem, 16vw, 12rem) 0;
+  margin-bottom: var(--block-gap);
+  text-align: center;
+}
+.pullquote p {
+  margin: 0;
+  font-family: var(--ff-heading);
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-heading);
+  line-height: 2.4;
+  letter-spacing: var(--ls-ja-wide);
+  text-align: center;
+}
+
+/* ------------------------------ こだわり -------------------------------- */
+/* ---- こだわりの横並び（参考サイト section03 の段違いレイアウト） --------
+   写真と本文を左右に置き、本文だけを一段下げて重心をずらす。
+   本文には padding-top が付くので行の高さは「本文＋段差」で決まり、
+   写真はその行いっぱいに伸びる。結果として写真は必ず本文より高い。   */
+.section--kodawari .media-row {
+  --media-stagger: clamp(2rem, 6vw, 6.5rem);
+  align-items: stretch;
+  gap: 0;
+}
+.section--kodawari .media-row__body {
+  align-self: start;
+  /* 上を大きく、下を少しだけ空けることで、本文が写真の縦幅の
+     内側に収まりながら重心が下へずれる（section03 と同じ見え方）。 */
+  padding-block: var(--media-stagger) calc(var(--media-stagger) * .45);
+  padding-inline-start: clamp(1.75rem, 5vw, 5.5rem);
+}
+/* 反転時は寄せる向きも入れ替える */
+.section--kodawari .media-row--rev .media-row__body {
+  padding-inline-start: 0;
+  padding-inline-end: clamp(1.75rem, 5vw, 5.5rem);
+}
+/* 写真は行いっぱいに伸ばす（本文より必ず高くなる） */
+
+.meat {
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+  margin-bottom: var(--block-gap);
+}
+
+.speclist { display: grid; }
+.speclist > div {
+  display: grid;
+  grid-template-columns: 6.5em 1fr;
+  gap: var(--sp-5);
+  padding-block: var(--sp-5);
+  border-top: var(--line-w) solid var(--c-line-faint);
+}
+.speclist > div:last-child { border-bottom: var(--line-w) solid var(--c-line-faint); }
+.speclist dt {
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--ls-ja-wide);
+  color: var(--c-ink-3);
+}
+.speclist dd { color: var(--c-ink); font-size: var(--fs-sm); line-height: var(--lh-snug); }
+.speclist em { font-style: normal; color: var(--c-accent-2); }
+
+/* 阿波華牛（写真を右側に置いて、直前の行と向きを互い違いにする） */
+.awaka {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+  margin-bottom: var(--block-gap);
+}
+.awaka__media { position: relative; }
+.awaka__media img { filter: grayscale(1) brightness(.88) contrast(1.05); }
+.awaka__label {
+  position: absolute;
+  inset-block-start: clamp(1rem, 3vw, 2.25rem);
+  inset-inline-end: clamp(1rem, 3vw, 2.25rem);
+  margin: 0;
+  font-family: var(--ff-heading);
+  font-size: clamp(1.125rem, 0.95rem + 0.8vw, 1.625rem);
+  font-weight: var(--fw-heading);
+  letter-spacing: .3em;
+  color: var(--c-ink);
+}
+.awaka__body p { color: var(--c-ink-2); line-height: var(--lh-loose); }
+.awaka__note {
+  margin-top: var(--sp-7);
+  padding-top: var(--sp-6);
+  border-top: var(--line-w) solid var(--c-line);
+  color: var(--c-ink) !important;
+  font-family: var(--ff-heading);
+  font-size: var(--fs-lg);
+  line-height: 2.2;
+  letter-spacing: var(--ls-ja-wide);
+}
+
+/* 旨さの秘訣 — カードをやめ、罫線と余白だけで区切る */
+.himitsu__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: clamp(2rem, 4vw, 3.5rem) clamp(1.5rem, 3vw, 3rem);
+}
+.hcard { display: flex; flex-direction: column; }
+.hcard__media {
+  margin-bottom: var(--sp-5);
+}
+.hcard__media img {
+  width: 100%;
+  aspect-ratio: var(--ratio-photo);
+  object-fit: cover;
+  filter: brightness(var(--img-brightness));
+}
+.hcard__num {
+  margin: 0 0 var(--sp-3);
+  font-family: var(--ff-accent);
+  font-size: var(--fs-xs);
+  font-style: italic;
+  letter-spacing: var(--ls-en-wide);
+  color: var(--c-accent-2);
+}
+
+/* subgrid が使える環境では、写真／番号／見出し／本文の各行の高さを
+   4 枚で共有させ、見出し下の罫線を 1px の誤差もなく揃える。 */
+@supports (grid-template-rows: subgrid) {
+  /* カードが 1 列に積まれる幅では揃える意味がないので適用しない。
+     auto-fit / minmax(230px, 1fr) で 2 列に並び始めるのが概ね 540px から
+     なので、その帯も subgrid に含める（2 列でも下線が揃う）。 */
+  @media (min-width: 540px) {
+    /* row-gap がカード内の行間になるため、子の margin は解除する */
+    .himitsu__grid { row-gap: var(--sp-5); }
+    .hcard {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 4;
+    }
+    .hcard__media,
+    .hcard__num { margin-bottom: 0; }
+    /* 行の高さは subgrid が決めるので、見出しの最低高さ指定は不要 */
+    .hcard h4 { min-height: 0; margin-bottom: 0; }
+  }
+}
+/* 見出しは 1 行でも 2 行でも同じ高さを確保し、
+   4 枚すべての下線が同じ位置に揃うようにする。 */
+.hcard h4 {
+  --hcard-title-lines: 2;
+  --hcard-title-lh: 1.9;
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-heading);
+  line-height: var(--hcard-title-lh);
+  letter-spacing: var(--ls-ja-wide);
+  /* box-sizing: border-box なので padding-bottom も含めた高さを確保する */
+  min-height: calc(var(--hcard-title-lh) * var(--hcard-title-lines) * 1em + var(--sp-4));
+  margin-bottom: var(--sp-4);
+  padding-bottom: var(--sp-4);
+  border-bottom: var(--line-w) solid var(--c-line-faint);
+}
+.hcard__txt {
+  margin: 0;
+  font-size: var(--fs-xs);
+  line-height: 2.1;
+  color: var(--c-ink-2);
+}
+
+/* ------------------------------ 空間 ------------------------------------ */
+/* ---- 空間：店内の情報 ----------------------------------------------------
+   席数など事実の情報なので、見出しの補足文と同じ書式で静かに置く。 */
+.kukan-info {
+  max-width: 44em;
+  margin: 0 auto var(--head-gap);
+  color: var(--c-ink-2);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-loose);
+  letter-spacing: var(--ls-ja);
+  text-align: center;
+}
+
+/* ---- sec11 相当：中央の幅広画像 -----------------------------------------
+   参考サイトの間取り図（.floor / 858×420）と同じ位置づけ。
+   見出し・説明・キーワードを中央に置いたあと、幅広の写真で締める。      */
+.kukan-floor {
+  margin: 0 auto;
+  max-width: 860px;
+  text-align: center;
+}
+.kukan-floor__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.kukan-floor__cap {
+  margin-top: var(--sp-4);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--ls-ja-wide);
+  color: var(--c-ink-3);
+}
+
+/* ---- sec12 相当：スクロールしても固定される全幅の一枚 -------------------
+   参考サイトの .bg-parallax と同じ「窓」の見え方。
+   写真は画面に対して固定され、この帯が窓として動くため、
+   前セクションの地色から現れ、次セクションの地色に隠れていくように見える。
+
+   ※ 以前は background-attachment: fixed で実装していたが、iOS Safari は
+     fixed 背景を「文書全体のサイズ」で敷いてしまい破綻する。そのため
+     タッチ端末では scroll に落としており、**スマホでは単に画像が
+     流れていくだけ**になっていた。
+
+     現在は「中の要素を position: fixed で画面に貼り付け、外側で切り抜く」
+     方式に変えて、PC もモバイルも同じ見え方に統一している。
+
+     切り抜きに overflow: hidden は使えない（fixed の子孫は切られない）。
+     clip-path なら切れる。しかも clip-path は fixed の包含ブロックを
+     作らないので、中の要素は画面に貼り付いたまま矩形だけが抜ける。
+     transform / filter / backdrop-filter は包含ブロックを作ってしまうので、
+     この帯（と親要素）には使わないこと。                          */
+.kukan-band {
+  margin-top: var(--block-gap);
+  height: var(--band-h);
+  background-color: var(--c-bg-3);
+  position: relative;
+  clip-path: inset(0);
+}
+.kukan-band__media {
+  position: fixed;
+  inset: 0;
+  background-image: url("../images/space-poster.jpg");
+  background-image: image-set(
+    url("../images/space-poster.webp") type("image/webp"),
+    url("../images/space-poster.jpg")  type("image/jpeg")
+  );
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+/* 明るさの調整は filter ではなく重ねる幕で行う
+   （filter は包含ブロックを作り、中の fixed レイヤーを壊すため）。
+   ::after は生成上いちばん後ろの子なので、画像より前面に載る。 */
+.kukan-band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--c-bg) var(--band-scrim, 12%), transparent);
+  pointer-events: none;
+}
+
+/* ------------------------------ 店舗情報 --------------------------------
+   カードをやめ、縦の細い罫線で 2 店舗を分ける（参考サイトの予約ブロック風） */
+.shops {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(4rem, 7vw, 6rem);
+}
+.shop {
+  display: flex;
+  flex-direction: column;
+}
+/* 2 店舗を縦の細い罫線で分ける。
+   左右に同じ余白を持たせないと写真幅がズレて行が揃わない。 */
+.shop:first-child { padding-inline-end: clamp(1.5rem, 3.5vw, 3rem); }
+.shop + .shop {
+  padding-inline-start: clamp(1.5rem, 3.5vw, 3rem);
+  border-inline-start: var(--line-w) solid var(--c-line-faint);
+}
+.shop__media img {
+  width: 100%;
+  aspect-ratio: var(--ratio-wide);
+  object-fit: cover;
+  filter: brightness(var(--img-brightness));
+}
+.shop--soon .shop__media img { filter: brightness(calc(var(--img-brightness) * .68)) saturate(.7); }
+
+.shop__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--sp-6);
+}
+.shop__badge {
+  align-self: flex-start;
+  margin: 0 0 var(--sp-4);
+  font-family: var(--ff-accent);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--ls-en);
+  line-height: 1.8;
+}
+.shop__badge--open { color: var(--c-accent-2); }
+.shop__badge--open::before { content: "— "; }
+.shop__badge--soon { color: var(--c-ink-3); }
+.shop__badge--soon::before { content: "— "; }
+
+.shop__name {
+  margin: 0 0 var(--sp-6);
+  padding-bottom: var(--sp-5);
+  border-bottom: var(--line-w) solid var(--c-line);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-ja-wide);
+}
+.shop__name span {
+  display: block;
+  margin-top: var(--sp-3);
+  font-size: var(--fs-xs);
+  font-family: var(--ff-body);
+  letter-spacing: var(--ls-ja-wide);
+  color: var(--c-ink-3);
+}
+
+.infolist { display: grid; }
+.infolist > div {
+  display: grid;
+  grid-template-columns: 5.75em 1fr;
+  gap: var(--sp-4);
+  padding-block: var(--sp-3);
+  font-size: var(--fs-xs);
+  line-height: 2.1;
+}
+.infolist dt { color: var(--c-ink-3); letter-spacing: var(--ls-ja); }
+.infolist dd { color: var(--c-ink-2); }
+.infolist a { color: var(--c-ink); border-bottom: var(--line-w) solid var(--c-line); }
+.infolist a:hover { color: var(--c-accent-2); border-bottom-color: var(--c-accent-2); }
+
+.shop__note {
+  margin-top: var(--sp-5);
+  font-size: var(--fs-xs);
+  line-height: 2.1;
+  color: var(--c-ink-3);
+}
+.shop__actions {
+  display: grid;
+  gap: 0;
+  margin-top: auto;
+  padding-top: var(--sp-7);
+}
+.shop__actions .btn--line { width: 100%; min-width: 0; }
+
+/* ------------------------------ 予約導線 --------------------------------
+   写真の上下を mask で透明へ落とし、前後のセクションの地色に溶け込ませる。
+   セクション自体も背が高く、写真がゆっくり現れて消えるようにしている。 */
+.reserve {
+  position: relative;
+  overflow: hidden;
+  /* 上下の余白は他セクションと同じにして間隔の統一を崩さない。
+     背の高さは min-height だけで確保する（内容は縦中央に置く）。 */
+  padding-block: var(--sec-py);
+  min-height: var(--reserve-min-h);
+  display: grid;
+  align-items: center;
+  /* 見出しを他セクションと同じ左揃えにしたため、中身も左寄せに揃える */
+  text-align: left;
+  /* mask で透けた部分に出る地色 */
+  background-color: var(--c-bg);
+}
+.reserve__media { position: absolute; inset: 0; z-index: 0; }
+.reserve__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(.6) saturate(1.05);
+}
+/* 写真の上端・下端を透明へ。--reserve-fade で溶け込む幅を調整できる */
+.reserve__media {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 var(--reserve-fade),
+    #000 calc(100% - var(--reserve-fade)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 var(--reserve-fade),
+    #000 calc(100% - var(--reserve-fade)),
+    transparent 100%
+  );
+}
+/* 幕も同じカーブで上下を抜き、境目が出ないようにする */
+.reserve__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(80% 70% at 50% 50%, transparent, var(--scrim-top));
+  -webkit-mask-image: linear-gradient(
+    to bottom, transparent 0%, #000 var(--reserve-fade),
+    #000 calc(100% - var(--reserve-fade)), transparent 100%);
+  mask-image: linear-gradient(
+    to bottom, transparent 0%, #000 var(--reserve-fade),
+    #000 calc(100% - var(--reserve-fade)), transparent 100%);
+}
+.reserve__inner { position: relative; z-index: 2; color: var(--c-on-media); }
+/* 見出しは他セクションと同じ .sec-head。下の余白だけ詰める */
+.reserve .sec-head { margin-bottom: clamp(2.5rem, 6vw, 4rem); }
+.reserve__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: var(--sp-4);
+}
+/* 予約導線内のリンクは枠付きのまま維持（写真の上なので白で固定） */
+.reserve__actions .btn--ghost {
+  color: var(--c-on-media);
+  border-color: var(--c-on-media-line);
+  backdrop-filter: blur(3px);
+}
+.reserve__actions .btn--ghost:hover { border-color: var(--c-on-media); }
+
+/* ------------------------------ フォーム --------------------------------
+   薄い面と枠線で 入力欄の位置がはっきり分かるようにしている。
+   濃さは --panel-bg / --field-bg で調整可能。                          */
+.form {
+  display: grid;
+  gap: var(--sp-6);
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background: var(--panel-bg);
+  border: var(--line-w) solid var(--c-line-faint);
+}
+.form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-6);
+}
+
+.field { display: grid; gap: var(--sp-2); }
+.field > label {
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-ja-wide);
+  color: var(--c-ink-2);
+}
+.req {
+  display: inline-block;
+  margin-inline-start: var(--sp-2);
+  color: var(--c-accent-2);
+  font-family: var(--ff-accent);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--ls-en);
+}
+.req::before { content: "＊"; }
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="tel"],
+.field textarea,
+.field select {
+  width: 100%;
+  padding: var(--sp-4);
+  background: var(--field-bg);
+  border: var(--line-w) solid var(--c-line);
+  border-radius: var(--radius-sm);
+  color: var(--c-ink);
+  font-size: var(--fs-md);
+  font-family: var(--ff-body);
+  line-height: 1.8;
+  letter-spacing: var(--ls-ja);
+  transition: border-color var(--dur-fast) var(--ease),
+              background-color var(--dur-fast) var(--ease);
+  appearance: none;
+}
+.field textarea { resize: vertical; min-height: 8em; }
+.field input::placeholder,
+.field textarea::placeholder { color: var(--c-ink-3); opacity: .6; }
+.field input:hover, .field textarea:hover, .field select:hover {
+  border-color: var(--c-line-strong);
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  border-color: var(--c-accent-2);
+  background: var(--field-bg-focus);
+  outline: none;
+}
+
+.select { position: relative; display: grid; }
+.select select { padding-inline-end: var(--sp-8); cursor: pointer; }
+.select .ico {
+  position: absolute;
+  inset-inline-end: var(--sp-4);
+  inset-block-start: 50%;
+  translate: 0 -50%;
+  pointer-events: none;
+  color: var(--c-ink-3);
+}
+.select select option { background: #111; color: #fff; }
+
+.field__err {
+  margin: 0;
+  font-size: var(--fs-2xs);
+  line-height: 1.9;
+  color: var(--c-accent-hover);
+  letter-spacing: var(--ls-ja);
+}
+.field.is-invalid input,
+.field.is-invalid textarea,
+.field.is-invalid select { border-color: var(--c-accent-hover); }
+
+.field--check { margin-top: var(--sp-3); }
+.check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sp-4);
+  align-items: start;
+  cursor: pointer;
+  font-size: var(--fs-xs);
+  color: var(--c-ink-2);
+  line-height: 2;
+}
+.check input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.check__box {
+  width: 18px;
+  height: 18px;
+  margin-top: .4em;
+  border: var(--line-w) solid var(--c-line-strong);
+  background: var(--field-bg);
+  position: relative;
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.check__box::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-start: 4.5px;
+  width: 4px;
+  height: 8px;
+  border-inline-end: 1.5px solid #000;
+  border-block-end: 1.5px solid #000;
+  rotate: 45deg;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.check input:checked + .check__box { background: var(--c-accent-2); border-color: var(--c-accent-2); }
+.check input:checked + .check__box::after { opacity: 1; }
+.check input:focus-visible + .check__box { outline: 1px solid var(--c-accent-2); outline-offset: 4px; }
+.check__txt small { display: inline-block; color: var(--c-ink-3); font-size: var(--fs-2xs); }
+
+.form__honey {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.form__submit { margin-top: var(--sp-5); text-align: center; }
+.form__submit .btn { min-width: min(300px, 100%); }
+
+.form__status {
+  margin: 0;
+  text-align: center;
+  font-size: var(--fs-xs);
+  line-height: 2;
+  min-height: 2em;
+}
+.form__status.is-ok    { color: var(--c-accent-2); }
+.form__status.is-error { color: var(--c-accent-hover); }
+.form__status.is-note  { color: var(--c-ink-3); }
+
+/* ------------------------------ フッター -------------------------------- */
+.site-footer {
+  border-top: var(--line-w) solid var(--c-line-faint);
+  padding-block: var(--sec-py) var(--sp-6);
+}
+.site-footer__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: clamp(2.5rem, 7vw, 6rem);
+  padding-bottom: clamp(2.5rem, 6vw, 4rem);
+}
+.site-footer__tagline {
+  margin: var(--sp-5) 0 var(--sp-6);
+  font-size: var(--fs-2xs);
+  line-height: 2.3;
+  color: var(--c-ink-3);
+  letter-spacing: var(--ls-ja);
+}
+
+.sns { display: flex; flex-wrap: wrap; gap: var(--sp-5); }
+.sns a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--ls-ja);
+  color: var(--c-ink-3);
+  border-bottom: var(--line-w) solid transparent;
+  padding-bottom: 2px;
+}
+.sns a:hover { color: var(--c-ink); border-bottom-color: var(--c-accent-2); }
+
+.site-footer__nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+.site-footer__nav h3 {
+  margin: 0 0 var(--sp-4);
+  font-family: var(--ff-accent);
+  font-size: var(--fs-2xs);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: var(--ls-en-wide);
+  color: var(--c-accent-2);
+}
+.site-footer__nav ul { display: grid; gap: var(--sp-2); }
+.site-footer__nav li a,
+.site-footer__nav address {
+  font-size: var(--fs-xs);
+  line-height: 2.2;
+  color: var(--c-ink-3);
+  letter-spacing: var(--ls-ja);
+}
+.site-footer__nav li a:hover { color: var(--c-ink); }
+.site-footer__nav address a { color: var(--c-ink-2); }
+.site-footer__nav address a:hover { color: var(--c-accent-2); }
+
+.site-footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding-top: var(--sp-6);
+  border-top: var(--line-w) solid var(--c-line-faint);
+}
+.copy {
+  margin: 0;
+  font-family: var(--ff-accent);
+  font-size: var(--fs-3xs);
+  letter-spacing: var(--ls-en);
+  color: var(--c-ink-3);
+}
+.totop {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--ff-accent);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--ls-en-wide);
+  text-transform: uppercase;
+  color: var(--c-ink-3);
+}
+.totop:hover { color: var(--c-accent-2); }
+.totop .ico { transition: transform var(--dur-mid) var(--ease-out); }
+.totop:hover .ico { transform: translateY(-3px); }
+
+
+/* ==========================================================================
+   6. RESPONSIVE
+   ========================================================================== */
+[id] { scroll-margin-top: calc(var(--nav-h) + var(--sp-4)); }
+
+@media (max-width: 1080px) {
+  /* 参考サイトの中間幅と同じ 450px */
+  :root { --band-h: 450px; }
+}
+
+@media (max-width: 900px) {
+  :root { --nav-h: var(--nav-h-sm); }
+
+  .gnav__inner { grid-template-columns: 1fr; gap: var(--sp-8); }
+
+  .meat,
+  .awaka { grid-template-columns: 1fr; --media-min-h: 0px; }
+
+  /* 想い：1カラムに積み替え、見出しは横組みへ戻す */
+  .omoi { grid-template-columns: 1fr; row-gap: var(--sp-7); }
+  .omoi__main,
+  .omoi__title,
+  .omoi__paras,
+  .omoi__accent--a,
+  .omoi__accent--b,
+  .omoi--rev .omoi__main,
+  .omoi--rev .omoi__title,
+  .omoi--rev .omoi__paras,
+  .omoi--rev .omoi__accent--a,
+  .omoi--rev .omoi__accent--b {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    margin-inline: 0;
+    margin-block: 0;
+  }
+  .omoi__main img { aspect-ratio: var(--ratio-photo); }
+  .omoi__title {
+    writing-mode: horizontal-tb;
+    margin-top: var(--sp-5);
+  }
+  .omoi__title::before {
+    inset-block-start: calc(var(--sp-6) * -1);
+    inset-inline: 0 auto;
+    width: clamp(1.75rem, 6vw, 2.5rem);
+    height: var(--line-w);
+  }
+  .omoi__paras { margin-top: 0; }
+  /* 小さい方の写真は2枚並べる */
+  .omoi__accent--a,
+  .omoi__accent--b { grid-column: span 1; }
+  /* 1 カラムでは段差・重なり・寄せを解除する */
+  .section--kodawari .media-row { gap: var(--sp-7); }
+  .section--kodawari .media-row__media { margin-bottom: 0; }
+  .section--kodawari .media-row__body,
+  .section--kodawari .media-row--rev .media-row__body {
+    padding-top: 0;
+    padding-inline: 0;
+  }
+  .section--kodawari .media-row--rev .media-row__media { order: 0; }
+  /* 1 カラムでは画像の高さを比率で決める */
+  .media-row__media { min-height: 0; aspect-ratio: var(--ratio-photo); }
+
+  .shop:first-child { padding-inline-end: 0; }
+  .shop + .shop { padding-inline-start: 0; border-inline-start: 0; }
+
+  .site-footer__top { grid-template-columns: 1fr; }
+}
+
+/* --------------------------------------------------------------------------
+   スマートフォン（720px 以下）
+   --------------------------------------------------------------------------
+   参考サイト準拠の「小さく・字間を広く」は PC では効くが、390px 幅の実機では
+   本文 13px・字間 0.12em が細く読みにくい。ここではコンポーネントを個別に
+   触らず、:root のサイズトークンを一段上げることで全体を底上げしている。
+   PC（721px 以上）の表示には一切影響しない。
+   -------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  :root {
+    --hero-h-min: 540px;
+
+    /* ---- 文字サイズを一段上げる ----
+       --fs-md（フォームの入力欄）を 16px にしているのは見た目のためだけでなく、
+       iOS Safari が 16px 未満の入力欄にフォーカスすると必ず画面を拡大する
+       ためでもある。16px あれば拡大されない。ここは下げないこと。 */
+    /* ラベル・キャプション系（--fs-3xs / --fs-2xs）は小ささが意匠の一部なので
+       PC と同じサイズのまま。読む量のある本文だけを底上げしている。 */
+    --fs-xs:  0.78125rem;  /* 12 → 12.5px 補足・カード本文・店舗情報 */
+    --fs-sm:  0.875rem;    /* 13 → 14px 本文 */
+    --fs-md:  1rem;        /* 14 → 16px 入力欄（iOS のオートズーム対策） */
+
+    /* ---- 字間と行間 ----
+       文字を大きくした分の縦の膨張を行間で吸収する。
+       字間は狭い画面だと語が分解して見えるため半分に。
+       見出し用の --ls-ja-wide / --ls-ja-hero は据え置き（明朝の佇まいを維持）。 */
+    --ls-ja:    0.06em;
+    --lh-body:  2.0;
+    --lh-loose: 2.3;
+
+    /* ---- 余白 ----
+       文字を大きくした分、余白側で総高を相殺する。 */
+    --sec-gap:   6rem;   /* 112 → 96px */
+    --veil-lead: 20vh;   /* 42vh(354px) → 20vh(169px) */
+    /* SP では引用（厳選された希少な…）に画面 1 枚分の高さを与えているため、
+       80% だと幕が引用文の途中で完成し、上部にヒーロー写真が透ける。
+       02 のブロックの終わり（セクション高の 62.6%）を過ぎ、
+       引用のブロックが始まる（65.0%）直前で完成させる。
+       ※ この値は文章量に依存する。想いセクションの本文を増減したら
+         引用ブロックの上端が何 % に来るか測り直すこと。 */
+    --veil-end:  64%;
+
+    /* 参考サイトの SP 指定と同じ 80vw */
+    --band-h: 80vw;
+    --reserve-min-h: min(88vh, 680px);
+    --reserve-fade: 22%;
+  }
+
+  /* ヒーロー：レールは下端に、キャッチは中央のまま小さく */
+  .hero__title { font-size: clamp(1.125rem, 4.6vw, 1.5rem); max-height: 58vh; }
+  .hero__hairline { display: none; }
+  .hero__rail--left,
+  .hero__rail--right { inset-block-end: clamp(1.5rem, 5vh, 2.5rem); }
+  .hero__rail .vert { font-size: var(--fs-2xs); letter-spacing: .22em; }
+
+  .form__row { grid-template-columns: 1fr; }
+
+  /* ---- 情報リストは 2 カラムのまま ----
+     dt/dd を縦積みにすると行数が倍になり、店舗情報だけで 450px を超える。
+     見出し列を詰めれば 360px 幅でも 2 カラムが成立し、
+     「項目：値」の対応も読み取りやすい。 */
+  .speclist > div { grid-template-columns: 4.5em 1fr; gap: var(--sp-4); }
+  .infolist > div { grid-template-columns: 5.5em 1fr; gap: var(--sp-4); }
+
+  /* ---- 想い：参考サイト（otowa-net.com）section01 の SP レイアウト ---------
+     390px 幅での実測をそのまま写している。
+
+       小さい写真   幅31%  右端フラッシュ
+       大きい写真   幅50%  左端フラッシュ・小さい写真の直下に階段状で続く
+       見出し       横組み・左から 73px 字下げ・先頭行の左に短い横罫線
+       段落         左から 43px 字下げ
+
+     要点は「写真を全幅にしない」こと。31〜50% の小さい写真を左右交互に
+     画面端へフラッシュさせ、あいだを大きな余白で抜くことで散らして見せる。
+     テキストは見出しのほうを段落より深く字下げする（参考サイトは 73px / 43px）。
+
+     12 カラムの明示配置で写真の位置と大きさを決め、テキストは
+     padding-inline で字下げする（テキストはカラムに乗せない方が調整しやすい）。 */
+  .omoi {
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 0;
+    row-gap: 0;
+    margin-bottom: 4rem;
+    /* コンテナのガターを打ち消して、画面幅いっぱいを配置の台にする */
+    margin-inline: calc(var(--gutter) * -1);
+  }
+
+  /* 900px 側の打ち消し規則が `.omoi--rev .omoi__main`（詳細度 0,2,0）で
+     書かれているため、こちらも `.omoi` を前置して詳細度を揃える。
+     揃えないと 02（.omoi--rev）だけ grid-column/row が効かない。 */
+
+  /* 行1：小さい写真を右端へ（参考 img02 = 幅31%・右フラッシュ） */
+  .omoi .omoi__accent--a {
+    grid-column: 9 / 13;
+    grid-row: 1;
+    width: auto;
+    margin: 0;
+  }
+
+  /* 行2：大きい写真を左端へ（参考 img01 = 幅50%・左フラッシュ）。
+     行1 の直下に接して階段状になる（重ねない）。 */
+  .omoi .omoi__main {
+    grid-column: 1 / 7;
+    grid-row: 2;
+    margin: 0;
+  }
+  .omoi .omoi__main img { aspect-ratio: 4 / 5; }
+
+  /* 02 は写真が 1 枚だけなので左右を反転して右端フラッシュにする */
+  .omoi--rev .omoi__main { grid-column: 7 / 13; }
+
+  /* 行3：見出しは横組みのまま、段落より深く字下げする */
+  .omoi .omoi__title {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    position: relative;
+    writing-mode: horizontal-tb;
+    margin: clamp(3.25rem, 13vw, 4.5rem) 0 0;
+    padding-inline: calc(var(--gutter) + 2.5rem) var(--gutter);
+    font-size: clamp(1.375rem, 1.15rem + 1.1vw, 1.625rem);
+    letter-spacing: .19em;
+    line-height: 1.85;
+    color: var(--c-ink);
+  }
+  /* 罫線は 1 行目の左側へ、行の中心に合わせて水平に置く
+     （参考サイトも「― 北海道の」と行頭に短い横罫線を添えている）。
+     ::before の基準は padding ボックスなので left:0 が画面左端になる。 */
+  .omoi .omoi__title::before {
+    inset: auto;
+    top: .92em;
+    left: var(--gutter);
+    width: clamp(1.5rem, 6vw, 2.25rem);
+    height: var(--line-w);
+  }
+  .omoi--rev .omoi__title::before { right: auto; left: var(--gutter); }
+
+  /* 行4：段落は見出しより浅い字下げ */
+  .omoi .omoi__paras {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    margin-top: var(--sp-5);
+    padding-inline: calc(var(--gutter) + 1.25rem) var(--gutter);
+  }
+
+  /* ---- 引用（厳選された希少な…）------------------------------------------
+     PC では上下の余白が大きく、スクロール中にこの一文だけが画面に残る瞬間がある。
+     SP は余白が足りずそうならないため、ブロック自体に画面 1 枚分の高さを与え、
+     中身を縦中央に置く。これで「ブロックが画面をちょうど覆う位置」が必ず存在する。
+
+     svh ではなくアドレスバーが隠れた状態の高さ（lvh）を使う。svh だと
+     バーが隠れたときに画面が伸び、前後の要素が覗いてしまう。 */
+  .pullquote {
+    min-height: 100lvh;
+    display: grid;
+    place-content: center;
+    padding-block: 3.5rem;
+  }
+
+  /* ---- 背景の煙 ------------------------------------------------------------
+     SP は 1 カラムなので写真がコンテナ全幅（x 24..366）を占め、
+     煙が見えるのは「写真が無い縦帯」だけになる。
+     ところが --smoke-size は clamp(26rem, 52vw, 54rem) で、
+     390px では 52vw(203px) が下限 26rem(416px) を下回るため常に 416px となり、
+     写真帯を跨いでしまって tr はほぼ全面が写真の裏に隠れていた。
+
+     実測した写真の無い帯（390px / セクション高 3572px）
+       419–963  (11.7%–27%)   … Wagyu Beef のテキストと諸元表
+       1219–1852(34.1%–51.8%) … 阿波華牛のテキストと「旨さの秘訣」見出し
+       3323–3572(93%–100%)    … 最後のカードの下（セクション下端の余白）
+
+     この3つの帯に収まるサイズまで縮めて置き直す。 */
+  .smoke {
+    --smoke-size: clamp(21rem, 92vw, 28rem);
+  }
+  .smoke__puff--tr { inset-block-start: 8%; }
+  .smoke__puff--bl { inset-block-start: 41%; }
+  /* br は最後のカードの写真より下から始めて、下端から抜けさせる
+     （PC の「右下から立ちのぼる」意図と同じ。はみ出しは overflow で切られる） */
+  .smoke__puff--br {
+    inset-block-start: 94%;
+    inset-block-end: auto;   /* 下端基準をやめて上端基準に切り替える */
+  }
+  /* 4:3 の写真 4 枚で 1,000px 超になるため、SP だけ 16:9 に */
+  .hcard__media img { aspect-ratio: var(--ratio-wide); }
+
+  /* リード文の行間 2.8 は狭い画面では開きすぎるので 2.5 に詰める。 */
+  .omoi__paras p { line-height: 2.5; }
+
+  /* 流し込みの本文は幅によって折り返し位置が変わるため .phrase では追えない。
+     text-wrap: pretty は最終行が極端に短くなる折り返しを避ける指定で、
+     未対応のブラウザでは単に無視される（進歩的強化）。 */
+  .hcard__txt,
+  .awaka__body p,
+  .infolist dd,
+  .speclist dd,
+  .sec-head__lead { text-wrap: pretty; }
+
+  .reserve__actions .btn { width: 100%; }
+
+  /* ---- フッター --------------------------------------------------------
+     auto-fit / minmax(140px) だと 342px 幅では 2 列になり、3 番目の
+     「弐番館」が 2 行目の左（メニューの下）へ落ちて右半分が空くうえ、
+     2 店舗の情報が離れてしまう。
+
+     参考サイト（otowa-net.com）のフッターと同じ「左にリンク列、
+     右に情報列を積む」構成に明示配置する。
+
+       ┌──────────┬──────────┐
+       │ メニュー  │ 北島本店  │
+       │          ├──────────┤
+       │          │ 弐番館    │
+       └──────────┴──────────┘                                        */
+  .site-footer__nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--sp-6);
+    row-gap: clamp(1.75rem, 6vw, 2.5rem);
+  }
+  .site-footer__nav > :nth-child(1) { grid-column: 1; grid-row: 1 / span 2; }
+  .site-footer__nav > :nth-child(2) { grid-column: 2; grid-row: 1; }
+  .site-footer__nav > :nth-child(3) { grid-column: 2; grid-row: 2; }
+
+  .site-footer__bottom { justify-content: center; text-align: center; }
+
+  /* ---- 見取り図 ----
+     680 の viewBox を 342px に縮めるとラベルが実効 7px になり読めない。
+     画面いっぱいまで広げたうえで、ラベルのユーザー単位を上げる。
+     「入り口」は左に余白が無いので、拡大した分だけ矢印を右へ逃がす。 */
+  .kukan-floor {
+    max-width: none;
+    margin-inline: calc(var(--gutter) * -1);
+  }
+  .kukan-floor__t-kitchen { font-size: 24px; letter-spacing: 8px; }
+  /* viewBox の左端は -307。x=-275 の中央揃えでは左に 32 しか余白が無く、
+     20px まで拡大すると「入」がはみ出すため、文字と矢印をまとめて右へ送る。 */
+  .kukan-floor__t-entry {
+    font-size: 20px;
+    letter-spacing: 3px;
+    transform: translateX(10px);
+  }
+  .kukan-floor__t-arrow { transform: translateX(24px); stroke-width: 1.6; }
+
+}
+
+/* --------------------------------------------------------------------------
+   タップ領域を 44px 以上に（900px 以下＝1カラムに積み替わる幅すべて）
+   --------------------------------------------------------------------------
+   タブレットの縦向き（768px など）も指で触るため、文字サイズの底上げとは
+   別のブレイクポイントにしている。見た目は動かさず当たり判定だけ広げる。
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  /* ヒーローのレールは ::after を重ねて拡張（レイアウトは不動） */
+  .hero__rail-icon { position: relative; }
+  .hero__rail-icon::after { content: ""; position: absolute; inset: -15px; }
+  /* ご予約は上下の罫線に ::before/::after を使っているので padding で広げる。
+     .hero__rail は justify-items: center なので左右対称に太るだけ。 */
+  .hero__rail-link { padding-inline: 13px; }
+
+  /* ヘッダーのロゴ。inner が 64px なので余白を足しても収まる */
+  .brand { padding-block: 12px; }
+
+  /* インライン要素は行の高さではなく文字の高さ分しか当たり判定が無い。
+     フッター内のリンクは ::after を重ねて広げる（下線の位置は動かさない）。 */
+  .infolist a,
+  .site-footer__nav address a { position: relative; }
+  .infolist a::after,
+  .site-footer__nav address a::after {
+    content: "";
+    position: absolute;
+    inset: -16px -6px;
+  }
+  /* block にして列幅いっぱいを当たり判定にする（「想い」「空間」のような
+     2 文字のリンクだと inline-block では横が 28px しか無い） */
+  .site-footer__nav li a { display: block; padding-block: 9px; }
+  .site-footer__nav ul { gap: 0; }
+  /* 11px の文字なので行の高さは 23px 前後。上下 11px 足して 45px にする */
+  .sns a { padding-block: 11px; padding-inline: 3px; }
+  .totop { padding-block: 12px; }
+}
+
+/* カードが 1 列に積まれる幅。見出しの高さを 2 行分そろえる意味が無くなり、
+   1 行見出しの下に空白が残るだけなので解除する（2 列以上は subgrid が担当）。 */
+@media (max-width: 539px) {
+  .hcard h4 { min-height: 0; }
+}
+
+/* 420px 以下で .brand__sub（焼・肉・店）を display:none にしていたため、
+   iPhone の実機幅ではヘッダーとフッターのロゴが PC と別物になっていた。
+   360px でもヘッダーは ロゴ 125px ＋ ハンバーガー 44px ＋ 余白 32px = 201px で
+   収まるため、PC と同じ表記に統一している。非表示に戻さないこと。 */
+
+
+/* ==========================================================================
+   7. MOTION / PRINT
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  /* html.js を付けているのは、隠す側の規則が html.js [data-reveal]（詳細度 0,2,0）
+     なので、こちらを [data-reveal]（0,1,0）で書くと打ち消せないため。 */
+  html.js [data-reveal] { opacity: 1; transform: none; filter: none; }
+  .hero__media { transform: none !important; }
+  /* 「動きを減らす」設定ではオープニングそのものを出さない。
+     アニメーションを 0.01ms に潰すだけだと黒幕が一瞬フラッシュするため、
+     display: none で最初から無かったことにする。 */
+  html.js .opening { display: none; }
+}
+
+@media print {
+  body { background: #fff; color: #000; }
+  body::before,
+  .opening,
+  .site-header, .nav-toggle, .hero__rail, .hero__hairline,
+  .reserve__media, .reserve__scrim { display: none !important; }
+  [data-reveal] { opacity: 1 !important; transform: none !important; filter: none !important; }
+  .section { padding-block: 1.5rem; break-inside: avoid; }
+}

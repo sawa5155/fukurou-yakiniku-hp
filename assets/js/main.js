@@ -1,0 +1,451 @@
+/* ==========================================================================
+   焼肉 福朗 — main.js
+   1. モバイル／PC のドロワー（ハンバーガー）
+   2. オープニング（初回・リロード時の黒幕とロゴ）
+   3. スクロール表示アニメーション
+   4. 現在地ナビハイライト
+   5. ヒーローの背景動画（回線・動きの設定を見て読み込み）
+   6. ヒーロー写真の固定レイヤーの後始末
+   7. お問い合わせフォームのバリデーション／送信
+   8. 西暦の自動更新
+
+   ※ ヘッダーは常に透明。スクロールによる背景色の付与は行いません。
+   ※ ヒーロー写真の固定と暗転、空間セクションの固定背景の帯は
+     いずれも CSS のみで実現しています（JS は関与しません）。
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $  = (sel, ctx = document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
+
+  /* ----------------------------------------------------------------------
+     1. ドロワー（PC・モバイル共通）
+     ---------------------------------------------------------------------- */
+  const toggle = $('#navToggle');
+  const gnav   = $('#gnav');
+
+  if (toggle && gnav) {
+    const setNav = (open) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+      gnav.classList.toggle('is-open', open);
+      document.body.classList.toggle('is-locked', open);
+    };
+
+    toggle.addEventListener('click', () => {
+      setNav(toggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    // ナビ内リンクをタップしたら閉じる
+    gnav.addEventListener('click', (e) => {
+      if (e.target.closest('a')) setNav(false);
+    });
+
+    // Esc で閉じる
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setNav(false);
+        toggle.focus();
+      }
+    });
+
+    // ドロワーは全幅で使用するため、幅変更によるリセットは行わない。
+    // 代わりに、開いている間はドロワー内にフォーカスを閉じ込める。
+    const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea';
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab' || toggle.getAttribute('aria-expanded') !== 'true') return;
+      const items = [toggle, ...gnav.querySelectorAll(FOCUSABLE)]
+        .filter((el) => el.offsetParent !== null);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    });
+  }
+
+
+  /* ----------------------------------------------------------------------
+     2. オープニング（初回・リロード時の黒幕とロゴ）
+     ----------------------------------------------------------------------
+     黒幕とロゴの動きは CSS アニメーションだけで完結しています
+     （JS が落ちても forwards で必ず消えます）。ここでやるのは2点だけ。
+
+       ・演出中はスクロールを止める
+       ・黒幕が抜けきってから、ヒーローの見出しとレールを出す
+         （黒幕の裏で先に出てしまうと「ファーストビューがフェードイン」に
+          ならず、幕が上がった瞬間に完成した状態で現れてしまう）
+
+     終了の合図は animationend。取りこぼすと黒幕の裏で固まるため、
+     尺 + 余裕のタイマーでも同じ後始末を呼ぶ二重の作りにしています。 */
+  const opening = $('#opening');
+  const openingDone = [];
+  let openingFinished = false;
+
+  const finishOpening = () => {
+    if (openingFinished) return;
+    openingFinished = true;
+    document.body.classList.remove('is-opening');
+    openingDone.forEach((fn) => fn());
+  };
+
+  const openingActive =
+    Boolean(opening) && !reduceMotion &&
+    getComputedStyle(opening).display !== 'none';
+
+  if (openingActive) {
+    document.body.classList.add('is-opening');
+
+    // CSS の --opening-total を読み、保険のタイマーに使う
+    const raw = getComputedStyle(document.documentElement)
+      .getPropertyValue('--opening-total').trim();
+    const total = /ms$/.test(raw) ? parseFloat(raw)
+                : /s$/.test(raw) ? parseFloat(raw) * 1000
+                : 2900;
+
+    // animationend は子（ロゴ）からも伝播してくるので、黒幕自身の分だけ拾う
+    opening.addEventListener('animationend', (e) => {
+      if (e.target === opening) finishOpening();
+    });
+    window.setTimeout(finishOpening, (Number.isFinite(total) ? total : 2900) + 400);
+  } else {
+    finishOpening();
+  }
+
+
+  /* ----------------------------------------------------------------------
+     3. スクロール表示アニメーション
+     ---------------------------------------------------------------------- */
+  const revealTargets = $$('[data-reveal]');
+
+  revealTargets.forEach((el) => {
+    const d = el.dataset.revealDelay;
+    if (d) el.style.setProperty('--reveal-delay', d);
+  });
+
+  // ヒーロー内の要素はオープニングが明けてから出す
+  const isHeroReveal = (el) => Boolean(el.closest('.hero'));
+
+  if (reduceMotion || !('IntersectionObserver' in window)) {
+    revealTargets.forEach((el) => el.classList.add('is-in'));
+  } else {
+    const show = (el) => {
+      if (isHeroReveal(el) && !openingFinished) {
+        openingDone.push(() => el.classList.add('is-in'));
+        return;
+      }
+      el.classList.add('is-in');
+    };
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        show(entry.target);
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.06 });
+
+    revealTargets.forEach((el) => io.observe(el));
+
+    /* ページ最下部の要素を取りこぼさないための保険。
+
+       rootMargin の下端インセット（-12%）のぶん、画面下端の約12%は
+       「見えた」と判定されない。ところが文書の末尾にある要素は、
+       最後までスクロールしてもその帯から出られないため、
+       高さが下端インセットを超えない限り交差率 threshold に届かず、
+       永久に is-in が付かない（＝ずっと透明のまま）。
+       フッター下段のような低い要素がこれに当たる。
+
+       そこで最下部まで来たら、残っている要素は無条件で出す。 */
+    const revealTail = () => {
+      const doc = document.documentElement;
+      if (window.scrollY + window.innerHeight < doc.scrollHeight - 4) return;
+      revealTargets.forEach((el) => {
+        if (el.classList.contains('is-in')) return;
+        show(el);
+        io.unobserve(el);
+      });
+    };
+    window.addEventListener('scroll', revealTail, { passive: true });
+    window.addEventListener('resize', revealTail);
+    revealTail();
+  }
+
+
+  /* ----------------------------------------------------------------------
+     4. 現在地ナビハイライト
+     ---------------------------------------------------------------------- */
+  const navLinks = $$('[data-navlink]');
+
+  if (navLinks.length && 'IntersectionObserver' in window) {
+    const map = new Map();
+    navLinks.forEach((link) => {
+      const target = document.getElementById(link.hash.slice(1));
+      if (target) map.set(target, link);
+    });
+
+    const visible = new Set();
+
+    const paint = () => {
+      // 画面内にあるセクションのうち最も上のものを現在地とする
+      const top = Array.from(visible).sort(
+        (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top
+      )[0];
+      navLinks.forEach((l) => l.classList.remove('is-active'));
+      if (top && map.has(top)) map.get(top).classList.add('is-active');
+    };
+
+    const spy = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) visible.add(e.target);
+        else visible.delete(e.target);
+      });
+      paint();
+    }, { rootMargin: '-45% 0px -45% 0px' });
+
+    map.forEach((_, section) => spy.observe(section));
+  }
+
+
+  /* ----------------------------------------------------------------------
+     5. ヒーローの背景動画
+     ---------------------------------------------------------------------- */
+  /* 動画は装飾なので、次の場合は読み込まずポスター画像のままにする。
+       ・「動きを減らす」設定（prefers-reduced-motion）
+       ・データセーバーが有効（navigator.connection.saveData）
+       ・回線が 2G / slow-2G
+     画面幅で 640 / 1280 の2種類を出し分ける（<source media> は
+     <video> では効かないため JS で選ぶ）。 */
+  const heroVideo = $('#heroVideo');
+
+  if (heroVideo) {
+    const conn = navigator.connection || navigator.mozConnection || {};
+    const slow = /(^|-)2g$/.test(conn.effectiveType || '');
+    const skip = reduceMotion || conn.saveData === true || slow;
+
+    if (!skip) {
+      const wide = window.matchMedia('(min-width: 900px)').matches;
+      heroVideo.src = wide ? heroVideo.dataset.srcLg : heroVideo.dataset.srcSm;
+      // 自動再生が拒否されてもポスターが残るだけなので、失敗は無視する
+      heroVideo.play().catch(() => {});
+    }
+
+    // 画面外では再生を止めて負荷を下げる
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => {
+        if (skip || !heroVideo.src) return;
+        if (e.isIntersecting) heroVideo.play().catch(() => {});
+        else heroVideo.pause();
+      }, { threshold: 0 }).observe(heroVideo);
+    }
+  }
+
+
+  /* ----------------------------------------------------------------------
+     6. ヒーロー写真の固定レイヤーの後始末
+     ---------------------------------------------------------------------- */
+  /* 写真の固定（.hero__media が position: fixed）と暗転
+     （「想い」セクションの背景グラデーション）は CSS だけで成立しています。
+     ここでは暗転しきったあとに固定レイヤーの描画を止めて負荷を下げるだけ。
+     判定は「想い」の次のセクションが見えたかどうか、で行います。 */
+  const hero = $('.hero');
+  const omoi = $('.section--omoi');
+
+  if (hero && omoi) {
+    // CSS と同じ --veil-end を読み、暗転しきる位置を割り出す
+    const veilEnd = () => {
+      const raw = getComputedStyle(document.documentElement)
+        .getPropertyValue('--veil-end').trim();
+      const pct = parseFloat(raw);
+      return Number.isFinite(pct) ? pct / 100 : 0.76;
+    };
+
+    let raf = null;
+    let covered = null;
+
+    const tick = () => {
+      raf = null;
+      const r = omoi.getBoundingClientRect();
+      // 暗転しきる位置が画面上端を越えたら、固定レイヤーは完全に隠れている
+      const should = r.top + r.height * veilEnd() <= 0;
+      if (should !== covered) {
+        covered = should;
+        hero.classList.toggle('is-covered', should);
+      }
+    };
+
+    const schedule = () => { if (raf === null) raf = window.requestAnimationFrame(tick); };
+    tick();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+  }
+
+
+  /* ----------------------------------------------------------------------
+     7. お問い合わせフォーム
+     ---------------------------------------------------------------------- */
+  const form = $('#contactForm');
+
+  if (form) {
+    const statusEl = $('#formStatus');
+
+    const RULES = {
+      name:    { label: 'お名前',            required: true },
+      email:   { label: 'メールアドレス',    required: true, type: 'email' },
+      tel:     { label: '電話番号',          required: false, type: 'tel' },
+      type:    { label: 'お問い合わせ種別',  required: true, verb: '選択' },
+      message: { label: 'お問い合わせ内容',  required: true, min: 10 },
+      agree:   { label: '個人情報の取り扱い', required: true, type: 'check' }
+    };
+
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const TEL_RE   = /^[0-9０-９+\-()\s]{9,20}$/;
+
+    const fieldOf = (input) => input.closest('.field');
+    const errOf   = (input) => {
+      const f = fieldOf(input);
+      return f ? f.querySelector('[data-err]') : null;
+    };
+
+    const setError = (input, msg) => {
+      const f = fieldOf(input);
+      const e = errOf(input);
+      if (f) f.classList.toggle('is-invalid', Boolean(msg));
+      if (e) e.textContent = msg || '';
+      if (msg) input.setAttribute('aria-invalid', 'true');
+      else input.removeAttribute('aria-invalid');
+    };
+
+    const validate = (input) => {
+      const rule = RULES[input.name];
+      if (!rule) return true;
+
+      if (rule.type === 'check') {
+        if (rule.required && !input.checked) {
+          setError(input, `${rule.label}に同意してください。`);
+          return false;
+        }
+        setError(input, '');
+        return true;
+      }
+
+      const v = input.value.trim();
+
+      if (rule.required && !v) {
+        setError(input, `${rule.label}を${rule.verb || '入力'}してください。`);
+        return false;
+      }
+      if (v && rule.type === 'email' && !EMAIL_RE.test(v)) {
+        setError(input, 'メールアドレスの形式をご確認ください。');
+        return false;
+      }
+      if (v && rule.type === 'tel' && !TEL_RE.test(v)) {
+        setError(input, '電話番号は数字とハイフンでご入力ください。');
+        return false;
+      }
+      if (v && rule.min && v.length < rule.min) {
+        setError(input, `${rule.label}は${rule.min}文字以上でご入力ください。`);
+        return false;
+      }
+      setError(input, '');
+      return true;
+    };
+
+    // 入力中の再検証（一度エラーになった項目のみ）
+    Object.keys(RULES).forEach((name) => {
+      const input = form.elements[name];
+      if (!input) return;
+      const ev = input.type === 'checkbox' || input.tagName === 'SELECT' ? 'change' : 'blur';
+      input.addEventListener(ev, () => validate(input));
+      input.addEventListener('input', () => {
+        const f = fieldOf(input);
+        if (f && f.classList.contains('is-invalid')) validate(input);
+      });
+    });
+
+    const setStatus = (msg, kind) => {
+      if (!statusEl) return;
+      statusEl.textContent = msg;
+      statusEl.className = 'form__status' + (kind ? ' is-' + kind : '');
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // ハニーポットに入力があれば無言で終了（ボット対策）
+      if (form.elements._gotcha && form.elements._gotcha.value) return;
+
+      let firstBad = null;
+      Object.keys(RULES).forEach((name) => {
+        const input = form.elements[name];
+        if (input && !validate(input) && !firstBad) firstBad = input;
+      });
+
+      if (firstBad) {
+        setStatus('入力内容にエラーがあります。ご確認ください。', 'error');
+        firstBad.focus();
+        firstBad.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+        return;
+      }
+
+      const endpoint = form.dataset.endpoint;
+
+      /* 送信先が未設定の場合（＝納品直後の状態）はここで案内を出します。
+         index.html の <form data-endpoint="..."> に送信先URLを設定すると
+         実際に POST 送信されます。 */
+      if (!endpoint) {
+        setStatus(
+          '※ 送信先が未設定です。index.html の data-endpoint に送信先URLをご設定ください。' +
+          '（お急ぎの場合は 088-612-8032 までお電話ください）',
+          'note'
+        );
+        return;
+      }
+
+      const btn = form.querySelector('button[type="submit"]');
+      const label = btn ? btn.querySelector('span') : null;
+      const original = label ? label.textContent : '';
+
+      if (btn) btn.disabled = true;
+      if (label) label.textContent = '送信中…';
+      setStatus('送信しています…', 'note');
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form)
+        });
+
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+
+        form.reset();
+        $$('.field', form).forEach((f) => f.classList.remove('is-invalid'));
+        $$('[data-err]', form).forEach((el) => { el.textContent = ''; });
+        setStatus('お問い合わせを受け付けました。3営業日以内にご返信いたします。', 'ok');
+      } catch (err) {
+        setStatus(
+          '送信に失敗しました。お手数ですが 088-612-8032 までお電話ください。',
+          'error'
+        );
+      } finally {
+        if (btn) btn.disabled = false;
+        if (label) label.textContent = original;
+      }
+    });
+  }
+
+
+  /* ----------------------------------------------------------------------
+     8. コピーライトの西暦
+     ---------------------------------------------------------------------- */
+  const year = $('#year');
+  if (year) year.textContent = String(new Date().getFullYear());
+
+})();

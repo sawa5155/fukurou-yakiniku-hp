@@ -1,0 +1,4 @@
+# 検証環境（fukurou-yakiniku-stg.webtantousha.com）用の設定です。
+# 本番公開時は、このファイルを削除するか Disallow を解除してください。
+User-agent: *
+Disallow: /

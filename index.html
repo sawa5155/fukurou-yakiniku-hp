@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="sumi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>焼肉 福朗｜徳島県産黒毛和牛と唯一無二の特製ダレ｜板野郡北島町の焼肉店</title>
+<meta name="description" content="焼肉 福朗は、昭和の香りを漂わせる新しくも懐かしい焼肉店。徳島県産黒毛和牛「阿波華牛」「すだち牛」と、修行先から受け継いだ濃厚特製ダレをレトロな空間でお楽しみください。徳島県板野郡北島町・徳島市庄町（弐番館 2026年9月上旬オープン予定）。">
+<meta name="keywords" content="焼肉,福朗,徳島,北島町,黒毛和牛,阿波華牛,すだち牛,肉の北海,焼肉福朗 弐番館">
+<link rel="canonical" href="https://example.com/">
+
+<!-- ============================================================
+     ⚠️ 検証環境専用 — 本番公開時に必ず削除してください
+     この1行を残したまま本番公開すると、検索結果に一切出なくなります。
+     あわせてルートの robots.txt も削除してください。
+     ============================================================ -->
+<meta name="robots" content="noindex, nofollow">
+
+<!-- ============================================================
+     OG / Twitter — ドメイン確定後 URL を差し替えてください
+     ============================================================ -->
+<meta property="og:type" content="restaurant">
+<meta property="og:site_name" content="焼肉 福朗">
+<meta property="og:title" content="焼肉 福朗｜徳島県産黒毛和牛と唯一無二の特製ダレ">
+<meta property="og:description" content="昭和の香りを漂わせる、新しくも懐かしい焼肉店。徳島県産黒毛和牛と濃厚特製ダレを、レトロな空間で。">
+<meta property="og:image" content="assets/images/hero.jpg">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#000000">
+
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+<link rel="preload" as="image" href="assets/images/hero.jpg" type="image/jpeg">
+<link rel="stylesheet" href="assets/css/style.css">
+
+<!-- ============================================================
+     オープニングの黒幕は CSS だけで動くため、JS を切っていても
+     必ず消えます。ただし JS 無効の環境では「黒幕を出す意味が無い」
+     ので、この 1 行で html に .js を付け、CSS 側で
+     html:not(.js) のときは黒幕自体を出さないようにしています。
+     （head 内のインライン script なので初回描画前に実行されます）
+     ============================================================ -->
+<script>document.documentElement.classList.add('js');</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "焼肉 福朗",
+  "servesCuisine": "焼肉",
+  "priceRange": "¥¥",
+  "telephone": "+81-88-612-8032",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "JP",
+    "addressRegion": "徳島県",
+    "addressLocality": "板野郡北島町",
+    "streetAddress": "高房字東中道32-7"
+  },
+  "openingHoursSpecification": [{
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+    "opens": "17:00", "closes": "22:00"
+  }],
+  "sameAs": ["https://www.instagram.com/fukurou_yakiniku296/"],
+  "acceptsReservations": "https://tabelog.com/tokushima/A3601/A360101/36008569/"
+}
+</script>
+</head>
+
+<body>
+
+<!-- ============================================================
+     OPENING — 初回アクセス／リロード時の演出
+     真っ暗な画面 → 中央にロゴがフェードイン → 保持 →
+     黒幕が抜けてファーストビューが現れる、という流れ。
+
+     動きは CSS アニメーション（.opening / .opening__brand）だけで
+     完結しており、JS が落ちても黒幕は必ず消えます。
+     JS は「演出中のスクロールを止める」「終わってからヒーローの
+     見出しを出す」ための上乗せだけです。
+
+     尺は CSS の --opening-total で調整できます。
+     読み上げには不要なので aria-hidden にしています。
+     ============================================================ -->
+<div class="opening" id="opening" aria-hidden="true">
+  <p class="opening__brand">
+    <span class="brand__mark">福朗</span>
+    <span class="brand__sub">焼<i>・</i>肉<i>・</i>店</span>
+  </p>
+</div>
+
+<a class="skip-link" href="#main">本文へスキップ</a>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="site-header" id="siteHeader">
+  <div class="site-header__inner">
+
+    <a class="brand" href="#top" aria-label="焼肉 福朗 トップへ">
+      <span class="brand__mark">福朗</span>
+      <span class="brand__sub">焼<i>・</i>肉<i>・</i>店</span>
+    </a>
+
+    <!-- 参考サイトに合わせ、PC でもナビはハンバーガー内に格納 -->
+    <nav class="gnav" id="gnav" aria-label="メインナビゲーション">
+      <div class="gnav__inner">
+        <ul class="gnav__list">
+          <li><a href="#omoi"     data-navlink><span class="gnav__ja">想い</span><span class="gnav__en">Philosophy</span></a></li>
+          <li><a href="#kodawari" data-navlink><span class="gnav__ja">こだわり</span><span class="gnav__en">Commitment</span></a></li>
+          <li><a href="#kukan"    data-navlink><span class="gnav__ja">空間</span><span class="gnav__en">Space</span></a></li>
+          <li><a href="#shops"    data-navlink><span class="gnav__ja">店舗情報</span><span class="gnav__en">Shops</span></a></li>
+          <li><a href="#reserve"  data-navlink><span class="gnav__ja">ご予約</span><span class="gnav__en">Reservation</span></a></li>
+          <li><a href="#contact"  data-navlink><span class="gnav__ja">お問い合わせ</span><span class="gnav__en">Contact</span></a></li>
+        </ul>
+
+        <div class="gnav__foot">
+          <a class="gnav__tel" href="tel:0886128032">088-612-8032</a>
+          <p class="gnav__hours">17:00 – 22:00 ／ 月曜定休<br>徳島県板野郡北島町高房字東中道32-7</p>
+          <!-- 上のナビと同じ、罫線で区切った行に揃えている -->
+          <ul class="gnav__sns" aria-label="SNS・予約サイト">
+            <li>
+              <a href="https://www.instagram.com/fukurou_yakiniku296/" target="_blank" rel="noopener">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/></svg>
+                <span class="gnav__sns-name">Instagram</span>
+                <span class="gnav__sns-sub">本店</span>
+                <svg class="ico gnav__sns-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.instagram.com/fukurou_yakiniku_2nd/" target="_blank" rel="noopener">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/></svg>
+                <span class="gnav__sns-name">Instagram</span>
+                <span class="gnav__sns-sub">弐番館</span>
+                <svg class="ico gnav__sns-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </a>
+            </li>
+            <li>
+              <a href="https://tabelog.com/tokushima/A3601/A360101/36008569/" target="_blank" rel="noopener">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></svg>
+                <span class="gnav__sns-name">食べログ</span>
+                <span class="gnav__sns-sub">ネット予約</span>
+                <svg class="ico gnav__sns-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <button class="nav-toggle" id="navToggle" type="button"
+            aria-controls="gnav" aria-expanded="false" aria-label="メニューを開く">
+      <span class="nav-toggle__bars" aria-hidden="true"><i></i><i></i></span>
+    </button>
+
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============================================================
+     1. HERO
+     ============================================================ -->
+<section class="hero" id="top">
+  <div class="hero__media">
+    <!-- 装飾用の背景動画（音声なし・ループ）。
+         src は JS が設定する。回線が細い場合や「動きを減らす」設定のときは
+         読み込まず、ポスター画像（動画の1フレーム）のまま表示される。
+         JS が無効な環境でもポスターが出るため、絵が消えることはない。 -->
+    <video class="hero__video" id="heroVideo"
+           poster="assets/images/hero.jpg"
+           muted loop playsinline preload="none"
+           data-src-sm="assets/video/hero-640.mp4"
+           data-src-lg="assets/video/hero-1280.mp4"
+           aria-hidden="true"></video>
+  </div>
+  <div class="hero__scrim" aria-hidden="true"></div>
+
+  <!-- 中央の縦組みキャッチ -->
+  <h1 class="hero__title" data-reveal>
+    <span>圧倒的、昭和スタイル</span>
+    <span>焼き台のファンファーレ</span>
+  </h1>
+
+  <!-- 左レール：SNS とご予約 -->
+  <div class="hero__rail hero__rail--left" data-reveal data-reveal-delay="2">
+    <a class="hero__rail-icon" href="https://www.instagram.com/fukurou_yakiniku296/"
+       target="_blank" rel="noopener" aria-label="Instagram">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/></svg>
+    </a>
+    <a class="hero__rail-link" href="#reserve"><span class="vert">ご予約</span></a>
+  </div>
+
+  <!-- 右レール：産地 -->
+  <p class="hero__rail hero__rail--right" data-reveal data-reveal-delay="2">
+    <span class="hero__rail-dot" aria-hidden="true"></span>
+    <span class="vert">徳島県産黒毛和牛</span>
+  </p>
+
+  <span class="hero__hairline" aria-hidden="true"></span>
+</section>
+
+<!-- ============================================================
+     2. 想い — PHILOSOPHY
+     ============================================================ -->
+<section class="section section--omoi" id="omoi">
+  <div class="container">
+
+    <!-- 見出しは表示しないが、ナビの遷移先・文書構造のため
+         読み上げ用の見出しだけ残している -->
+    <h2 class="visually-hidden">想い</h2>
+
+    <!-- 想い 01 : 飲食業に対する想い
+         data-reveal はブロックではなく中の要素ごとに付けている。
+         写真 → 見出し → 段落 の順に data-reveal-delay をずらし、
+         下からふわっと順番に立ち上がるようにしている。 -->
+    <div class="omoi">
+
+      <figure class="omoi__main" data-reveal>
+        <picture>
+          <source srcset="assets/images/omoi-chef.webp" type="image/webp">
+          <img src="assets/images/omoi-chef.jpg" alt="焼き台で炙られる黒毛和牛" loading="lazy" decoding="async">
+        </picture>
+      </figure>
+
+      <h3 class="omoi__title" data-reveal data-reveal-delay="1">
+        <span>誇りを、</span>
+        <span>次の世代へ。</span>
+      </h3>
+
+      <!-- リード文は SP で 17px まで上がるため、<br> の行がそのままでは
+           画面幅に収まらず句点だけが次行へ落ちる。.phrase で文節を包み、
+           折り返しを文節の切れ目に限定している（PC では 1 行に収まるので影響なし）。 -->
+      <div class="omoi__paras" data-reveal data-reveal-delay="2">
+        <p><span
+          class="phrase">和食をはじめとする</span><span
+          class="phrase">飲食産業は、</span><br><span
+          class="phrase">世界に誇るべき</span><span
+          class="phrase">日本の文化です。</span></p>
+        <p><span
+          class="phrase">この仕事に誇りを持ち、</span><br><span
+          class="phrase">若い世代が</span><span
+          class="phrase">「飲食業で働きたい」と</span><br><span
+          class="phrase">思える未来をつくりたい。</span></p>
+      </div>
+
+      <figure class="omoi__accent omoi__accent--a" data-reveal>
+        <picture>
+          <source srcset="assets/images/omoi-hands.webp" type="image/webp">
+          <img src="assets/images/omoi-hands.jpg" alt="小鉢に盛られたそぼろと青ねぎ" loading="lazy" decoding="async">
+        </picture>
+      </figure>
+
+    </div>
+
+    <!-- 想い 02 : タレに対する想い -->
+    <div class="omoi omoi--rev">
+
+      <figure class="omoi__main" data-reveal>
+        <picture>
+          <source srcset="assets/images/tare.webp" type="image/webp">
+          <img src="assets/images/tare.jpg" alt="特製ダレをまとった黒毛和牛が並ぶ卓" loading="lazy" decoding="async">
+        </picture>
+      </figure>
+
+      <h3 class="omoi__title" data-reveal data-reveal-delay="1">
+        <span>「このタレは</span>
+        <span>本物だ。」</span>
+      </h3>
+
+      <div class="omoi__paras" data-reveal data-reveal-delay="2">
+        <p><span
+          class="phrase">醤油とニンニクを</span><span
+          class="phrase">ベースにした、</span><br><span
+          class="phrase">他では味わえない甘辛い味。</span></p>
+        <p><span
+          class="phrase">その味に惚れ込み、</span><span
+          class="phrase">修行を願い出ました。</span><br><span
+          class="phrase">受け継いだこのタレを、</span><br><span
+          class="phrase">いま福朗で</span><span
+          class="phrase">使わせていただいています。</span></p>
+      </div>
+
+    </div>
+
+    <!-- .phrase は文節のまとまり（この内部では折り返さない）。
+         狭い画面で「使用しま／す。」のように句点だけが次行へ落ちるのを防ぐ。
+         <br> はそのままなので PC の改行位置は変わらない。
+         span の間に空白を入れると半角スペースが出るため、タグ内側で改行している。 -->
+    <blockquote class="pullquote" data-reveal>
+      <p><span
+        class="phrase">厳選された希少な</span><br><span
+        class="phrase">徳島産の食材を</span><span
+        class="phrase">使用しています。</span></p>
+    </blockquote>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     3. こだわり — COMMITMENT（肉・素材）
+     ============================================================ -->
+<section class="section section--kodawari" id="kodawari">
+
+  <!-- 背景の煙（装飾）。参考サイト section03 と同じく端から流し込む。
+       右上・左下・右下の3か所。同じ素材を反転／回転して使い回している。 -->
+  <div class="smoke" aria-hidden="true">
+    <span class="smoke__puff smoke__puff--tr"></span>
+    <span class="smoke__puff smoke__puff--bl"></span>
+    <span class="smoke__puff smoke__puff--br"></span>
+  </div>
+
+  <div class="container">
+
+    <header class="sec-head" data-reveal>
+      <p class="sec-head__en">Our Commitment</p>
+      <h2 class="sec-head__ja">こだわり</h2>
+    </header>
+
+    <!-- 肉について -->
+    <div class="media-row meat">
+      <figure class="media-row__media meat__media" data-reveal>
+        <picture>
+          <source srcset="assets/images/meat-main.webp" type="image/webp">
+          <img src="assets/images/meat-main.jpg" alt="美しく脂の入った徳島県産黒毛和牛" loading="lazy" decoding="async">
+        </picture>
+      </figure>
+      <div class="media-row__body meat__body" data-reveal data-reveal-delay="1">
+        <p class="sec-head__en">Wagyu Beef</p>
+        <h3 class="h3">徳島県産黒毛和牛、<br>その日いちばんを。</h3>
+        <dl class="speclist">
+          <div>
+            <dt>産地</dt>
+            <dd>徳島県産 黒毛和牛</dd>
+          </div>
+          <div>
+            <dt>主な銘柄</dt>
+            <dd>すだち牛 ／ 阿波華牛</dd>
+          </div>
+          <div>
+            <dt>仕入れ</dt>
+            <dd><span class="phrase">阿波華牛は<em>花補佐牧場指定</em>で</span><span
+              class="phrase">優先的な取引を</span><span
+              class="phrase">させていただいています</span></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- 阿波華牛 -->
+    <div class="media-row media-row--rev awaka">
+      <div class="media-row__media awaka__media" data-reveal>
+        <picture>
+          <source srcset="assets/images/cattle-bw.webp" type="image/webp">
+          <img src="assets/images/cattle-bw.jpg" alt="牛舎で育てられる黒毛和牛" loading="lazy" decoding="async">
+        </picture>
+        <p class="awaka__label" aria-hidden="true"><span class="vert">阿波華牛</span></p>
+      </div>
+      <div class="media-row__body awaka__body" data-reveal data-reveal-delay="1">
+        <h3 class="h3">徳島の大自然が育んだ<br>県内外で人気のブランド牛</h3>
+        <p>徳島の水と空気、無添加飼料で約32ヶ月。<br>愛情深く育てられたブランド牛です。</p>
+        <p>甘い香りと、絹のようになめらかな口溶け。<br>胃もたれしにくい脂が特徴です。</p>
+        <!-- 文節ごとに .phrase で包み、語の途中で折り返さないようにしている。
+             span の間に空白を入れると半角スペースが出るため、タグ内側で改行 -->
+        <p class="awaka__note"><span
+          class="phrase">ここまで厳選された</span><span
+          class="phrase">阿波華牛を楽しめるのは、</span><span
+          class="phrase">当店だけです。</span></p>
+      </div>
+    </div>
+
+    <!-- 旨さの秘訣 -->
+    <div class="himitsu">
+      <header class="sec-head sec-head--sub" data-reveal>
+        <p class="sec-head__en">The Secret</p>
+        <h3 class="sec-head__ja">旨さの秘訣</h3>
+      </header>
+
+      <ul class="himitsu__grid">
+        <li class="hcard" data-reveal>
+          <div class="hcard__media">
+            <picture>
+              <source srcset="assets/images/meat-plate.webp" type="image/webp">
+              <img src="assets/images/meat-plate.jpg" alt="卓に並ぶ黒毛和牛の盛り合わせ" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <p class="hcard__num">01</p>
+            <h4>肉の北海様からの仕入れ</h4>
+            <p class="hcard__txt">肉の北海様の社長が、長年の経験と確かな目利きで厳選した阿波華牛。その中からさらに選び抜いたものだけを仕入れています。</p>
+        </li>
+
+        <li class="hcard" data-reveal data-reveal-delay="1">
+          <div class="hcard__media">
+            <picture>
+              <source srcset="assets/images/farm.webp" type="image/webp">
+              <img src="assets/images/farm.jpg" alt="徳島の田園風景" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <p class="hcard__num">02</p>
+            <h4>厳選された良血統の子牛</h4>
+            <p class="hcard__txt">和牛の産地として知られる九州などから、花補佐さん自らが良血統の子牛を厳選。「満天白清」は農林水産大臣賞を受賞しています。</p>
+        </li>
+
+        <li class="hcard" data-reveal data-reveal-delay="2">
+          <div class="hcard__media">
+            <picture>
+              <source srcset="assets/images/cattle.webp" type="image/webp">
+              <img src="assets/images/cattle.jpg" alt="牧場で飼育される黒毛和牛" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <p class="hcard__num">03</p>
+            <h4>32ヶ月かけた長期肥育</h4>
+            <p class="hcard__txt">多くの農家が早出出荷を選ぶ中、花補佐牧場では約32ヶ月かけてじっくりと。価格に直結しないこだわりで、肉の旨味を深めています。</p>
+        </li>
+
+        <li class="hcard" data-reveal data-reveal-delay="3">
+          <div class="hcard__media">
+            <picture>
+              <source srcset="assets/images/sake.webp" type="image/webp">
+              <img src="assets/images/sake.jpg" alt="店内に並ぶ豊富なお酒" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <p class="hcard__num">04</p>
+            <h4>濃厚特製ダレと豊富なお酒</h4>
+            <p class="hcard__txt">この最高品質のお肉を、修行先から受け継いだ濃厚な特製ダレと豊富なお酒とともに、レトロな空間でお楽しみください。</p>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     4. 空間 — SPACE
+     ============================================================ -->
+<section class="section section--kukan" id="kukan">
+
+  <!-- 参考サイト sec11 相当：中央揃えの見出し＋説明＋幅広の中央画像 -->
+  <div class="container">
+    <header class="sec-head" data-reveal>
+      <p class="sec-head__en">Our Space</p>
+      <h2 class="sec-head__ja">空間</h2>
+    </header>
+
+    <!-- 中央揃えのため、狭い画面では「22席。」「さです。」だけが行に残りやすい。
+         .phrase で文節を包み、折り返し位置を文節の切れ目に限定している。 -->
+    <p class="kukan-info" data-reveal><span
+      class="phrase">カウンター8席と</span><span
+      class="phrase">テーブル席14席、</span><span
+      class="phrase">あわせて22席。</span><br><span
+      class="phrase">おひとりでも、</span><span
+      class="phrase">少人数のお集まりにも。</span><br><span
+      class="phrase">焼き台を囲む距離の近さが、</span><span
+      class="phrase">この店の心地よさです。</span></p>
+
+    <!-- 店内の見取り図。実席数（カウンター8席／テーブル14席）に合わせて作図。
+         インライン SVG にしているのは、ページの明朝体をそのまま使うため。 -->
+    <figure class="kukan-floor" data-reveal>
+<svg class="kukan-floor__svg" xmlns="http://www.w3.org/2000/svg" viewBox="-307 -76 680 292" role="img" aria-labelledby="floorT floorD"><title id="floorT">焼肉 福朗 北島本店の店内見取り図</title><desc id="floorD">カウンター8席とテーブル席14席、あわせて22席。奥に厨房、左手前に入り口があります。</desc><polygon points="0.0,0.0 349.6,114.0 110.4,192.0 -239.2,78.0" fill="#2b1613"/><polygon points="174.8,57.0 349.6,114.0 257.6,144.0 82.8,87.0" fill="#1c100d"/><polygon points="0.0,-52.0 -239.2,26.0 -239.2,78.0 0.0,0.0" fill="#351d11"/><polygon points="-239.2,26.0 -226.3,30.2 -226.3,82.2 -239.2,78.0" fill="#22110b"/><polygon points="0.0,-52.0 12.9,-47.8 -226.3,30.2 -239.2,26.0" fill="#4e2c19"/><polygon points="82.8,45.0 72.7,48.3 72.7,90.3 82.8,87.0" fill="#351d11"/><polygon points="72.7,48.3 247.5,105.3 247.5,147.3 72.7,90.3" fill="#22110b"/><polygon points="82.8,45.0 257.6,102.0 247.5,105.3 72.7,48.3" fill="#4e2c19"/><polygon points="-14.7,-18.8 -169.3,31.6 -169.3,63.6 -14.7,13.2" fill="#5f3720"/><polygon points="-169.3,31.6 -125.1,46.0 -125.1,78.0 -169.3,63.6" fill="#3b2113"/><polygon points="-14.7,-18.8 29.4,-4.4 -125.1,46.0 -169.3,31.6" fill="#8a5230"/><ellipse cx="-12.9" cy="-5.0" rx="11.0" ry="3.8" fill="#140e10" stroke="#a07c55" stroke-width="1.7"/><ellipse cx="-12.9" cy="-5.0" rx="6.4" ry="2.2" fill="none" stroke="#a07c55" stroke-width="0.9" opacity="0.5"/><ellipse cx="-50.6" cy="7.3" rx="11.0" ry="3.8" fill="#140e10" stroke="#a07c55" stroke-width="1.7"/><ellipse cx="-50.6" cy="7.3" rx="6.4" ry="2.2" fill="none" stroke="#a07c55" stroke-width="0.9" opacity="0.5"/><ellipse cx="-88.3" cy="19.6" rx="11.0" ry="3.8" fill="#140e10" stroke="#a07c55" stroke-width="1.7"/><ellipse cx="-88.3" cy="19.6" rx="6.4" ry="2.2" fill="none" stroke="#a07c55" stroke-width="0.9" opacity="0.5"/><ellipse cx="-126.0" cy="31.9" rx="11.0" ry="3.8" fill="#140e10" stroke="#a07c55" stroke-width="1.7"/><ellipse cx="-126.0" cy="31.9" rx="6.4" ry="2.2" fill="none" stroke="#a07c55" stroke-width="0.9" opacity="0.5"/><polygon points="32.2,14.9 19.3,19.1 19.3,35.1 32.2,30.9" fill="#4c2c1a"/><polygon points="19.3,19.1 32.2,23.3 32.2,39.3 19.3,35.1" fill="#2b160e"/><polygon points="32.2,14.9 45.1,19.1 32.2,23.3 19.3,19.1" fill="#7a4a2c"/><polygon points="13.8,20.9 0.9,25.1 0.9,41.1 13.8,36.9" fill="#4c2c1a"/><polygon points="0.9,25.1 13.8,29.3 13.8,45.3 0.9,41.1" fill="#2b160e"/><polygon points="13.8,20.9 26.7,25.1 13.8,29.3 0.9,25.1" fill="#7a4a2c"/><polygon points="-5.5,27.2 -18.4,31.4 -18.4,47.4 -5.5,43.2" fill="#4c2c1a"/><polygon points="-18.4,31.4 -5.5,35.6 -5.5,51.6 -18.4,47.4" fill="#2b160e"/><polygon points="-5.5,27.2 7.4,31.4 -5.5,35.6 -18.4,31.4" fill="#7a4a2c"/><polygon points="-23.9,33.2 -36.8,37.4 -36.8,53.4 -23.9,49.2" fill="#4c2c1a"/><polygon points="-36.8,37.4 -23.9,41.6 -23.9,57.6 -36.8,53.4" fill="#2b160e"/><polygon points="-23.9,33.2 -11.0,37.4 -23.9,41.6 -36.8,37.4" fill="#7a4a2c"/><polygon points="-43.2,39.5 -56.1,43.7 -56.1,59.7 -43.2,55.5" fill="#4c2c1a"/><polygon points="-56.1,43.7 -43.2,47.9 -43.2,63.9 -56.1,59.7" fill="#2b160e"/><polygon points="-43.2,39.5 -30.4,43.7 -43.2,47.9 -56.1,43.7" fill="#7a4a2c"/><polygon points="-61.6,45.5 -74.5,49.7 -74.5,65.7 -61.6,61.5" fill="#4c2c1a"/><polygon points="-74.5,49.7 -61.6,53.9 -61.6,69.9 -74.5,65.7" fill="#2b160e"/><polygon points="-61.6,45.5 -48.8,49.7 -61.6,53.9 -74.5,49.7" fill="#7a4a2c"/><polygon points="-81.0,51.8 -93.8,56.0 -93.8,72.0 -81.0,67.8" fill="#4c2c1a"/><polygon points="-93.8,56.0 -81.0,60.2 -81.0,76.2 -93.8,72.0" fill="#2b160e"/><polygon points="-81.0,51.8 -68.1,56.0 -81.0,60.2 -93.8,56.0" fill="#7a4a2c"/><polygon points="-99.4,57.8 -112.2,62.0 -112.2,78.0 -99.4,73.8" fill="#4c2c1a"/><polygon points="-112.2,62.0 -99.4,66.2 -99.4,82.2 -112.2,78.0" fill="#2b160e"/><polygon points="-99.4,57.8 -86.5,62.0 -99.4,66.2 -112.2,62.0" fill="#7a4a2c"/><polygon points="75.4,90.2 62.6,94.4 62.6,110.4 75.4,106.2" fill="#4c2c1a"/><polygon points="62.6,94.4 75.4,98.6 75.4,114.6 62.6,110.4" fill="#2b160e"/><polygon points="75.4,90.2 88.3,94.4 75.4,98.6 62.6,94.4" fill="#7a4a2c"/><polygon points="44.2,100.4 31.3,104.6 31.3,120.6 44.2,116.4" fill="#4c2c1a"/><polygon points="31.3,104.6 44.2,108.8 44.2,124.8 31.3,120.6" fill="#2b160e"/><polygon points="44.2,100.4 57.0,104.6 44.2,108.8 31.3,104.6" fill="#7a4a2c"/><polygon points="104.9,80.6 36.8,102.8 36.8,130.8 104.9,108.6" fill="#5f3720"/><polygon points="36.8,102.8 86.5,119.0 86.5,147.0 36.8,130.8" fill="#3b2113"/><polygon points="104.9,80.6 154.6,96.8 86.5,119.0 36.8,102.8" fill="#8a5230"/><ellipse cx="95.7" cy="99.8" rx="13.8" ry="4.7" fill="#140e10" stroke="#a07c55" stroke-width="1.7"/><ellipse cx="95.7" cy="99.8" rx="8.0" ry="2.7" fill="none" stroke="#a07c55" stroke-width="0.9" opacity="0.5"/><polygon points="149.0,114.2 136.2,118.4 136.2,134.4 149.0,130.2" fill="#4c2c1a"/><polygon points="136.2,118.4 149.0,122.6 149.0,138.6 136.2,134.4" fill="#2b160e"/><polygon points="149.0,114.2 161.9,118.4 149.0,122.6 136.2,118.4" fill="#7a4a2c"/><polygon points="117.8,124.4 104.9,128.6 104.9,144.6 117.8,140.4" fill="#4c2c1a"/><polygon points="104.9,128.6 117.8,132.8 117.8,148.8 104.9,144.6" fill="#2b160e"/><polygon points="117.8,124.4 130.6,128.6 117.8,132.8 104.9,128.6" fill="#7a4a2c"/><polygon points="-33.1,54.8 -46.0,59.0 -46.0,75.0 -33.1,70.8" fill="#4c2c1a"/><polygon points="-46.0,59.0 -33.1,63.2 -33.1,79.2 -46.0,75.0" fill="#2b160e"/><polygon points="-33.1,54.8 -20.2,59.0 -33.1,63.2 -46.0,59.0" fill="#7a4a2c"/><polygon points="-64.4,65.0 -77.3,69.2 -77.3,85.2 -64.4,81.0" fill="#4c2c1a"/><polygon points="-77.3,69.2 -64.4,73.4 -64.4,89.4 -77.3,85.2" fill="#2b160e"/><polygon points="-64.4,65.0 -51.5,69.2 -64.4,73.4 -77.3,69.2" fill="#7a4a2c"/><polygon points="-3.7,45.2 -71.8,67.4 -71.8,95.4 -3.7,73.2" fill="#5f3720"/><polygon points="-71.8,67.4 -22.1,83.6 -22.1,111.6 -71.8,95.4" fill="#3b2113"/><polygon points="-3.7,45.2 46.0,61.4 -22.1,83.6 -71.8,67.4" fill="#8a5230"/><ellipse cx="-12.9" cy="64.4" rx="13.8" ry="4.7" fill="#140e10" stroke="#a07c55" stroke-width="1.7"/><ellipse cx="-12.9" cy="64.4" rx="8.0" ry="2.7" fill="none" stroke="#a07c55" stroke-width="0.9" opacity="0.5"/><polygon points="40.5,78.8 27.6,83.0 27.6,99.0 40.5,94.8" fill="#4c2c1a"/><polygon points="27.6,83.0 40.5,87.2 40.5,103.2 27.6,99.0" fill="#2b160e"/><polygon points="40.5,78.8 53.4,83.0 40.5,87.2 27.6,83.0" fill="#7a4a2c"/><polygon points="9.2,89.0 -3.7,93.2 -3.7,109.2 9.2,105.0" fill="#4c2c1a"/><polygon points="-3.7,93.2 9.2,97.4 9.2,113.4 -3.7,109.2" fill="#2b160e"/><polygon points="9.2,89.0 22.1,93.2 9.2,97.4 -3.7,93.2" fill="#7a4a2c"/><polygon points="-12.9,119.0 -25.8,123.2 -25.8,139.2 -12.9,135.0" fill="#4c2c1a"/><polygon points="-25.8,123.2 -12.9,127.4 -12.9,143.4 -25.8,139.2" fill="#2b160e"/><polygon points="-12.9,119.0 0.0,123.2 -12.9,127.4 -25.8,123.2" fill="#7a4a2c"/><polygon points="-44.2,129.2 -57.0,133.4 -57.0,149.4 -44.2,145.2" fill="#4c2c1a"/><polygon points="-57.0,133.4 -44.2,137.6 -44.2,153.6 -57.0,149.4" fill="#2b160e"/><polygon points="-44.2,129.2 -31.3,133.4 -44.2,137.6 -57.0,133.4" fill="#7a4a2c"/><polygon points="16.6,109.4 -51.5,131.6 -51.5,159.6 16.6,137.4" fill="#5f3720"/><polygon points="-51.5,131.6 -1.8,147.8 -1.8,175.8 -51.5,159.6" fill="#3b2113"/><polygon points="16.6,109.4 66.2,125.6 -1.8,147.8 -51.5,131.6" fill="#8a5230"/><ellipse cx="7.4" cy="128.6" rx="13.8" ry="4.7" fill="#140e10" stroke="#a07c55" stroke-width="1.7"/><ellipse cx="7.4" cy="128.6" rx="8.0" ry="2.7" fill="none" stroke="#a07c55" stroke-width="0.9" opacity="0.5"/><polygon points="60.7,143.0 47.8,147.2 47.8,163.2 60.7,159.0" fill="#4c2c1a"/><polygon points="47.8,147.2 60.7,151.4 60.7,167.4 47.8,163.2" fill="#2b160e"/><polygon points="60.7,143.0 73.6,147.2 60.7,151.4 47.8,147.2" fill="#7a4a2c"/><polygon points="29.4,153.2 16.6,157.4 16.6,173.4 29.4,169.2" fill="#4c2c1a"/><polygon points="16.6,157.4 29.4,161.6 29.4,177.6 16.6,173.4" fill="#2b160e"/><polygon points="29.4,153.2 42.3,157.4 29.4,161.6 16.6,157.4" fill="#7a4a2c"/><polygon points="-125.1,84.8 -138.0,89.0 -138.0,105.0 -125.1,100.8" fill="#4c2c1a"/><polygon points="-138.0,89.0 -125.1,93.2 -125.1,109.2 -138.0,105.0" fill="#2b160e"/><polygon points="-125.1,84.8 -112.2,89.0 -125.1,93.2 -138.0,89.0" fill="#7a4a2c"/><polygon points="-92.0,74.0 -136.2,88.4 -136.2,116.4 -92.0,102.0" fill="#5f3720"/><polygon points="-136.2,88.4 -86.5,104.6 -86.5,132.6 -136.2,116.4" fill="#3b2113"/><polygon points="-92.0,74.0 -42.3,90.2 -86.5,104.6 -136.2,88.4" fill="#8a5230"/><ellipse cx="-89.2" cy="89.3" rx="13.8" ry="4.7" fill="#140e10" stroke="#a07c55" stroke-width="1.7"/><ellipse cx="-89.2" cy="89.3" rx="8.0" ry="2.7" fill="none" stroke="#a07c55" stroke-width="0.9" opacity="0.5"/><polygon points="-51.5,108.8 -64.4,113.0 -64.4,129.0 -51.5,124.8" fill="#4c2c1a"/><polygon points="-64.4,113.0 -51.5,117.2 -51.5,133.2 -64.4,129.0" fill="#2b160e"/><polygon points="-51.5,108.8 -38.6,113.0 -51.5,117.2 -64.4,113.0" fill="#7a4a2c"/><polygon points="-231.8,35.6 -239.2,38.0 -239.2,78.0 -231.8,75.6" fill="#351d11"/><polygon points="-239.2,38.0 -150.9,66.8 -150.9,106.8 -239.2,78.0" fill="#22110b"/><polygon points="-231.8,35.6 -143.5,64.4 -150.9,66.8 -239.2,38.0" fill="#4e2c19"/><text class="kukan-floor__t-kitchen" x="235" y="94" fill="#f3ece2" font-size="14" letter-spacing="7" text-anchor="middle" font-family="Shippori Mincho, Yu Mincho, serif">厨房</text><text class="kukan-floor__t-entry" x="-275" y="92" fill="#c0ac97" font-size="12" letter-spacing="4" text-anchor="middle" font-family="Shippori Mincho, Yu Mincho, serif">入り口</text><path class="kukan-floor__t-arrow" d="M-249 87 h20" stroke="#c0ac97" stroke-width="1"/><path class="kukan-floor__t-arrow" d="M-233 83 l5 4 -5 4" fill="none" stroke="#c0ac97" stroke-width="1"/></svg>
+    </figure>
+  </div>
+
+  <!-- 参考サイト sec12（.bg-parallax）相当：
+       background-attachment: fixed で写真を画面に固定し、
+       この帯を「窓」として前セクションの地色から現れ、
+       次セクションの地色に隠れていくように見せる。 -->
+  <!-- 中の .kukan-band__media が position: fixed で画面に貼り付き、
+       外側の .kukan-band が clip-path でその矩形だけを切り抜く。
+       これで background-attachment: fixed と同じ「窓」の見え方になり、
+       fixed 背景を正しく描画できない iOS Safari でも成立する。 -->
+  <div class="kukan-band" role="img" aria-label="提灯とポスターが並ぶ昭和レトロな店内">
+    <div class="kukan-band__media" aria-hidden="true"></div>
+  </div>
+
+</section>
+
+<!-- ============================================================
+     5. 店舗情報 — SHOPS（2店舗）
+     ============================================================ -->
+<section class="section section--shops" id="shops">
+  <div class="container">
+
+    <header class="sec-head" data-reveal>
+      <p class="sec-head__en">Shops</p>
+      <h2 class="sec-head__ja">店舗情報</h2>
+    </header>
+
+    <div class="shops">
+
+      <!-- 北島本店 -->
+      <article class="shop" data-reveal>
+        <div class="shop__media">
+          <picture>
+            <source srcset="assets/images/shop-kitajima.webp" type="image/webp">
+            <img src="assets/images/shop-kitajima.jpg" alt="焼肉 福朗 北島本店のイメージ" loading="lazy" decoding="async">
+          </picture>
+        </div>
+
+        <div class="shop__body">
+          <p class="shop__badge shop__badge--open">営業中</p>
+          <h3 class="shop__name">焼肉 福朗<span>北島本店</span></h3>
+
+          <dl class="infolist">
+            <div><dt>住所</dt><dd><span class="phrase">徳島県板野郡北島町</span><span class="phrase">高房字東中道32-7</span></dd></div>
+            <div><dt>電話</dt><dd><a href="tel:0886128032">088-612-8032</a></dd></div>
+            <div><dt>営業時間</dt><dd>17:00 – 22:00（L.O. 21:30）</dd></div>
+            <div><dt>定休日</dt><dd>月曜日</dd></div>
+            <div><dt>設備</dt><dd>駐車場あり ／ 全席禁煙</dd></div>
+            <div><dt>ご予約</dt><dd>お電話・Instagram DM・食べログ</dd></div>
+            <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/fukurou_yakiniku296/" target="_blank" rel="noopener">@fukurou_yakiniku296</a></dd></div>
+          </dl>
+
+          <div class="shop__actions">
+            <a class="btn btn--line" href="tel:0886128032">
+              <span>電話する</span>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+            </a>
+            <a class="btn btn--line" href="https://maps.google.com/?q=徳島県板野郡北島町高房字東中道32-7" target="_blank" rel="noopener">
+              <span>地図を見る</span>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 弐番館 -->
+      <article class="shop shop--soon" data-reveal data-reveal-delay="1">
+        <div class="shop__media">
+          <picture>
+            <source srcset="assets/images/shop-second.webp" type="image/webp">
+            <img src="assets/images/shop-second.jpg" alt="焼肉福朗 弐番館のイメージ" loading="lazy" decoding="async">
+          </picture>
+        </div>
+
+        <div class="shop__body">
+          <p class="shop__badge shop__badge--soon">2026年9月上旬オープン予定</p>
+          <h3 class="shop__name">焼肉福朗<span>弐番館</span></h3>
+
+          <!-- 開店前のため、確定情報のみ掲載しています。
+               住所・電話・営業時間が確定次第、下記 dd を差し替えてください。 -->
+          <dl class="infolist">
+            <div><dt>住所</dt><dd>徳島県徳島市庄町<span class="tbd">（詳細は確定後に掲載）</span></dd></div>
+            <div><dt>電話</dt><dd><span class="tbd">準備中</span></dd></div>
+            <div><dt>営業時間</dt><dd><span class="tbd">準備中</span></dd></div>
+            <div><dt>定休日</dt><dd><span class="tbd">準備中</span></dd></div>
+            <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/fukurou_yakiniku_2nd/" target="_blank" rel="noopener">@fukurou_yakiniku_2nd</a></dd></div>
+          </dl>
+
+          <p class="shop__note"><span class="phrase">最新情報は Instagram にて</span><span class="phrase">お知らせいたします。</span></p>
+
+          <div class="shop__actions">
+            <a class="btn btn--line" href="https://www.instagram.com/fukurou_yakiniku_2nd/" target="_blank" rel="noopener">
+              <span>最新情報を見る</span>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     6. 予約導線 — RESERVE
+     ============================================================ -->
+<section class="reserve" id="reserve" aria-labelledby="reserveTitle">
+  <div class="reserve__media" aria-hidden="true">
+    <picture>
+      <source srcset="assets/images/flame.webp" type="image/webp">
+      <img src="assets/images/flame.jpg" alt="" loading="lazy" decoding="async">
+    </picture>
+  </div>
+  <div class="reserve__scrim" aria-hidden="true"></div>
+
+  <div class="container reserve__inner">
+    <header class="sec-head sec-head--left sec-head--rule sec-head--on-media" data-reveal>
+      <p class="sec-head__en">Reservation</p>
+      <h2 class="sec-head__ja" id="reserveTitle">ご予約</h2>
+      <p class="sec-head__lead"><span
+        class="phrase">その日いちばんの一枚を、</span><span
+        class="phrase">あなたのために。</span><br><span
+        class="phrase">ご予約・空席のお問い合わせは</span><span
+        class="phrase">お気軽にどうぞ。</span></p>
+    </header>
+
+    <div class="reserve__actions" data-reveal data-reveal-delay="3">
+      <a class="btn btn--accent btn--lg"
+         href="https://tabelog.com/tokushima/A3601/A360101/36008569/"
+         target="_blank" rel="noopener">
+        <span>食べログで予約する</span>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+      </a>
+      <a class="btn btn--ghost btn--lg" href="tel:0886128032">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5c0-.6.4-1 1-1h3l2 5-2 1a11 11 0 005 5l1-2 5 2v3c0 .6-.4 1-1 1A16 16 0 014 5z"/></svg>
+        <span>088-612-8032</span>
+      </a>
+      <a class="btn btn--ghost btn--lg" href="https://www.instagram.com/fukurou_yakiniku296/" target="_blank" rel="noopener">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/></svg>
+        <span>Instagram DM</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     7. お問い合わせ — CONTACT
+     ============================================================ -->
+<section class="section section--contact" id="contact">
+  <div class="container container--narrow">
+
+    <header class="sec-head" data-reveal>
+      <p class="sec-head__en">Contact</p>
+      <h2 class="sec-head__ja">お問い合わせ</h2>
+      <p class="sec-head__lead"><span
+        class="phrase">3営業日以内にご返信いたします。</span><span
+        class="phrase">お急ぎの場合は</span><span
+        class="phrase">お電話ください。</span></p>
+    </header>
+
+    <!-- ============================================================
+         送信先の設定
+         action に送信先URL（Formspree / SSGフォーム / 自社PHP 等）を入れると
+         そのままPOST送信されます。空のままだと JS が
+         「送信先未設定」メッセージを表示します。
+         ============================================================ -->
+    <form class="form" id="contactForm" data-endpoint="" novalidate data-reveal data-reveal-delay="1">
+
+      <div class="form__row">
+        <div class="field">
+          <label for="f-name">お名前 <span class="req">必須</span></label>
+          <input type="text" id="f-name" name="name" autocomplete="name" required
+                 placeholder="山田 太郎">
+          <p class="field__err" data-err></p>
+        </div>
+        <div class="field">
+          <label for="f-kana">フリガナ</label>
+          <input type="text" id="f-kana" name="kana" placeholder="ヤマダ タロウ">
+          <p class="field__err" data-err></p>
+        </div>
+      </div>
+
+      <div class="form__row">
+        <div class="field">
+          <label for="f-email">メールアドレス <span class="req">必須</span></label>
+          <input type="email" id="f-email" name="email" autocomplete="email" required
+                 placeholder="example@mail.com">
+          <p class="field__err" data-err></p>
+        </div>
+        <div class="field">
+          <label for="f-tel">電話番号</label>
+          <input type="tel" id="f-tel" name="tel" autocomplete="tel" inputmode="tel"
+                 placeholder="088-000-0000">
+          <p class="field__err" data-err></p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-type">お問い合わせ種別 <span class="req">必須</span></label>
+        <div class="select">
+          <select id="f-type" name="type" required>
+            <option value="">選択してください</option>
+            <option>ご予約・空席について</option>
+            <option>ご宴会・団体でのご利用</option>
+            <option>アレルギー・お食事内容について</option>
+            <option>求人・採用について</option>
+            <option>取材・お取引のご相談</option>
+            <option>その他</option>
+          </select>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <p class="field__err" data-err></p>
+      </div>
+
+      <div class="field">
+        <label for="f-shop">ご希望の店舗</label>
+        <div class="select">
+          <select id="f-shop" name="shop">
+            <option value="">指定なし</option>
+            <option>北島本店</option>
+            <option>弐番館（2026年9月上旬オープン予定）</option>
+          </select>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-msg">お問い合わせ内容 <span class="req">必須</span></label>
+        <textarea id="f-msg" name="message" rows="7" required
+                  placeholder="ご希望の日時・人数・ご相談内容などをご記入ください。"></textarea>
+        <p class="field__err" data-err></p>
+      </div>
+
+      <!-- スパム対策（人には見えません） -->
+      <p class="form__honey" aria-hidden="true">
+        <label for="f-hp">この欄は入力しないでください</label>
+        <input type="text" id="f-hp" name="_gotcha" tabindex="-1" autocomplete="off">
+      </p>
+
+      <div class="field field--check">
+        <label class="check" for="f-agree">
+          <input type="checkbox" id="f-agree" name="agree" required>
+          <span class="check__box" aria-hidden="true"></span>
+          <span class="check__txt">
+            個人情報の取り扱いに同意します <span class="req">必須</span><br>
+            <small>ご記入いただいた内容は、お問い合わせへの対応のみに使用します。</small>
+          </span>
+        </label>
+        <p class="field__err" data-err></p>
+      </div>
+
+      <div class="form__submit">
+        <button class="btn btn--accent btn--lg" type="submit">
+          <span>送信する</span>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <p class="form__status" id="formStatus" role="status" aria-live="polite"></p>
+    </form>
+
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     8. FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="container">
+
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <p class="brand brand--footer">
+          <span class="brand__mark">福朗</span>
+          <span class="brand__sub">焼<i>・</i>肉<i>・</i>店</span>
+        </p>
+        <p class="site-footer__tagline">圧倒的、昭和スタイル。<br>徳島県産黒毛和牛と唯一無二の特製ダレ。</p>
+        <ul class="sns" aria-label="SNS">
+          <li>
+            <a href="https://www.instagram.com/fukurou_yakiniku296/" target="_blank" rel="noopener" aria-label="北島本店 Instagram">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/></svg>
+              <span>本店</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.instagram.com/fukurou_yakiniku_2nd/" target="_blank" rel="noopener" aria-label="弐番館 Instagram">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/></svg>
+              <span>弐番館</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://tabelog.com/tokushima/A3601/A360101/36008569/" target="_blank" rel="noopener" aria-label="食べログ">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></svg>
+              <span>食べログ</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <nav class="site-footer__nav" aria-label="フッターナビゲーション">
+        <div>
+          <h3>メニュー</h3>
+          <ul>
+            <li><a href="#omoi">想い</a></li>
+            <li><a href="#kodawari">こだわり</a></li>
+            <li><a href="#kukan">空間</a></li>
+            <li><a href="#shops">店舗情報</a></li>
+            <li><a href="#contact">お問い合わせ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>北島本店</h3>
+          <address>
+            徳島県板野郡北島町<br>高房字東中道32-7<br>
+            <a href="tel:0886128032">088-612-8032</a><br>
+            <span class="phrase">17:00 – 22:00</span> <span class="phrase">／ 月曜定休</span>
+          </address>
+        </div>
+        <div>
+          <h3>弐番館</h3>
+          <address>
+            徳島県徳島市庄町<br>
+            <span class="tbd">2026年9月上旬<br>オープン予定</span>
+          </address>
+        </div>
+      </nav>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p class="copy">&copy; <span id="year">2026</span> 焼肉 福朗. All rights reserved.</p>
+      <a class="totop" href="#top">
+        <span>Page Top</span>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </a>
+    </div>
+
+  </div>
+</footer>
+
+<script src="assets/js/main.js" defer></script>
+</body>
+</html>
