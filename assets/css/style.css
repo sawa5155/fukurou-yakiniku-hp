@@ -1559,8 +1559,14 @@ html.js [data-reveal].is-in {
     url("../images/space-poster.jpg")  type("image/jpeg")
   );
   background-size: cover;
-  background-position: center center;
+  background-position: center 60%;
   background-repeat: no-repeat;
+}
+/* cover は「画面の比率で中央を切る」ので、縦長の画面では横に細い帯だけが残る。
+   中央のままだと壁と椅子の背だけになってしまうため、写真の主題（焼き台の
+   のった卓とダクト）が入る位置まで左に寄せる。 */
+@media (max-aspect-ratio: 1 / 1) {
+  .kukan-band__media { background-position: center center; }
 }
 /* 明るさの調整は filter ではなく重ねる幕で行う
    （filter は包含ブロックを作り、中の fixed レイヤーを壊すため）。
@@ -1598,6 +1604,22 @@ html.js [data-reveal].is-in {
   filter: brightness(var(--img-brightness));
 }
 .shop--soon .shop__media img { filter: brightness(calc(var(--img-brightness) * .68)) saturate(.7); }
+
+/* 弐番館は開店前で外観写真が無いため、写真の代わりに置く「準備中」の面。
+   aspect-ratio を写真と同じにしてあるので、2枚のカードの行の高さが揃う。 */
+.shop__soon {
+  display: grid;
+  place-items: center;
+  aspect-ratio: var(--ratio-wide);
+  background: var(--panel-bg);
+  border: var(--line-w) solid var(--c-line-faint);
+  border-radius: var(--radius-img);
+  color: var(--c-ink-3);
+  font-family: var(--ff-heading);
+  font-size: var(--fs-lg);
+  letter-spacing: var(--ls-ja-wide);
+  text-indent: var(--ls-ja-wide);   /* 字間ぶん右に寄るのを打ち消して中央に */
+}
 
 .shop__body {
   flex: 1;
@@ -2325,22 +2347,20 @@ html.js [data-reveal].is-in {
   .site-footer__bottom { justify-content: center; text-align: center; }
 
   /* ---- 見取り図 ----
-     680 の viewBox を 342px に縮めるとラベルが実効 7px になり読めない。
+     637 の viewBox を 342px に縮めるとラベルが実効 7px になり読めない。
      画面いっぱいまで広げたうえで、ラベルのユーザー単位を上げる。
-     「入り口」は左に余白が無いので、拡大した分だけ矢印を右へ逃がす。 */
+     ラベルはすべて図の内側〜下側にあり、viewBox の端に余裕があるので
+     以前のような「はみ出し避けに横へ逃がす」補正は要らない。 */
   .kukan-floor {
     max-width: none;
     margin-inline: calc(var(--gutter) * -1);
   }
-  .kukan-floor__t-kitchen { font-size: 24px; letter-spacing: 8px; }
-  /* viewBox の左端は -307。x=-275 の中央揃えでは左に 32 しか余白が無く、
-     20px まで拡大すると「入」がはみ出すため、文字と矢印をまとめて右へ送る。 */
-  .kukan-floor__t-entry {
-    font-size: 20px;
-    letter-spacing: 3px;
-    transform: translateX(10px);
-  }
-  .kukan-floor__t-arrow { transform: translateX(24px); stroke-width: 1.6; }
+  /* ラベルは3つとも同じ大きさ（SVG 側の 13px を一律 20px に上げる）。
+     viewBox 655 を画面幅 390 で見ると実効 12px 程度になる。 */
+  .kukan-floor__t-kitchen,
+  .kukan-floor__t-toilet,
+  .kukan-floor__t-entry { font-size: 20px; letter-spacing: 6px; }
+  .kukan-floor__t-arrow { stroke-width: 1.6; }
 
 }
 
