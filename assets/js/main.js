@@ -151,7 +151,19 @@
       });
     }, { rootMargin: '0px 0px -12% 0px', threshold: 0.06 });
 
-    revealTargets.forEach((el) => io.observe(el));
+    /* 画面の隅に置いたレール（ご予約・産地）は交差判定に載せない。
+
+       いずれも最初から画面内にいるので観測する意味が無いうえ、
+       下端に寄せてあるぶん rootMargin の除外帯（画面下 12%）に丸ごと
+       入ってしまうことがあり、そうなると永久に is-in が付かず
+       透明のままになる（＝ボタンが消えたように見える）。
+       出るタイミングは show() に任せる（ヒーロー内はオープニング明け）。 */
+    const isCornerRail = (el) => el.matches('.reserve-rail, .hero__rail');
+
+    revealTargets.forEach((el) => {
+      if (isCornerRail(el)) show(el);
+      else io.observe(el);
+    });
 
     /* ページ最下部の要素を取りこぼさないための保険。
 

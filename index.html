@@ -194,8 +194,8 @@
     <video class="hero__video" id="heroVideo"
            poster="assets/images/hero-fv.jpg"
            muted loop playsinline preload="none"
-           data-src-sm="assets/video/fv-960.mp4"
-           data-src-lg="assets/video/fv-1280.mp4"
+           data-src-sm="assets/video/0801.mp4"
+           data-src-lg="assets/video/0801.mp4"
            aria-hidden="true"></video>
   </div>
   <div class="hero__scrim" aria-hidden="true"></div>
@@ -206,23 +206,20 @@
     <span>現代焼肉</span>
   </h1>
 
-  <!-- 左レール：SNS とご予約 -->
-  <div class="hero__rail hero__rail--left" data-reveal data-reveal-delay="2">
-    <a class="hero__rail-icon" href="https://www.instagram.com/fukurou_yakiniku/"
-       target="_blank" rel="noopener" aria-label="Instagram">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/></svg>
-    </a>
-    <a class="hero__rail-link" href="#reserve"><span class="vert">ご予約</span></a>
-  </div>
-
-  <!-- 右レール：産地 -->
+  <!-- 右レール -->
   <p class="hero__rail hero__rail--right" data-reveal data-reveal-delay="2">
-    <span class="hero__rail-dot" aria-hidden="true"></span>
-    <span class="vert">徳島県産黒毛和牛</span>
+    <span class="vert">徳島｜焼肉</span>
   </p>
 
   <span class="hero__hairline" aria-hidden="true"></span>
 </section>
+
+<!-- ご予約：画面左下に固定し、全セクションでスクロールに追従する。
+     .hero の中に置くと z-index: 0 のスタック文脈に閉じ込められ、
+     後続セクション（body > * の z-index: 1）に隠れるため body 直下に出す。 -->
+<a class="reserve-rail" href="#reserve" data-reveal data-reveal-delay="2">
+  <span class="vert">ご予約</span>
+</a>
 
 <!-- ============================================================
      2. 想い — PHILOSOPHY
@@ -248,8 +245,8 @@
       </figure>
 
       <h3 class="omoi__title" data-reveal data-reveal-delay="1">
-        <span>誇りを、</span>
-        <span>次の世代へ。</span>
+        <span>その日、</span>
+        <span>いちばんのお肉を。</span>
       </h3>
 
       <!-- リード文は SP で 17px まで上がるため、<br> の行がそのままでは
@@ -257,23 +254,14 @@
            折り返しを文節の切れ目に限定している（PC では 1 行に収まるので影響なし）。 -->
       <div class="omoi__paras" data-reveal data-reveal-delay="2">
         <p><span
-          class="phrase">和食をはじめとする</span><span
-          class="phrase">飲食産業は、</span><br><span
-          class="phrase">世界に誇るべき</span><span
-          class="phrase">日本の文化です。</span></p>
+          class="phrase">焼肉福朗は、昭和の香りを漂わせる、</span><br><span
+          class="phrase">新しくも懐かしい焼肉店。</span></p>
         <p><span
-          class="phrase">この仕事に誇りを持ち、</span><br><span
-          class="phrase">若い世代が</span><span
-          class="phrase">「飲食業で働きたい」と</span><br><span
-          class="phrase">思える未来をつくりたい。</span></p>
+          class="phrase">確かな目利きで仕入れる、極上の一枚。</span><br><span
+          class="phrase">部位ごとの旨みや脂の入り方を見極め、</span><br><span
+          class="phrase">福朗らしく気取らず楽しめる焼肉として</span><br><span
+          class="phrase">ご提供します。</span></p>
       </div>
-
-      <figure class="omoi__accent omoi__accent--a" data-reveal>
-        <picture>
-          <source srcset="assets/images/omoi-hands.webp" type="image/webp">
-          <img src="assets/images/omoi-hands.jpg" alt="小鉢に盛られたそぼろと青ねぎ" loading="lazy" decoding="async">
-        </picture>
-      </figure>
 
     </div>
 
@@ -288,21 +276,18 @@
       </figure>
 
       <h3 class="omoi__title" data-reveal data-reveal-delay="1">
-        <span>「このタレは</span>
-        <span>本物だ。」</span>
+        <span>徳島県産</span>
+        <span>A5ランク和牛</span>
       </h3>
 
       <div class="omoi__paras" data-reveal data-reveal-delay="2">
         <p><span
-          class="phrase">醤油とニンニクを</span><span
-          class="phrase">ベースにした、</span><br><span
-          class="phrase">他では味わえない甘辛い味。</span></p>
+          class="phrase">きめ細かな霜降りと、</span><br><span
+          class="phrase">口の中でほどけるような上質な旨み。</span></p>
         <p><span
-          class="phrase">その味に惚れ込み、</span><span
-          class="phrase">修行を願い出ました。</span><br><span
-          class="phrase">受け継いだこのタレを、</span><br><span
-          class="phrase">いま福朗で</span><span
-          class="phrase">使わせていただいています。</span></p>
+          class="phrase">高品質な徳島産ブランド和牛を中心に、</span><br><span
+          class="phrase">優先的な枝肉の選別や独自ルートからの</span><br><span
+          class="phrase">仕入れを行っています。</span></p>
       </div>
 
     </div>
