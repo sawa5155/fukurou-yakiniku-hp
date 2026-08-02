@@ -74,28 +74,6 @@
 <body>
 
 <!-- ============================================================
-     ヒーロー映像のシャドウ持ち上げフィルタ
-
-     FV の素材は暗い照明で撮られていて、そのまま出すと画面の 8 割が
-     ほぼ黒に潰れる。CSS の brightness() は乗算なので黒には効かない
-     （0 に何を掛けても 0）ため、ガンマ補正で暗部だけを持ち上げる。
-     exponent を小さくするほど明るくなる。0.50 まで下げると肉が
-     白っぽく飛ぶので 0.60 に置いている。
-
-     参照は assets/css/style.css の .hero__media video / img。
-     色ずれを避けるため色空間は sRGB を明示している。
-     ============================================================ -->
-<svg class="svg-defs" aria-hidden="true" focusable="false">
-  <filter id="hero-lift" color-interpolation-filters="sRGB">
-    <feComponentTransfer>
-      <feFuncR type="gamma" exponent="0.60"/>
-      <feFuncG type="gamma" exponent="0.60"/>
-      <feFuncB type="gamma" exponent="0.60"/>
-    </feComponentTransfer>
-  </filter>
-</svg>
-
-<!-- ============================================================
      OPENING — 初回アクセス／リロード時の演出
      真っ暗な画面 → 中央にロゴがフェードイン → 保持 →
      黒幕が抜けてファーストビューが現れる、という流れ。
@@ -194,8 +172,8 @@
     <video class="hero__video" id="heroVideo"
            poster="assets/images/hero-fv.jpg"
            muted loop playsinline preload="none"
-           data-src-sm="assets/video/0801.mp4"
-           data-src-lg="assets/video/0801.mp4"
+           data-src-sm="assets/video/0801-960.mp4"
+           data-src-lg="assets/video/0801-1280.mp4"
            aria-hidden="true"></video>
   </div>
   <div class="hero__scrim" aria-hidden="true"></div>

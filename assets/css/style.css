@@ -266,9 +266,10 @@
   --scrim-mid:    rgb(0 0 0 / .28);
   --scrim-bottom: rgb(0 0 0 / .80);
   --img-brightness: .95;
-  /* ヒーローの FV 動画は元から暗いので、ここでは落とさない。
-     明るさは #hero-lift のガンマ補正、文字の可読性は .hero__scrim の
-     中央ビネットが担当する（明るいストック映像の頃は .62 まで落としていた）。 */
+  /* ヒーローの FV 動画は素材のままの見え方で出す（1 ＝無変換）。
+     色調をいじると暗部の粒子が目立つため、明るさも彩度も触らない。
+     文字の可読性は .hero__scrim の中央ビネットだけで作っている
+     （明るいストック映像の頃は .62 まで落としていた）。 */
   --hero-img-brightness: 1;
   --hero-img-saturate: 1;
 
@@ -457,16 +458,6 @@ address { font-style: normal; }
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
-}
-
-/* フィルタ定義だけを置いた SVG。描画しないので場所を取らせない
-   （display: none にすると Safari でフィルタごと無効になるため使わない） */
-.svg-defs {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-  pointer-events: none;
 }
 
 .skip-link {
@@ -1028,12 +1019,12 @@ html.js [data-reveal].is-in {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* url(#hero-lift) は index.html 冒頭の SVG フィルタ。暗部を持ち上げてから
-     brightness / saturate で微調整する。順番を入れ替えないこと。
-     フィルタが見つからない環境では filter 全体が無効になり、
-     素の（暗い）映像がそのまま出る＝崩れはしない。 */
-  filter: url(#hero-lift)
-          brightness(var(--hero-img-brightness))
+  /* 映像には色調補正をかけず、素材そのままの明るさ・彩度で出す。
+     既定テーマ（sumi）は --hero-img-* が 1／1 なので実質無変換。
+     別テーマ（kinari / ebicha）だけ、配色に合わせて明るさと彩度を寄せる。
+     以前ここにあった暗部持ち上げ（SVG の #hero-lift）は、素材の粒子を
+     増幅して背景がザラつくため撤去した。 */
+  filter: brightness(var(--hero-img-brightness))
           saturate(var(--hero-img-saturate));
 }
 /* 中央のビネットは縦組み見出しの下敷き。映像そのものを暗くする代わりに
@@ -1254,6 +1245,15 @@ html.js [data-reveal].is-in {
   aspect-ratio: 4 / 5;
   object-fit: cover;
   filter: brightness(var(--img-brightness));
+}
+/* 01（トングの肉）は素材 1200×1500 の中で被写体が上寄りで、天面に暗い余白が
+   多い。既定の中央基準で横長に切ると焼き台と炎が切り落ちるので、切り取り位置を
+   下げて肉の芯・炎・焼き台の縁が入る範囲に寄せる。
+   横方向は指定しても効かない（素材が縦長なので横長の箱では常に全幅が見える）。
+   左に寄せる指定は SP 側の overflow で行っている。
+   素材と同じ 4:5 で出す PC では切り取りが起きないため、ここは影響しない。 */
+.omoi:first-of-type .omoi__main img {
+  object-position: center 75%;
 }
 
 /* 横組みの見出し。左端（X 方向）を下の段落（.omoi__paras）に揃えたいので、
@@ -2174,6 +2174,34 @@ html.js [data-reveal].is-in {
     margin: 0;
   }
   .omoi .omoi__main img { aspect-ratio: 4 / 5; }
+
+  /* 01 だけは横長の帯で見せる。狙いは 3 つ。
+
+     (1) 右に余白：12 カラム中 9（幅75%）までにし、左端フラッシュは維持する。
+     (2) ズームアウト：箱を 16:9 → 4:3 にして素材の縦を多く見せる（45% → 52%）。
+         あわせて幅が縮むぶん表示倍率も下がる（0.325 → 0.280）。
+     (3) 焦点を左へ：素材が縦長（4:5）なので横長の箱では cover が幅基準になり、
+         常に全幅が見える＝object-position の X が効かない。左に寄せるには
+         img を箱より広く描いて、figure の overflow: hidden で右端を削るしかない。
+         1.15 倍で右の 13% を落としている。
+
+     結果、390px 幅で 292×219px・右余白 98px、素材の x0〜87% / y36〜88% が見える。
+     箱の形は figure 側で決めるので、img の aspect-ratio は解除する。 */
+  .omoi:first-of-type .omoi__main {
+    grid-column: 1 / 10;
+    aspect-ratio: var(--ratio-photo);
+  }
+  /* picture は既定でインラインなので、行ボックスの余白ぶん img が下にずれて
+     箱の底が切れる。ブロックにして高さをそのまま渡す。 */
+  .omoi:first-of-type .omoi__main picture {
+    display: block;
+    height: 100%;
+  }
+  .omoi:first-of-type .omoi__main img {
+    width: 115%;
+    height: 100%;
+    aspect-ratio: auto;
+  }
 
   /* 02 は写真が 1 枚だけなので左右を反転して右端フラッシュにする */
   .omoi--rev .omoi__main { grid-column: 7 / 13; }
