@@ -263,9 +263,11 @@
   --scrim-mid:    rgb(0 0 0 / .28);
   --scrim-bottom: rgb(0 0 0 / .80);
   --img-brightness: .95;
-  /* ヒーローは中央に文字を重ねるため、参考サイト同様しっかり落とす */
-  --hero-img-brightness: .62;
-  --hero-img-saturate: .88;
+  /* ヒーローの FV 動画は元から暗いので、ここでは落とさない。
+     明るさは #hero-lift のガンマ補正、文字の可読性は .hero__scrim の
+     中央ビネットが担当する（明るいストック映像の頃は .62 まで落としていた）。 */
+  --hero-img-brightness: 1;
+  --hero-img-saturate: 1;
 
   /* 背景テクスチャ（参考サイトは無地のため既定で無効） */
   --texture-opacity: 0;
@@ -302,9 +304,9 @@
      明るい地色では使えない。明るいテーマでは非表示にしている。
      使う場合は「白地に黒い煙」の素材を用意し multiply に変更してください。 */
   --smoke-opacity: 0;
-  /* ヒーロー見出しは白固定なので、明るいテーマでも写真は暗く落とす */
-  --hero-img-brightness: .52;
-  --hero-img-saturate: .85;
+  /* ヒーロー見出しは白固定。FV 動画は元から暗いので落としすぎない */
+  --hero-img-brightness: .85;
+  --hero-img-saturate: .95;
   /* 明るいテーマは本文が暗色なので、写真の上に文字が乗らないよう
      見出しが現れる前に地色へ到達させる（助走も短くする） */
   --veil-end: 20%;
@@ -341,8 +343,8 @@
   --scrim-bottom: rgb(21 12 12 / .84);
   --img-brightness: .95;
   --smoke-opacity: .32;
-  --hero-img-brightness: .60;
-  --hero-img-saturate: .88;
+  --hero-img-brightness: .93;
+  --hero-img-saturate: 1;
 
   --texture-opacity: .18;
   --texture-blend: soft-light;
@@ -454,6 +456,16 @@ address { font-style: normal; }
   border: 0;
 }
 
+/* フィルタ定義だけを置いた SVG。描画しないので場所を取らせない
+   （display: none にすると Safari でフィルタごと無効になるため使わない） */
+.svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .skip-link {
   position: fixed;
   top: var(--sp-2);
@@ -500,27 +512,18 @@ html.js .opening {
 
 html.js .opening__brand {
   margin: 0;
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--sp-4);
-  font-family: var(--ff-heading);
-  line-height: 1;
-  color: var(--c-ink);
+  display: block;
   animation: opening-logo var(--opening-total) var(--ease) forwards;
 }
-/* オープニングのロゴはページ内のロゴより大きく見せる */
-html.js .opening__brand .brand__mark {
-  font-size: clamp(1.75rem, 1.4rem + 2vw, 3rem);
-  font-weight: var(--fw-heading-strong);
-  letter-spacing: .22em;
+/* オープニングのロゴはページ内のロゴより大きく見せる。
+   元画像の余白ぶん、字面は指定値の 6 割ほどの高さで出る。 */
+html.js .opening__brand .brand__img {
+  display: block;
+  height: clamp(112px, 17.5vw, 168px);
+  width: auto;
+  max-width: min(56vw, 272px);
+  object-fit: contain;
 }
-html.js .opening__brand .brand__sub {
-  font-size: clamp(var(--fs-3xs), 0.45rem + 0.5vw, var(--fs-xs));
-  letter-spacing: .34em;
-  color: var(--c-ink-3);
-  white-space: nowrap;
-}
-html.js .opening__brand .brand__sub i { font-style: normal; opacity: .5; }
 
 @keyframes opening-logo {
   0%          { opacity: 0; filter: blur(12px); transform: translateY(18px); }
@@ -797,28 +800,30 @@ html.js [data-reveal].is-in {
    5. COMPONENTS
    ========================================================================== */
 
-/* ------------------------------ ブランドロゴ ----------------------------- */
+/* ------------------------------ ブランドロゴ -----------------------------
+   ロゴは画像（assets/images/福朗本店ロゴ.png）。白抜きの版なので、
+   暗い背景（sumi）にそのまま乗る。
+
+   ▼ サイズ指定を height でそろえている理由
+   元画像 842×595 には上下左右に余白が入っており、字面は
+   横 65%／縦 60% ほどしか占めていない。width を基準にすると
+   場所ごとに見た目の大きさがそろわないため、height を基準にして
+   width: auto に任せる。見た目の高さは指定値のおよそ 6 割。      */
 .brand {
   display: inline-flex;
-  align-items: baseline;
-  gap: var(--sp-3);
-  font-family: var(--ff-heading);
-  line-height: 1;
+  align-items: center;
   margin: 0;
 }
-.brand__mark {
-  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
-  font-weight: var(--fw-heading-strong);
-  letter-spacing: .18em;
+/* height はボックス（透明余白込み）の高さで、字面はその約 6 割。
+   ヘッダーのバー（--nav-h）より大きい値を入れているが、余白が上下を
+   吸収するため字面はバー内に収まる。ヘッダーに overflow: hidden を
+   足すと切れるので注意。 */
+.brand__img {
+  display: block;
+  height: clamp(86px, 8.6vw, 112px);
+  width: auto;
 }
-.brand__sub {
-  font-size: var(--fs-3xs);
-  letter-spacing: .34em;
-  color: var(--c-ink-3);
-  white-space: nowrap;
-}
-.brand__sub i { font-style: normal; opacity: .5; }
-.brand--footer .brand__mark { font-size: clamp(1.5rem, 1.3rem + 0.8vw, 2rem); }
+.brand--footer .brand__img { height: clamp(84px, 9vw, 116px); }
 
 /* ------------------------------ ヘッダー --------------------------------
    参考サイトに合わせ、PC でもロゴとハンバーガーのみ。                   */
@@ -1018,12 +1023,21 @@ html.js [data-reveal].is-in {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(var(--hero-img-brightness)) saturate(var(--hero-img-saturate));
+  /* url(#hero-lift) は index.html 冒頭の SVG フィルタ。暗部を持ち上げてから
+     brightness / saturate で微調整する。順番を入れ替えないこと。
+     フィルタが見つからない環境では filter 全体が無効になり、
+     素の（暗い）映像がそのまま出る＝崩れはしない。 */
+  filter: url(#hero-lift)
+          brightness(var(--hero-img-brightness))
+          saturate(var(--hero-img-saturate));
 }
+/* 中央のビネットは縦組み見出しの下敷き。映像そのものを暗くする代わりに
+   こちらで可読性を作っているので、見出しの掛かる範囲だけ効かせて
+   周囲（皿や焼き台）は素の明るさで見せる。 */
 .hero__scrim {
   background:
     linear-gradient(to bottom, var(--scrim-top) 0%, transparent 30%, transparent 72%, var(--scrim-mid) 100%),
-    radial-gradient(58% 62% at 50% 46%, rgb(0 0 0 / .62), rgb(0 0 0 / .18) 62%, transparent 82%);
+    radial-gradient(46% 56% at 50% 46%, rgb(0 0 0 / .46), rgb(0 0 0 / .16) 58%, transparent 78%);
 }
 
 /* 暗転しきったら固定レイヤーの描画を止めて負荷を下げる（JS が付与） */
@@ -1044,17 +1058,20 @@ html.js [data-reveal].is-in {
   font-weight: var(--fw-heading);
   letter-spacing: var(--ls-ja-hero);
   line-height: 1;
+  /* 縦組みでは inline 軸＝上下なので、text-align が上下方向の揃えになる。
+     短い列（現代焼肉）が長い列（レトロが香る）の中央に来る。 */
+  text-align: center;
 }
 .hero__title span {
   display: block;
   white-space: nowrap;        /* 列の折り返しを防ぐ */
 }
-/* 2 列目（＝縦組みでは左側）。block-start = 右側の間隔、inline-start = 上の余白 */
+/* 2 列目（＝縦組みでは左側）。block-start は右側の列との間隔。
+   上下位置は .hero__title の text-align: center に任せるので
+   inline-start（上の余白）は持たせない。
+   字の大きさとウェイトは 1 列目とそろえるため、font-size も指定しない。 */
 .hero__title span + span {
   margin-block-start: clamp(1.5rem, 4vw, 3.25rem);
-  margin-inline-start: clamp(2rem, 7vh, 5rem);
-  font-size: .82em;
-  color: var(--c-on-media-2);
 }
 
 /* 左右のレール */
@@ -2378,8 +2395,10 @@ html.js [data-reveal].is-in {
      .hero__rail は justify-items: center なので左右対称に太るだけ。 */
   .hero__rail-link { padding-inline: 13px; }
 
-  /* ヘッダーのロゴ。inner が 64px なので余白を足しても収まる */
-  .brand { padding-block: 12px; }
+  /* ヘッダーのロゴ。inner が 64px しか無いので画像を縮めて収める。
+     画像そのものが 48px あり当たり判定は足りているため、
+     文字ロゴの頃に足していた padding-block は不要。 */
+  .site-header__inner > .brand > .brand__img { height: 78px; }
 
   /* インライン要素は行の高さではなく文字の高さ分しか当たり判定が無い。
      フッター内のリンクは ::after を重ねて広げる（下線の位置は動かさない）。 */
@@ -2406,10 +2425,9 @@ html.js [data-reveal].is-in {
   .hcard h4 { min-height: 0; }
 }
 
-/* 420px 以下で .brand__sub（焼・肉・店）を display:none にしていたため、
-   iPhone の実機幅ではヘッダーとフッターのロゴが PC と別物になっていた。
-   360px でもヘッダーは ロゴ 125px ＋ ハンバーガー 44px ＋ 余白 32px = 201px で
-   収まるため、PC と同じ表記に統一している。非表示に戻さないこと。 */
+/* ロゴは画像 1 枚（.brand__img）になったため、狭い幅で一部だけ隠す
+   といった出し分けはしていない。360px でもヘッダーは
+   ロゴ 79px ＋ ハンバーガー 44px ＋ 余白 32px = 155px で収まる。 */
 
 
 /* ==========================================================================

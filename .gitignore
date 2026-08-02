@@ -4,6 +4,8 @@
 # 原本素材（サイト未参照・ローカル管理）
 assets/images/fukurou_images/
 assets/images/_stock-backup/
+# FV 動画の原本（4K/HEVC・68MB）。配信するのは assets/video/fv-*.mp4 の方。
+assets/images/fukurouFV.mp4
 
 # クライアント提供資料・制作用スクリプト（非公開）
 資料/

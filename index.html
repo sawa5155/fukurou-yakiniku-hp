@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>焼肉 福朗｜徳島県産黒毛和牛と唯一無二の特製ダレ｜板野郡北島町の焼肉店</title>
-<meta name="description" content="焼肉 福朗は、昭和の香りを漂わせる新しくも懐かしい焼肉店。徳島県産黒毛和牛「阿波華牛」「すだち牛」と、修行先から受け継いだ濃厚特製ダレをレトロな空間でお楽しみください。徳島県板野郡北島町・徳島市庄町（弐番館 2026年9月上旬オープン予定）。">
+<meta name="description" content="焼肉 福朗は、レトロが香る現代焼肉。徳島県産黒毛和牛「阿波華牛」「すだち牛」と、修行先から受け継いだ濃厚特製ダレを懐かしくも新しい空間でお楽しみください。徳島県板野郡北島町・徳島市庄町（弐番館 2026年9月上旬オープン予定）。">
 <meta name="keywords" content="焼肉,福朗,徳島,北島町,黒毛和牛,阿波華牛,すだち牛,肉の北海,焼肉福朗 弐番館">
 <link rel="canonical" href="https://example.com/">
 
@@ -21,8 +21,8 @@
 <meta property="og:type" content="restaurant">
 <meta property="og:site_name" content="焼肉 福朗">
 <meta property="og:title" content="焼肉 福朗｜徳島県産黒毛和牛と唯一無二の特製ダレ">
-<meta property="og:description" content="昭和の香りを漂わせる、新しくも懐かしい焼肉店。徳島県産黒毛和牛と濃厚特製ダレを、レトロな空間で。">
-<meta property="og:image" content="assets/images/hero.jpg">
+<meta property="og:description" content="レトロが香る現代焼肉。徳島県産黒毛和牛と濃厚特製ダレを、懐かしくも新しい空間で。">
+<meta property="og:image" content="assets/images/hero-fv.jpg">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#000000">
@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 
-<link rel="preload" as="image" href="assets/images/hero.jpg" type="image/jpeg">
+<link rel="preload" as="image" href="assets/images/hero-fv.jpg" type="image/jpeg">
 <link rel="stylesheet" href="assets/css/style.css">
 
 <!-- ============================================================
@@ -74,6 +74,28 @@
 <body>
 
 <!-- ============================================================
+     ヒーロー映像のシャドウ持ち上げフィルタ
+
+     FV の素材は暗い照明で撮られていて、そのまま出すと画面の 8 割が
+     ほぼ黒に潰れる。CSS の brightness() は乗算なので黒には効かない
+     （0 に何を掛けても 0）ため、ガンマ補正で暗部だけを持ち上げる。
+     exponent を小さくするほど明るくなる。0.50 まで下げると肉が
+     白っぽく飛ぶので 0.60 に置いている。
+
+     参照は assets/css/style.css の .hero__media video / img。
+     色ずれを避けるため色空間は sRGB を明示している。
+     ============================================================ -->
+<svg class="svg-defs" aria-hidden="true" focusable="false">
+  <filter id="hero-lift" color-interpolation-filters="sRGB">
+    <feComponentTransfer>
+      <feFuncR type="gamma" exponent="0.60"/>
+      <feFuncG type="gamma" exponent="0.60"/>
+      <feFuncB type="gamma" exponent="0.60"/>
+    </feComponentTransfer>
+  </filter>
+</svg>
+
+<!-- ============================================================
      OPENING — 初回アクセス／リロード時の演出
      真っ暗な画面 → 中央にロゴがフェードイン → 保持 →
      黒幕が抜けてファーストビューが現れる、という流れ。
@@ -88,8 +110,7 @@
      ============================================================ -->
 <div class="opening" id="opening" aria-hidden="true">
   <p class="opening__brand">
-    <span class="brand__mark">福朗</span>
-    <span class="brand__sub">焼<i>・</i>肉<i>・</i>店</span>
+    <img class="brand__img" src="assets/images/福朗本店ロゴ.png" alt="" width="842" height="595" decoding="async" fetchpriority="high">
   </p>
 </div>
 
@@ -102,8 +123,7 @@
   <div class="site-header__inner">
 
     <a class="brand" href="#top" aria-label="焼肉 福朗 トップへ">
-      <span class="brand__mark">福朗</span>
-      <span class="brand__sub">焼<i>・</i>肉<i>・</i>店</span>
+      <img class="brand__img" src="assets/images/福朗本店ロゴ.png" alt="" width="842" height="595" decoding="async">
     </a>
 
     <!-- 参考サイトに合わせ、PC でもナビはハンバーガー内に格納 -->
@@ -172,18 +192,18 @@
          読み込まず、ポスター画像（動画の1フレーム）のまま表示される。
          JS が無効な環境でもポスターが出るため、絵が消えることはない。 -->
     <video class="hero__video" id="heroVideo"
-           poster="assets/images/hero.jpg"
+           poster="assets/images/hero-fv.jpg"
            muted loop playsinline preload="none"
-           data-src-sm="assets/video/hero-640.mp4"
-           data-src-lg="assets/video/hero-1280.mp4"
+           data-src-sm="assets/video/fv-960.mp4"
+           data-src-lg="assets/video/fv-1280.mp4"
            aria-hidden="true"></video>
   </div>
   <div class="hero__scrim" aria-hidden="true"></div>
 
   <!-- 中央の縦組みキャッチ -->
   <h1 class="hero__title" data-reveal>
-    <span>圧倒的、昭和スタイル</span>
-    <span>焼き台のファンファーレ</span>
+    <span>レトロが香る</span>
+    <span>現代焼肉</span>
   </h1>
 
   <!-- 左レール：SNS とご予約 -->
@@ -755,10 +775,9 @@
     <div class="site-footer__top">
       <div class="site-footer__brand">
         <p class="brand brand--footer">
-          <span class="brand__mark">福朗</span>
-          <span class="brand__sub">焼<i>・</i>肉<i>・</i>店</span>
+          <img class="brand__img" src="assets/images/福朗本店ロゴ.png" alt="上級品質 焼肉店 福朗" width="842" height="595" loading="lazy" decoding="async">
         </p>
-        <p class="site-footer__tagline">圧倒的、昭和スタイル。<br>徳島県産黒毛和牛と唯一無二の特製ダレ。</p>
+        <p class="site-footer__tagline">レトロが香る現代焼肉。<br>徳島県産黒毛和牛と唯一無二の特製ダレ。</p>
         <ul class="sns" aria-label="SNS">
           <li>
             <a href="https://www.instagram.com/fukurou_yakiniku/" target="_blank" rel="noopener" aria-label="北島本店 Instagram">
