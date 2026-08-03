@@ -31,7 +31,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;800&family=Zen+Kaku+Gothic+New:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 
 <link rel="preload" as="image" href="assets/images/hero-fv.jpg" type="image/jpeg">
 <link rel="stylesheet" href="assets/css/style.css">
@@ -216,9 +216,11 @@
     <div class="omoi">
 
       <figure class="omoi__main" data-reveal>
+        <!-- 原本は assets/images/fukurou_hp5.JPG（6016×4016・3.0MB）。
+             そのままでは重いので 1400px 幅に落として書き出したものを使う。 -->
         <picture>
-          <source srcset="assets/images/omoi-chef.webp" type="image/webp">
-          <img src="assets/images/omoi-chef.jpg" alt="焼き台で炙られる黒毛和牛" loading="lazy" decoding="async">
+          <source srcset="assets/images/omoi-grill.webp" type="image/webp">
+          <img src="assets/images/omoi-grill.jpg" alt="焼き台で炙られる黒毛和牛" loading="lazy" decoding="async">
         </picture>
       </figure>
 
@@ -243,10 +245,22 @@
 
     </div>
 
-    <!-- 想い 02 : タレに対する想い -->
+    <!-- 想い 02 : タレに対する想い
+         写真は 2 枚。大きい方（omoi__main）が主役の一皿、
+         小さい方（omoi__sub）が卓の引きのカット。
+         01 と左右が反転するので、SP では sub → main の順に階段状で出す。 -->
     <div class="omoi omoi--rev">
 
       <figure class="omoi__main" data-reveal>
+        <!-- 原本は assets/images/fukurou_hp32.JPG（4048×2702・1.9MB）。
+             そのままでは重いので 1400px 幅に落として書き出したものを使う。 -->
+        <picture>
+          <source srcset="assets/images/omoi-wagyu.webp" type="image/webp">
+          <img src="assets/images/omoi-wagyu.jpg" alt="特製ダレをまとった徳島県産A5ランク和牛の一皿" loading="lazy" decoding="async">
+        </picture>
+      </figure>
+
+      <figure class="omoi__sub" data-reveal>
         <picture>
           <source srcset="assets/images/tare.webp" type="image/webp">
           <img src="assets/images/tare.jpg" alt="特製ダレをまとった黒毛和牛が並ぶ卓" loading="lazy" decoding="async">

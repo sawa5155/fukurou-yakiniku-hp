@@ -1051,7 +1051,12 @@ html.js [data-reveal].is-in {
   writing-mode: vertical-rl;
   text-orientation: upright;
   font-size: var(--fs-hero);
-  font-weight: var(--fw-heading);
+  /* キャッチだけは最大の太さにする。Shippori Mincho の書体側の上限が 800 で、
+     index.html の Google Fonts の URL でもキャッチ専用に 800 を読み込んでいる
+     （400/500/600/800。--fw-heading の 300 は未読み込みで実際は 400 相当）。
+     900 を指定しても実体がないので合成太字になり、明朝の細い横画やウロコが
+     潰れる。800 が「本物のウェイトの最大」なのでこれ以上は上げない。 */
+  font-weight: 800;
   letter-spacing: var(--ls-ja-hero);
   line-height: 1;
   /* 縦組みでは inline 軸＝上下なので、text-align が上下方向の揃えになる。
@@ -1246,14 +1251,48 @@ html.js [data-reveal].is-in {
   object-fit: cover;
   filter: brightness(var(--img-brightness));
 }
-/* 01（トングの肉）は素材 1200×1500 の中で被写体が上寄りで、天面に暗い余白が
-   多い。既定の中央基準で横長に切ると焼き台と炎が切り落ちるので、切り取り位置を
-   下げて肉の芯・炎・焼き台の縁が入る範囲に寄せる。
-   横方向は指定しても効かない（素材が縦長なので横長の箱では常に全幅が見える）。
-   左に寄せる指定は SP 側の overflow で行っている。
-   素材と同じ 4:5 で出す PC では切り取りが起きないため、ここは影響しない。 */
+/* 01 の素材（omoi-grill = 1400×935 の 3:2 横長）は PC の箱（4:5）より横長なので、
+   切り取りは「横」に起きる。＝縦は常に全部見えていて object-position の Y は
+   効かない。寄せられるのは左右だけで、0%＝左端、100%＝右端。
+   60% は肉がほぼ中央、トングが左から入り、右に焼き台の奥行きが残る位置。
+   85% まで寄せると右が空きすぎて重心が崩れる。
+   901px 未満では箱がこれより横長になり切り取り量が変わるので、
+   下の max-width: 900px 側で中央基準に戻している。 */
 .omoi:first-of-type .omoi__main img {
-  object-position: center 75%;
+  object-position: 60% center;
+}
+
+/* PC だけ 01 をズームインさせる。
+   この箱（4:5）では cover の倍率が高さ基準で決まるため、object-position をどう
+   振っても倍率は変わらず、箱の比を変えると写真の高さ＝セクションの縦位置が動く。
+   縦幅を保ったまま寄るには、img を箱より縦に長く描いて、figure の
+   overflow: hidden で上下を均等に落とすのがいちばん副作用が小さい。
+   絶対配置にして高さを --zoom（箱の高さに対する %）で与え、top で溢れの半分だけ
+   上へずらす。倍率は --zoom の 1 箇所で動く。
+   1180px コンテナで 576×720px の箱、倍率 0.770 → 0.863（＋12%）、
+   可視は素材の x31〜79% / y5〜95%。
+
+   幅ではなく高さで寄せているのは、この箱（4:5）では cover の倍率が高さ基準で
+   決まるため。幅を広げても倍率は変わらない（横に切れるだけ）。
+   なお inset だけで大きさを決めることはできない。img は置換要素なので
+   width: auto が固有サイズ（1400px）になり、right の指定が無視される。
+
+   901px 未満に持ち込むと箱の比（4:3 / 3:2）と噛み合わないので、
+   max-width ではなく min-width で PC だけに閉じている。 */
+@media (min-width: 901px) {
+  .omoi:first-of-type .omoi__main {
+    position: relative;
+    aspect-ratio: 4 / 5;
+  }
+  .omoi:first-of-type .omoi__main img {
+    --zoom: 112%;
+    position: absolute;
+    left: 0;
+    top: calc((100% - var(--zoom)) / 2);
+    width: 100%;
+    height: var(--zoom);
+    aspect-ratio: auto;
+  }
 }
 
 /* 横組みの見出し。左端（X 方向）を下の段落（.omoi__paras）に揃えたいので、
@@ -1298,6 +1337,24 @@ html.js [data-reveal].is-in {
 /* 02 も見出しは段落と同じカラム（左端が揃う） */
 .omoi--rev .omoi__title { grid-column: 1 / 6; }
 .omoi--rev .omoi__paras { grid-column: 1 / 6; }
+
+/* 02 の 2 枚目（卓の引きのカット）。見出し・段落と同じ左カラムの下に続けて、
+   段落の下に横長で置く。大きい写真（右・rows 1-3）とは列が別なので重ならない。
+   3 列ぶんに絞って、右側にあえて余白を残している。 */
+.omoi__sub {
+  grid-column: 1 / 5;
+  grid-row: 3;
+  align-self: end;
+  /* .omoi は column-gap しか持たないので、段落との間隔はここで作る */
+  margin: clamp(2.5rem, 5vw, 4.5rem) 0 0;
+  overflow: hidden;
+}
+.omoi__sub img {
+  width: 100%;
+  aspect-ratio: var(--ratio-photo);
+  object-fit: cover;
+  filter: brightness(var(--img-brightness));
+}
 
 .pullquote {
   margin: 0;
@@ -2022,9 +2079,11 @@ html.js [data-reveal].is-in {
   /* 想い：1カラムに積み替える */
   .omoi { grid-template-columns: 1fr; row-gap: var(--sp-7); }
   .omoi__main,
+  .omoi__sub,
   .omoi__title,
   .omoi__paras,
   .omoi--rev .omoi__main,
+  .omoi--rev .omoi__sub,
   .omoi--rev .omoi__title,
   .omoi--rev .omoi__paras {
     grid-column: 1 / -1;
@@ -2033,6 +2092,12 @@ html.js [data-reveal].is-in {
     margin-block: 0;
   }
   .omoi__main img { aspect-ratio: var(--ratio-photo); }
+  /* 1 カラムでは DOM 順（大きい写真 → 小さい写真 → 見出し → 段落）になるが、
+     PC と同じ「見出し → 段落 → 小さい写真」の縦順にそろえたいので最後へ送る。 */
+  .omoi__sub { order: 1; }
+  /* 01 の右寄せは PC の 4:5（可視幅53%）向けの値。ここから下は箱が横長になって
+     切り取り量が減るため、そのまま持ち込むと寄りすぎる。中央基準に戻す。 */
+  .omoi:first-of-type .omoi__main img { object-position: center; }
   .omoi__title {
     margin-top: var(--sp-5);
   }
@@ -2175,35 +2240,61 @@ html.js [data-reveal].is-in {
   }
   .omoi .omoi__main img { aspect-ratio: 4 / 5; }
 
-  /* 01 だけは横長の帯で見せる。狙いは 3 つ。
+  /* 01 だけは横長の帯で見せる。12 カラム中 11（幅92%）で右に余白を残し、
+     左端フラッシュは維持する。右余白はカラムの刻みだと 32px（11カラム）と
+     65px（10カラム）しか取れず中間が作れないので、margin を足して 48px にしている。
+     390px 幅で 342×228px。
 
-     (1) 右に余白：12 カラム中 9（幅75%）までにし、左端フラッシュは維持する。
-     (2) ズームアウト：箱を 16:9 → 4:3 にして素材の縦を多く見せる（45% → 52%）。
-         あわせて幅が縮むぶん表示倍率も下がる（0.325 → 0.280）。
-     (3) 焦点を左へ：素材が縦長（4:5）なので横長の箱では cover が幅基準になり、
-         常に全幅が見える＝object-position の X が効かない。左に寄せるには
-         img を箱より広く描いて、figure の overflow: hidden で右端を削るしかない。
-         1.15 倍で右の 13% を落としている。
+     箱は 3:2 ＝ 素材（1400×935）とまったく同じ比。縦幅はこの比で決まる。
 
-     結果、390px 幅で 292×219px・右余白 98px、素材の x0〜87% / y36〜88% が見える。
-     箱の形は figure 側で決めるので、img の aspect-ratio は解除する。 */
+     そのうえで img を箱より広く描き、figure の overflow: hidden で溢れた分を
+     落としてズームインさせている。箱の比を変えてズームインすると縦幅が動いて
+     しまうため（3:2 より縦長にしないと表示倍率は上がらない）、縦幅 228px を
+     保ったまま寄るにはこの方法しかない。
+     箱と素材が同じ 3:2 なので、この方法だと上下左右が同率で削れる。
+     --zoom 130% で表示倍率 0.244 → 0.317、可視は素材の 77%（x12〜88%）。
+
+     img は箱の左端起点なので、溢れた分をそのままにすると右だけが削られて
+     可視が左に張り付く。margin-inline-start で溢れの半分だけ左へずらして
+     左右均等にしている（--zoom を変えれば calc が追従する）。
+     右に寄せたいときはこの値を 0 に近づける（0 で右端そろえ）。
+     上下は object-position の Y（900px 側で center）で均等に落ちている。
+
+     ズームは --zoom の 1 箇所だけで動かせる。ただし 145% を超えると、
+     3 倍描画の端末で素材幅 1400px を使い切って拡大表示になる（＝甘くなる）。
+
+     箱の形は figure 側で決めるので、img の aspect-ratio は解除する。
+     picture は 430 行目で display: contents になっていて img が figure の直接の子
+     として扱われるため、picture 側には何も指定しない。 */
   .omoi:first-of-type .omoi__main {
-    grid-column: 1 / 10;
-    aspect-ratio: var(--ratio-photo);
-  }
-  /* picture は既定でインラインなので、行ボックスの余白ぶん img が下にずれて
-     箱の底が切れる。ブロックにして高さをそのまま渡す。 */
-  .omoi:first-of-type .omoi__main picture {
-    display: block;
-    height: 100%;
+    grid-column: 1 / 12;
+    margin-inline-end: var(--sp-4);
+    aspect-ratio: 3 / 2;
   }
   .omoi:first-of-type .omoi__main img {
-    width: 115%;
+    --zoom: 125%;
+    /* 溢れた 30% をどこから削るか。0 ＝ 左端そろえ（可視 x0〜77%）、
+       0.5 ＝ 左右均等（x12〜88%）、1 ＝ 右端そろえ（x23〜100%）。
+       大きくするほど可視範囲が右へ動く。 */
+    --focus-x: 0.7;
+    width: var(--zoom);
+    /* 424 行目の img { max-width: 100% } が --zoom を 100% に丸めてしまうので外す。
+       これが無いと幅は箱と同じままで、margin のぶんだけ横にずれて右に隙間が出る。 */
+    max-width: none;
+    margin-inline-start: calc((100% - var(--zoom)) * var(--focus-x));
     height: 100%;
     aspect-ratio: auto;
   }
 
-  /* 02 は写真が 1 枚だけなので左右を反転して右端フラッシュにする */
+  /* 02 は 2 枚あるので、01 の左右を反転した階段にする。
+     行1 に小さい写真（左端フラッシュ・横長）、行2 に大きい写真（右端フラッシュ）。
+     01 は写真が 1 枚なので行1 は空のまま（大きい写真が行2 から始まる）。 */
+  .omoi--rev .omoi__sub {
+    grid-column: 1 / 6;
+    grid-row: 1;
+    margin: 0;
+  }
+  .omoi--rev .omoi__sub img { aspect-ratio: var(--ratio-photo); }
   .omoi--rev .omoi__main { grid-column: 7 / 13; }
 
   /* 行3：見出し。字下げは段落と同じ値にして左端（X 方向）を揃える */
