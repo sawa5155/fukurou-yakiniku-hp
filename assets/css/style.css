@@ -172,13 +172,19 @@
   --c-on-media-line: rgb(255 255 255 / .48);
 
   /* ---- 背景の煙（こだわりセクション） ------------------------------------
-     「黒地に白い煙」の写真をスクリーン合成で重ね、
-     黒い部分を透過させて煙だけを浮かせる。
-     --smoke-size で大きさ、--smoke-opacity で濃さが変わる。          */
-  --smoke-size:    clamp(26rem, 52vw, 54rem);
-  --smoke-opacity: .40;   /* 参考サイトの 0.412 に合わせた濃さ */
+     写真素材ではなく CSS のグラデーションで描いている。
+     煙ひと筋（.smoke__wisp）を 3 枚重ね、それぞれ違う周期で
+     「足元から湧いて、斜め上へのぼりながら広がって、消える」を
+     繰り返させることで、途切れずに立ちのぼって見える。
+     --smoke-size で大きさ、--smoke-opacity で濃さ、
+     --smoke-tint で煙の色（rgb の 3 値）、--smoke-speed で速さが変わる。 */
+  --smoke-size:    clamp(22rem, 46vw, 48rem);
+  --smoke-opacity: .66;
   --smoke-blend:   screen;
-  --smoke-blur:    2px;   /* JPEG のノイズを消す程度。大きくすると煙の形が崩れる */
+  --smoke-tint:    255 255 255;  /* 暗い地色に screen で重ねる白い煙 */
+  --smoke-speed:   .42;   /* 小さいほど速い。1 で 31/43/37 秒、.42 で約 4 割の時間
+                             （＝約 2.4 倍速）。0 や負の値にはしないこと */
+  --smoke-grain:   512px; /* 煙のちぎれ方の細かさ。小さくすると筋が細かくなる */
 
   /* ---- フォームの面 ------------------------------------------------------
      地色に対して --c-ink（文字色）をごく薄く混ぜて面を作るため、
@@ -319,10 +325,12 @@
   --scrim-mid:    rgb(20 18 16 / .24);
   --scrim-bottom: rgb(20 18 16 / .72);
   --img-brightness: 1;
-  /* 煙の素材は「黒地に白い煙」でスクリーン合成が前提のため、
-     明るい地色では使えない。明るいテーマでは非表示にしている。
-     使う場合は「白地に黒い煙」の素材を用意し multiply に変更してください。 */
-  --smoke-opacity: 0;
+  /* 煙は CSS で描いているので色を変えられる。明るい地色では
+     白い煙が消えてしまうため、墨色にして multiply で重ねる。
+     写真素材だった頃はここを --smoke-opacity: 0 にして隠していた。 */
+  --smoke-tint:    26 25 23;
+  --smoke-blend:   multiply;
+  --smoke-opacity: .26;
   /* ヒーロー見出しは白固定。FV 動画は元から暗いので落としすぎない */
   --hero-img-brightness: .85;
   --hero-img-saturate: .95;
@@ -361,7 +369,7 @@
   --scrim-mid:    rgb(21 12 12 / .30);
   --scrim-bottom: rgb(21 12 12 / .84);
   --img-brightness: .95;
-  --smoke-opacity: .32;
+  --smoke-opacity: .60;
   --hero-img-brightness: .93;
   --hero-img-saturate: 1;
 
@@ -1375,48 +1383,244 @@ body.is-reserve-open .nav-toggle {
 /* ---- 背景の煙 ------------------------------------------------------------
    参考サイト（otowa-net.com の section03）と同じ考え方で、
    大きな煙を左右の端から半分はみ出させ、低い不透明度で重ねる。
-   置いたセクション側に overflow: hidden が必要。 */
+   置いたセクション側に overflow: hidden が必要。
+
+   合成（screen / multiply）と濃さは .smoke にまとめて一度だけ掛ける。
+   こうしておくと内側の煙は通常合成のまま動かせるので、
+   ブラウザは各層を GPU のテクスチャに焼いたまま transform だけ
+   動かせばよく、毎フレーム描き直さずに済む。         */
+
+/* 煙のゆらぎ模様。SVG の feTurbulence（フラクタルノイズ）を data URI で
+   持たせた 512×512 の絵で、これを mask に敷いてもやを刻む。
+   ・baseFrequency の 2 値は「横 縦」の細かさ。横を大きく・縦を小さく
+     すると模様が縦に伸び、煙が立ちのぼる筋に見える。
+   ・seed を変えると別のちぎれ方になる（a / b / c で変えている）。
+   ・stitchTiles='stitch' が繰り返しの継ぎ目を消す指定。
+   ・feColorMatrix の最終行 "1.9 0 0 0 -0.44" は
+     「不透明度 ＝ 1.9 × ノイズ − 0.44」の意味。
+     第1数値を上げるとコントラストが上がって筋が細くちぎれ、
+     第5数値（引く量）を小さくすると穴が埋まって煙が分厚くなる。
+   ・512×512 は --smoke-grain と同じ値にしてある。ここを揃えておくと
+     拡大縮小されないので、細い筋がぼやけずに出る。      */
+:root {
+  --smoke-noise-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='s' filterUnits='userSpaceOnUse' x='0' y='0' width='512' height='512' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.042 0.017' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1.9 0 0 0 -0.44'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23s)'/%3E%3C/svg%3E");
+  --smoke-noise-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='s' filterUnits='userSpaceOnUse' x='0' y='0' width='512' height='512' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.034 0.014' numOctaves='4' seed='29' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1.8 0 0 0 -0.39'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23s)'/%3E%3C/svg%3E");
+  --smoke-noise-c: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='s' filterUnits='userSpaceOnUse' x='0' y='0' width='512' height='512' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.050 0.021' numOctaves='3' seed='47' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.0 0 0 0 -0.48'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23s)'/%3E%3C/svg%3E");
+}
+
 .smoke {
   position: absolute;
   inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-}
-.smoke__puff {
-  position: absolute;
-  width: var(--smoke-size);
-  height: var(--smoke-size);
-  background-image: url("../images/smoke.jpg");
-  background-image: image-set(
-    url("../images/smoke.webp") type("image/webp"),
-    url("../images/smoke.jpg")  type("image/jpeg")
-  );
-  background-size: cover;
-  background-repeat: no-repeat;
   opacity: var(--smoke-opacity);
   mix-blend-mode: var(--smoke-blend);
-  filter: blur(var(--smoke-blur));
 }
 
-/* 右上から流れ込む */
+/* セクションの上下端で煙を地色に溶かす幕。
+   煙は overflow: hidden の境目で切られるため、そのままだと
+   端に水平の切り口が出る。地色（--c-bg）で薄く覆って消す。
+   ・screen 合成のとき地色は黒 → 黒を screen しても変化しない
+   ・multiply 合成のとき地色はほぼ白 → 白を multiply しても変化しない
+   どちらの合成でも「煙だけが消えて地色は変わらない」ので、
+   テーマを問わずこの指定で足りる。                      */
+.smoke::before,
+.smoke::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  /* ::before は最初の子なので、そのままだと煙より先に描かれて
+     下敷きになってしまう（::after は最後の子なので効く）。
+     z-index で前面に出して、どちらの幕も煙の上に載せる。 */
+  z-index: 1;
+}
+.smoke::before {
+  inset-block-start: 0;
+  height: clamp(8rem, 16vw, 14rem);
+  background: linear-gradient(to bottom, var(--c-bg), transparent);
+}
+.smoke::after {
+  inset-block-end: 0;
+  height: clamp(7rem, 14vw, 12rem);
+  background: linear-gradient(to top, var(--c-bg), transparent);
+}
+
+/* 煙 1 本ぶんの箱。横幅は --smoke-size、縦はその 6 割にしている。
+   中のグラデーションも移動量も箱に対する % なので、この 1 行で
+   「横はそのまま、縦だけ縮める」ができる。
+   正方形のままだと 1 本で 976px（1 画面ぶん）を占めてしまう。
+   ただし縦だけ詰めすぎると、横移動が縦移動を上回って煙が寝てしまう。
+   横（--smoke-size）と縦（--puff-h）は必ずセットで見ること。 */
+.smoke__puff {
+  --puff-h: calc(var(--smoke-size) * .68);
+  position: absolute;
+  width: var(--smoke-size);
+  height: var(--puff-h);
+}
+
+/* 煙ひと筋。1 本が「足元から湧いて、斜め上へのぼりながら広がって、消える」
+   を繰り返す。3 枚を別々の周期・別々の出だしで走らせているので、
+   途切れずに立ちのぼり続けているように見える。
+
+   回転は使っていない。斜めの傾きは、塊（radial-gradient）を
+   「足元は外側・上へいくほど内側」と斜めに並べて出している。
+   rotate で箱ごと傾けるとゆらぎ模様まで回ってしまい、
+   煙が渦を巻いて見えるため。
+
+   見た目は「もやの塊（background のグラデーション）」を
+   「ゆらぎ模様（mask のノイズ）」で刻んで作る。
+   ノイズは SVG の feTurbulence を data URI で持たせた小さな絵で、
+   stitchTiles を付けて継ぎ目なく敷き詰められるようにしてある。
+   --smoke-grain（固定 px）で敷くので、大きさの違う煙どうしでも
+   同じ絵を使い回せ、ブラウザは 1 回描くだけで済む。
+
+   動かすのは transform と opacity だけ。ぼかしフィルタや
+   mask-position のアニメーションは、動くたびに描き直しになるので使わない。 */
+.smoke__wisp {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-repeat: repeat;
+          mask-repeat: repeat;
+  -webkit-mask-size: var(--smoke-grain) var(--smoke-grain);
+          mask-size: var(--smoke-grain) var(--smoke-grain);
+  /* のぼる速さは一定にしたいので linear。ease だと途中で止まって見える */
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: calc(var(--wisp-dur) * var(--smoke-speed));
+  /* 出だしのずれも --smoke-speed で一緒に縮める。
+     こうしておくと速さを変えても 3 枚の間隔の比率が崩れない。 */
+  animation-delay: calc((var(--wisp-lag) + var(--puff-lag, 0s)) * var(--smoke-speed));
+  /* 足元を支点にして拡大すると、上へ広がりながらのぼる形になる */
+  transform-origin: 50% 85%;
+  will-change: transform, opacity;
+}
+
+/* 3 枚それぞれ、柱の太さ・ゆらぎの種・のぼり方を変えている。
+   radial-gradient の「12% 20%」が塊の縦横比、「at 58% 70%」が位置。
+   下ほど小さく濃く・外寄り、上ほど大きく薄く・内寄りに置くことで、
+   「元は細く、斜め上へ広がりながら薄れる」煙の形になる。
+   間を埋める 3 本目があるのは、これが無いと足元と上とが分かれて
+   2 つの塊に見え、ひと続きの分厚い煙にならないため。
+
+   ★ どの塊も「中心 ± 半径 × 消える位置」が 3%〜97% に収まっていること。
+     はみ出すと、色が残ったまま箱の縁で切られて四角い継ぎ目が出る。
+     例：at 36% 26% で半径 36% 26%、消える位置 88% なら
+         横 36±31.7 → 4.3〜67.7、縦 26±22.9 → 3.1〜48.9 で収まる。
+   feTurbulence の seed を変えると別のちぎれ方になる。       */
+.smoke__wisp--a {
+  --wisp-dur: 31s;
+  --wisp-lag:    0s;   /* 周期の 0/3 */
+  background:
+    radial-gradient(14% 20% at 62% 74%, rgb(var(--smoke-tint) / 1), rgb(var(--smoke-tint) / 0) 100%),
+    radial-gradient(24% 34% at 52% 56%, rgb(var(--smoke-tint) / .95), rgb(var(--smoke-tint) / 0) 80%),
+    radial-gradient(22% 26% at 44% 42%, rgb(var(--smoke-tint) / .80), rgb(var(--smoke-tint) / 0) 85%),
+    radial-gradient(36% 26% at 36% 26%, rgb(var(--smoke-tint) / .66), rgb(var(--smoke-tint) / 0) 88%);
+  -webkit-mask-image: var(--smoke-noise-a);
+          mask-image: var(--smoke-noise-a);
+  animation-name: smoke-rise-a;
+}
+.smoke__wisp--b {
+  --wisp-dur: 36s;
+  --wisp-lag:  -12s;   /* 周期の 1/3 */
+  background:
+    radial-gradient(13% 18% at 66% 76%, rgb(var(--smoke-tint) / .98), rgb(var(--smoke-tint) / 0) 100%),
+    radial-gradient(23% 36% at 54% 56%, rgb(var(--smoke-tint) / .90), rgb(var(--smoke-tint) / 0) 80%),
+    radial-gradient(20% 24% at 46% 40%, rgb(var(--smoke-tint) / .74), rgb(var(--smoke-tint) / 0) 85%),
+    radial-gradient(34% 24% at 34% 26%, rgb(var(--smoke-tint) / .60), rgb(var(--smoke-tint) / 0) 90%);
+  -webkit-mask-image: var(--smoke-noise-b);
+          mask-image: var(--smoke-noise-b);
+  -webkit-mask-position: 37% 61%;
+          mask-position: 37% 61%;
+  animation-name: smoke-rise-b;
+}
+.smoke__wisp--c {
+  --wisp-dur: 33.5s;
+  --wisp-lag: -22.3s;  /* 周期の 2/3 */
+  background:
+    radial-gradient(11% 16% at 58% 70%, rgb(var(--smoke-tint) / .92), rgb(var(--smoke-tint) / 0) 100%),
+    radial-gradient(20% 32% at 48% 50%, rgb(var(--smoke-tint) / .76), rgb(var(--smoke-tint) / 0) 82%),
+    radial-gradient(18% 22% at 40% 36%, rgb(var(--smoke-tint) / .60), rgb(var(--smoke-tint) / 0) 86%),
+    radial-gradient(29% 22% at 32% 24%, rgb(var(--smoke-tint) / .52), rgb(var(--smoke-tint) / 0) 90%);
+  -webkit-mask-image: var(--smoke-noise-c);
+          mask-image: var(--smoke-noise-c);
+  -webkit-mask-position: 68% 24%;
+          mask-position: 68% 24%;
+  animation-name: smoke-rise-c;
+}
+
+/* 3 か所の煙が揃ってのぼると作り物に見えるので、場所ごとにもずらす */
+.smoke__puff--tr { --puff-lag:  -5s; }
+.smoke__puff--bl { --puff-lag: -20s; }
+.smoke__puff--br { --puff-lag: -34s; }
+
+/* 斜め上へのぼる 1 周期。
+   足元（translateY プラス・translateX プラス＝外寄り）で細く・透明 →
+   濃くなりながら斜め上へ →  広がって薄れ、上で消える。
+   X が ＋ から － へ動くぶんが「斜め」で、縦の移動量に対して
+   だいたい 30 度ほど内側へ傾く。回転はしていない。
+   82% あたりの opacity は「消え際を粘らせる」ための点で、
+   これが無いと 3 枚が同時に薄くなる瞬間に煙がほぼ消える。
+   0% と 100% はどちらも opacity 0 なので、1 周して先頭に戻る瞬間は見えない。 */
+@keyframes smoke-rise-a {
+  0%   { transform: translate3d(9%, 16%, 0) scale(.58, .60);      opacity: 0; }
+  12%  {                                                          opacity: .95; }
+  55%  { transform: translate3d(-5%, -10%, 0) scale(1.02, 1.04);  opacity: .80; }
+  82%  {                                                          opacity: .55; }
+  100% { transform: translate3d(-22%, -40%, 0) scale(1.30, 1.26); opacity: 0; }
+}
+@keyframes smoke-rise-b {
+  0%   { transform: translate3d(11%, 18%, 0) scale(.54, .56);     opacity: 0; }
+  14%  {                                                          opacity: .88; }
+  58%  { transform: translate3d(-6%, -12%, 0) scale(1.06, 1.08);  opacity: .74; }
+  84%  {                                                          opacity: .50; }
+  100% { transform: translate3d(-24%, -42%, 0) scale(1.36, 1.30); opacity: 0; }
+}
+@keyframes smoke-rise-c {
+  0%   { transform: translate3d(7%, 14%, 0) scale(.62, .64);      opacity: 0; }
+  12%  {                                                          opacity: .80; }
+  55%  { transform: translate3d(-5%, -9%, 0) scale(1.00, 1.02);   opacity: .64; }
+  80%  {                                                          opacity: .44; }
+  100% { transform: translate3d(-21%, -36%, 0) scale(1.24, 1.22); opacity: 0; }
+}
+
+/* 「動きを減らす」設定への対応。
+   立ちのぼる動きは 0% も 100% も opacity: 0 なので、共通の指定
+   （animation-duration: .01ms）でアニメーションを潰すと煙ごと消える。
+   ここではアニメーション自体を切って、のぼりかけの姿で静止させる。 */
+@media (prefers-reduced-motion: reduce) {
+  .smoke__wisp {
+    animation: none !important;
+    opacity: .84;
+    transform: translate3d(0, -6%, 0) scale(1.00, 1.02);
+  }
+  .smoke__wisp--b { opacity: .70; transform: translate3d(-10%, -24%, 0) scale(1.22, 1.30); }
+  .smoke__wisp--c { opacity: .56; transform: translate3d(-15%, -36%, 0) scale(1.30, 1.40); }
+}
+
+/* 3 か所の置き場所。
+   煙は「足元は外側・上へいくほど内側」に流れるので、右端の 2 本は
+   そのまま左上へのぼる。左端の 1 本だけ scaleX(-1) で鏡に映して
+   右上へのぼらせる（回転ではなく左右反転なので、ゆらぎ模様は回らない）。
+   上下端に出る切り口は .smoke::before / .smoke::after の幕で地色に溶かす。 */
+/* 右上 */
 .smoke__puff--tr {
-  inset-inline-end: calc(var(--smoke-size) * -.34);
-  inset-block-start: 1%;
+  inset-inline-end: calc(var(--smoke-size) * -.36);
+  inset-block-start: 14%;
 }
-/* 左下寄りから流れ込む（左右反転） */
+/* 左の中ほど（左右反転して右上へのぼらせる） */
 .smoke__puff--bl {
-  inset-inline-start: calc(var(--smoke-size) * -.38);
-  inset-block-start: 44%;
-  transform: scaleX(-1) rotate(6deg);
+  inset-inline-start: calc(var(--smoke-size) * -.40);
+  inset-block-start: 48%;
+  transform: scaleX(-1);
 }
-/* 右下から立ちのぼる（回転させて流れの向きを変え、少し小さく・薄く） */
+/* 右下。下へのはみ出しは浅くしておく。深く出すと、グラデーションが
+   まだ濃いところでセクション下端に切られて水平の切り口が見えるため。 */
 .smoke__puff--br {
-  --smoke-size: clamp(21rem, 42vw, 44rem);
-  inset-inline-end: calc(var(--smoke-size) * -.26);
-  inset-block-end: calc(var(--smoke-size) * -.30);
-  opacity: calc(var(--smoke-opacity) * .82);
-  transform: rotate(168deg);
+  --smoke-size: clamp(26rem, 52vw, 54rem);
+  inset-inline-end: calc(var(--smoke-size) * -.28);
+  inset-block-end: calc(var(--puff-h) * -.05);
+  opacity: .88;
 }
 
 /* ------------------------------ 想い ------------------------------------ */
@@ -2878,29 +3082,24 @@ body.is-reserve-open .nav-toggle {
   }
 
   /* ---- 背景の煙 ------------------------------------------------------------
-     SP は 1 カラムなので写真がコンテナ全幅（x 24..366）を占め、
-     煙が見えるのは「写真が無い縦帯」だけになる。
-     ところが --smoke-size は clamp(26rem, 52vw, 54rem) で、
-     390px では 52vw(203px) が下限 26rem(416px) を下回るため常に 416px となり、
-     写真帯を跨いでしまって tr はほぼ全面が写真の裏に隠れていた。
-
-     実測した写真の無い帯（390px / セクション高 3572px）
-       419–963  (11.7%–27%)   … Wagyu Beef のテキストと諸元表
-       1219–1852(34.1%–51.8%) … 阿波華牛のテキストと「旨さの秘訣」見出し
-       3323–3572(93%–100%)    … 最後のカードの下（セクション下端の余白）
-
-     この3つの帯に収まるサイズまで縮めて置き直す。 */
+     SP は 1 カラムなので、写真がコンテナ全幅を占める帯では煙が裏に隠れる。
+     6 本を縦に散らしてあるので、どこかしらの帯には必ず顔を出す。
+     1 本を大きくするより、小さめのまま本数で見せるほうが破綻しない。 */
   .smoke {
-    --smoke-size: clamp(21rem, 92vw, 28rem);
+    --smoke-size: clamp(26rem, 112vw, 34rem);
+    /* 帯が狭いぶん動きも見えにくいので、PC より少しゆっくりにする */
+    --smoke-speed: .52;
   }
-  .smoke__puff--tr { inset-block-start: 8%; }
-  .smoke__puff--bl { inset-block-start: 41%; }
-  /* br は最後のカードの写真より下から始めて、下端から抜けさせる
-     （PC の「右下から立ちのぼる」意図と同じ。はみ出しは overflow で切られる） */
-  .smoke__puff--br {
-    inset-block-start: 94%;
-    inset-block-end: auto;   /* 下端基準をやめて上端基準に切り替える */
-  }
+  /* 実測した「写真が無い縦帯」に合わせて置き直す（390px / セクション高 3572px）
+       419–963   … Wagyu Beef のテキストと諸元表
+       1219–1852 … 阿波華牛のテキストと「旨さの秘訣」見出し
+     PC の 1% / 42% のままだと、上の 1 本が上端の幕に食われてしまう。 */
+  .smoke__puff--tr { inset-block-start: 14%; }
+  .smoke__puff--bl { inset-block-start: 44%; }
+  /* SP でも 3 枚そろえる。立ちのぼる動きは 3 枚を 1/3 周期ずつずらして
+     途切れないようにしているので、1 枚落とすと煙が消える瞬間ができる。
+     1 枚あたりの面積が PC の 1/4 ほどなので、9 層でも負荷は軽い。 */
+
   /* 4:3 の写真 4 枚で 1,000px 超になるため、SP だけ 16:9 に */
   .hcard__media img { aspect-ratio: var(--ratio-wide); }
 

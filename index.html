@@ -332,12 +332,26 @@
      ============================================================ -->
 <section class="section section--kodawari" id="kodawari">
 
-  <!-- 背景の煙（装飾）。参考サイト section03 と同じく端から流し込む。
-       右上・左下・右下の3か所。同じ素材を反転／回転して使い回している。 -->
+  <!-- 背景の煙（装飾）。写真は使わず CSS のグラデーションで描いている。
+       右上・左の中ほど・右下の3か所。1 本は .smoke__wisp を 3 枚重ねたもので、
+       別々の周期で斜め上へ立ちのぼらせている
+       （詳細は style.css の「背景の煙」）。 -->
   <div class="smoke" aria-hidden="true">
-    <span class="smoke__puff smoke__puff--tr"></span>
-    <span class="smoke__puff smoke__puff--bl"></span>
-    <span class="smoke__puff smoke__puff--br"></span>
+    <span class="smoke__puff smoke__puff--tr">
+      <span class="smoke__wisp smoke__wisp--a"></span>
+      <span class="smoke__wisp smoke__wisp--b"></span>
+      <span class="smoke__wisp smoke__wisp--c"></span>
+    </span>
+    <span class="smoke__puff smoke__puff--bl">
+      <span class="smoke__wisp smoke__wisp--a"></span>
+      <span class="smoke__wisp smoke__wisp--b"></span>
+      <span class="smoke__wisp smoke__wisp--c"></span>
+    </span>
+    <span class="smoke__puff smoke__puff--br">
+      <span class="smoke__wisp smoke__wisp--a"></span>
+      <span class="smoke__wisp smoke__wisp--b"></span>
+      <span class="smoke__wisp smoke__wisp--c"></span>
+    </span>
   </div>
 
   <div class="container">
