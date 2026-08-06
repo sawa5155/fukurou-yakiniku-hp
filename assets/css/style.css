@@ -1735,6 +1735,17 @@ body.is-reserve-open .nav-toggle {
   letter-spacing: var(--ls-ja);
 }
 .pullquote__body p:last-child { margin-bottom: 0; }
+/* PC は全面写真の上に置くので 13px（--fs-sm）のままだと文字が写真に埋もれる。
+   ただし理念の文章なので --fs-lg（15–17px）まで上げると見出しに寄って騒がしい。
+   1px だけ足した --fs-md（14px）に留める。
+   いちばん長い行「ひいては経済成長を…信じています。」が 24 字＝336px で、
+   PC の本文幅には十分収まるので折り返しは起きない。
+   ※ 上の .pullquote__body p と同じ詳細度なので、必ずこの位置（後ろ）に置くこと。 */
+@media (min-width: 901px) {
+  .pullquote__body p {
+    font-size: var(--fs-md);
+  }
+}
 
 /* ------------------------------ こだわり -------------------------------- */
 /* ---- こだわりの横並び（参考サイト section03 の段違いレイアウト） --------
