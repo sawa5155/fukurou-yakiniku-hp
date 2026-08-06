@@ -39,9 +39,12 @@
   --ff-sans:  "YuGothic", "Yu Gothic", "Zen Kaku Gothic New", "Hiragino Sans",
               "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
   --ff-en:    "EB Garamond", "Times New Roman", Times, serif;
-  /* 本店ロゴ「福朗」の筆文字はヒーローのキャッチにだけ使い、そこは
-     アウトライン化した SVG で入れている（.hero__title-svg）。
-     Web フォントとしては読み込んでいないので、ここに毛筆の変数は持たない。 */
+  /* 本店ロゴ「福朗」の筆文字に寄せるための書体。使うのはヒーローのキャッチだけ。
+     Yuji Syuku（佑字 肅）は Google Fonts の無償の毛筆書体。
+     Web フォントが落ちてきていない環境では Windows 標準の行書体、
+     最後に明朝へ落とす（ゴシックに落ちるとロゴの気配が完全に消えるため）。 */
+  --ff-brush: "Yuji Syuku", "HGP行書体", "HG行書体",
+              "Hiragino Mincho ProN", "Yu Mincho", serif;
 
   --ff-heading: var(--ff-serif);
   --ff-body:    var(--ff-sans);
@@ -1061,25 +1064,41 @@ body.is-locked .site-header::after {
 .hero.is-covered .hero__media,
 .hero.is-covered .hero__scrim { visibility: hidden; }
 
-/* キャッチは本店ロゴと同じ毛筆書体をアウトライン化した SVG。
-   Web フォント配信ライセンスの無い書体でもこの形なら見出しに使えるうえ、
-   CJK サブセットのダウンロードも FOUT も無くなる。縦組み・列送り・字送りは
-   すべて SVG 側の座標に焼き込んであるので、ここでは大きさだけ決める。
-   文字データは tools/make-hero-title-svg.py で生成（書体差し替えも同スクリプト）。 */
+/* 縦組みでは inline 軸＝縦、block 軸＝右→左。
+   flex を使うと row が縦方向になり列が折り返すため、素の block で組む。 */
 .hero__title {
   position: relative;
   z-index: 2;
   display: block;
   margin: 0;
   color: var(--c-on-media);
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  /* 本店ロゴと同じ筆文字にして、キャッチをロゴの延長として読ませる。
+     Yuji Syuku は 400 の単一ウェイトしか無いので、太らせようとして
+     font-weight を上げても合成太字になり、穂先の抜けが潰れて
+     「筆で書いた線」に見えなくなる。400 のまま字面を大きくして見せる。 */
+  font-family: var(--ff-brush);
+  font-size: calc(var(--fs-hero) * 1.15);
+  font-weight: 400;
+  /* 毛筆は字面が不定形でそれ自体が余白を持つため、明朝 800 のときの
+     0.3em ではバラけて 1 本の書に見えない。少し詰める。 */
+  letter-spacing: .2em;
+  line-height: 1;
+  /* 縦組みでは inline 軸＝上下なので、text-align が上下方向の揃えになる。
+     短い列（現代焼肉）が長い列（レトロが香る）の中央に来る。 */
+  text-align: center;
 }
-.hero__title-svg {
+.hero__title span {
   display: block;
-  /* viewBox の高さが 6.73em ぶん。従来の文字サイズ基準の見えをそのまま保つ。
-     width: auto なので、縦を詰めても viewBox の比率で横幅が追従する。 */
-  height: calc(var(--fs-hero) * 1.15 * 6.73);
-  width: auto;
-  max-height: 62vh;
+  white-space: nowrap;        /* 列の折り返しを防ぐ */
+}
+/* 2 列目（＝縦組みでは左側）。block-start は右側の列との間隔。
+   上下位置は .hero__title の text-align: center に任せるので
+   inline-start（上の余白）は持たせない。
+   字の大きさとウェイトは 1 列目とそろえるため、font-size も指定しない。 */
+.hero__title span + span {
+  margin-block-start: clamp(1.5rem, 4vw, 3.25rem);
 }
 
 /* 右のレール */
@@ -2650,7 +2669,7 @@ body.is-reserve-open .nav-toggle {
   }
 
   /* ヒーロー：レールは下端に、キャッチは中央のまま小さく */
-  .hero__title-svg { height: calc(clamp(2rem, 8.4vw, 2.75rem) * 6.73); max-height: 58vh; }
+  .hero__title { font-size: clamp(2rem, 8.4vw, 2.75rem); max-height: 58vh; }
   .hero__hairline { display: none; }
   .reserve-rail { inset-block-end: clamp(0.75rem, 2.5vh, 1.5rem); }
   .hero__rail--right { inset-block-end: clamp(1.5rem, 5vh, 2.5rem); }
