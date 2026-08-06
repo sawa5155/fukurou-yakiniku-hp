@@ -427,7 +427,9 @@
         return false;
       }
       if (v && rule.type === 'tel' && !TEL_RE.test(v)) {
-        setError(input, '電話番号は数字とハイフンでご入力ください。');
+        // ラベルに「電話番号」と出ているので主語は省く。付けると 2 カラム時に
+        // 1 行に収まらず、この欄だけエラー文が折り返してしまう。
+        setError(input, '数字とハイフンでご入力ください。');
         return false;
       }
       if (v && rule.min && v.length < rule.min) {
