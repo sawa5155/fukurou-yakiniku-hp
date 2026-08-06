@@ -1,6 +1,7 @@
 /* ==========================================================================
    焼肉 福朗 — main.js
    1. モバイル／PC のドロワー（ハンバーガー）
+   1-2. ご予約モーダル（店舗の選択）
    2. オープニング（初回・リロード時の黒幕とロゴ）
    3. スクロール表示アニメーション
    4. 現在地ナビハイライト
@@ -39,9 +40,10 @@
       setNav(toggle.getAttribute('aria-expanded') !== 'true');
     });
 
-    // ナビ内リンクをタップしたら閉じる
+    // ナビ内リンクをタップしたら閉じる。
+    // パネルは右端だけなので、その外（背面の幕）を押したときも閉じる。
     gnav.addEventListener('click', (e) => {
-      if (e.target.closest('a')) setNav(false);
+      if (e.target.closest('a') || !e.target.closest('.gnav__inner')) setNav(false);
     });
 
     // Esc で閉じる
@@ -52,13 +54,80 @@
       }
     });
 
-    // ドロワーは全幅で使用するため、幅変更によるリセットは行わない。
+    // ドロワーは PC・モバイルとも同じ右側パネルなので、幅変更によるリセットは行わない。
     // 代わりに、開いている間はドロワー内にフォーカスを閉じ込める。
     const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea';
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Tab' || toggle.getAttribute('aria-expanded') !== 'true') return;
       const items = [toggle, ...gnav.querySelectorAll(FOCUSABLE)]
         .filter((el) => el.offsetParent !== null);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    });
+  }
+
+
+  /* ----------------------------------------------------------------------
+     1-2. ご予約モーダル（店舗の選択）
+     ----------------------------------------------------------------------
+     「ご予約」（.reserve-rail）は素の状態では食べログへのリンクで、
+     JS があるときだけクリックを横取りして店舗選択のモーダルを開く。
+     こうしておくと JS が落ちても予約導線は死なない。
+     修飾キー付き・中クリックは「別タブで開く」意図なので横取りしない。 */
+  const reserveRail  = $('#reserveRail');
+  const reserveModal = $('#reserveModal');
+
+  if (reserveRail && reserveModal) {
+    const reserveClose = $('.reserve-modal__close', reserveModal);
+    const RESERVE_FOCUSABLE = 'a[href], button:not([disabled])';
+
+    const setReserve = (open) => {
+      const wasInside = reserveModal.contains(document.activeElement);
+
+      reserveModal.classList.toggle('is-open', open);
+      reserveModal.setAttribute('aria-hidden', String(!open));
+      reserveRail.setAttribute('aria-expanded', String(open));
+      document.body.classList.toggle('is-reserve-open', open);
+
+      if (open) {
+        // 画面が低いとカードが収まらずスクロールできる状態で開く。
+        // × は最後にあるので、そのままフォーカスすると下端まで送られてしまう。
+        reserveModal.scrollTop = 0;
+        if (reserveClose) reserveClose.focus({ preventScroll: true });
+      } else if (wasInside || document.activeElement === document.body) {
+        // 閉じたあとの行き先は必ず開いた場所（＝ご予約）に戻す
+        reserveRail.focus();
+      }
+    };
+
+    reserveRail.addEventListener('click', (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      e.preventDefault();
+      setReserve(true);
+    });
+
+    // 幕と × で閉じる（カード内の予約リンク・電話は別タブ／発信なので閉じない）
+    reserveModal.addEventListener('click', (e) => {
+      if (e.target.closest('[data-reserve-close]')) setReserve(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!reserveModal.classList.contains('is-open')) return;
+
+      if (e.key === 'Escape') { setReserve(false); return; }
+
+      // 開いている間はモーダル内にフォーカスを閉じ込める。
+      // 表示判定に offsetParent は使えない（× は position: fixed のため
+      // 常に null になり、輪から漏れる）。描画矩形の有無で見る。
+      if (e.key !== 'Tab') return;
+      const items = $$(RESERVE_FOCUSABLE, reserveModal)
+        .filter((el) => el.getClientRects().length > 0);
       if (!items.length) return;
       const first = items[0];
       const last = items[items.length - 1];
