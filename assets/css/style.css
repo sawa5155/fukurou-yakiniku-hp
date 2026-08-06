@@ -1614,12 +1614,16 @@ body.is-reserve-open .nav-toggle {
   inset-block-start: 48%;
   transform: scaleX(-1);
 }
-/* 右下。下へのはみ出しは浅くしておく。深く出すと、グラデーションが
-   まだ濃いところでセクション下端に切られて水平の切り口が見えるため。 */
+/* 右下。下へのはみ出しの深さで足元の高さが決まる。
+   深くするほど下から立ちのぼって見えるが、出しすぎると
+   グラデーションがまだ濃いところで切られる。切り口自体は
+   .smoke::after の幕（下端 192px）が地色に溶かしている。 */
 .smoke__puff--br {
   --smoke-size: clamp(26rem, 52vw, 54rem);
-  inset-inline-end: calc(var(--smoke-size) * -.28);
-  inset-block-end: calc(var(--puff-h) * -.05);
+  /* 足元（濃い芯は箱の横 62% あたり）が画面の右端に来る深さ。
+     ここを浅くすると煙が内側へ寄り、深くすると芯ごと画面外へ出る。 */
+  inset-inline-end: calc(var(--smoke-size) * -.42);
+  inset-block-end: calc(var(--puff-h) * -.38);
   opacity: .88;
 }
 
