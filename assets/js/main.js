@@ -76,23 +76,29 @@
   /* ----------------------------------------------------------------------
      1-2. ご予約モーダル（店舗の選択）
      ----------------------------------------------------------------------
-     「ご予約」（.reserve-rail）は素の状態では食べログへのリンクで、
-     JS があるときだけクリックを横取りして店舗選択のモーダルを開く。
+     ご予約への入り口は 2 か所（画面左下のレールと、ドロワーの中のボタン）。
+     どちらも素の状態では食べログへのリンクで、JS があるときだけ
+     クリックを横取りして店舗選択のモーダルを開く。
      こうしておくと JS が落ちても予約導線は死なない。
+     入り口は data-reserve-open で見分けるので、増やすときは属性を付けるだけ。
      修飾キー付き・中クリックは「別タブで開く」意図なので横取りしない。 */
-  const reserveRail  = $('#reserveRail');
-  const reserveModal = $('#reserveModal');
+  const reserveRail    = $('#reserveRail');
+  const reserveOpeners = $$('[data-reserve-open]');
+  const reserveModal   = $('#reserveModal');
 
-  if (reserveRail && reserveModal) {
+  if (reserveOpeners.length && reserveModal) {
     const reserveClose = $('.reserve-modal__close', reserveModal);
     const RESERVE_FOCUSABLE = 'a[href], button:not([disabled])';
+
+    // 閉じたあとの戻り先。最後に押した入り口を覚えておく。
+    let reserveOpener = reserveRail || reserveOpeners[0];
 
     const setReserve = (open) => {
       const wasInside = reserveModal.contains(document.activeElement);
 
       reserveModal.classList.toggle('is-open', open);
       reserveModal.setAttribute('aria-hidden', String(!open));
-      reserveRail.setAttribute('aria-expanded', String(open));
+      reserveOpeners.forEach((el) => el.setAttribute('aria-expanded', String(open)));
       document.body.classList.toggle('is-reserve-open', open);
 
       if (open) {
@@ -101,15 +107,21 @@
         reserveModal.scrollTop = 0;
         if (reserveClose) reserveClose.focus({ preventScroll: true });
       } else if (wasInside || document.activeElement === document.body) {
-        // 閉じたあとの行き先は必ず開いた場所（＝ご予約）に戻す
-        reserveRail.focus();
+        // 閉じたあとの行き先は必ず開いた場所（＝ご予約）に戻す。
+        // ドロワー内のボタンから開いた場合、閉じる頃にはドロワーも
+        // 閉じていてフォーカスを受け取れないので、レールに逃がす。
+        const back = reserveOpener.getClientRects().length ? reserveOpener : reserveRail;
+        if (back) back.focus();
       }
     };
 
-    reserveRail.addEventListener('click', (e) => {
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-      e.preventDefault();
-      setReserve(true);
+    reserveOpeners.forEach((opener) => {
+      opener.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        e.preventDefault();
+        reserveOpener = opener;
+        setReserve(true);
+      });
     });
 
     // 幕と × で閉じる（カード内の予約リンク・電話は別タブ／発信なので閉じない）
@@ -198,8 +210,10 @@
     if (d) el.style.setProperty('--reveal-delay', d);
   });
 
-  // ヒーロー内の要素はオープニングが明けてから出す
-  const isHeroReveal = (el) => Boolean(el.closest('.hero'));
+  // ヒーロー内の要素はオープニングが明けてから出す。
+  // 「徳島｜焼肉」（.hero__rail）は追従させるため body 直下に出してあるが、
+  // 見え方はファーストビューの一部なので、同じ扱いにする。
+  const isHeroReveal = (el) => Boolean(el.closest('.hero')) || el.matches('.hero__rail');
 
   if (reduceMotion || !('IntersectionObserver' in window)) {
     revealTargets.forEach((el) => el.classList.add('is-in'));

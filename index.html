@@ -110,10 +110,23 @@
       <div class="gnav__inner">
         <ul class="gnav__list">
           <li><a href="#top"      data-navlink><span class="gnav__ja">TOP</span><span class="gnav__en">Top</span></a></li>
-          <li><a href="#kodawari" data-navlink><span class="gnav__ja">こだわり</span><span class="gnav__en">Commitment</span></a></li>
           <li><a href="#shops"    data-navlink><span class="gnav__ja">店舗情報</span><span class="gnav__en">Shops</span></a></li>
           <li><a href="#contact"  data-navlink><span class="gnav__ja">お問い合わせ</span><span class="gnav__en">Contact</span></a></li>
         </ul>
+
+        <!-- ご予約：画面左下のレール（.reserve-rail）と同じ導線。
+             data-reserve-open が付いた要素は JS がクリックを横取りして
+             店舗選択モーダルを開く。JS が落ちている環境では
+             href のまま食べログへ飛ぶので、予約導線は死なない。 -->
+        <p class="gnav__reserve">
+          <a class="btn btn--reserve gnav__reserve-btn"
+             href="https://tabelog.com/tokushima/A3601/A360101/36008569/"
+             target="_blank" rel="noopener" data-reserve-open
+             aria-haspopup="dialog" aria-controls="reserveModal" aria-expanded="false">
+            <span class="gnav__reserve-ja">ご予約</span>
+            <span class="gnav__reserve-en">Reservation</span>
+          </a>
+        </p>
       </div>
     </nav>
 
@@ -150,11 +163,6 @@
     <span>レトロが香る</span>
     <span>現代焼肉</span>
   </h1>
-
-  <!-- 右レール -->
-  <p class="hero__rail hero__rail--right" data-reveal data-reveal-delay="2">
-    <span class="vert">徳島｜焼肉</span>
-  </p>
 
   <span class="hero__hairline" aria-hidden="true"></span>
 </section>
@@ -301,17 +309,40 @@
       </div>
       <div class="pullquote__scrim" aria-hidden="true"></div>
 
+      <!-- 背景の煙（装飾）。写真は使わず CSS のグラデーションで描いている。
+           右上と左下の2か所。1 本は .smoke__wisp を 3 枚重ねたもので、
+           別々の周期で斜め上へ立ちのぼらせている
+           （詳細は style.css の「背景の煙」）。 -->
+      <div class="smoke" aria-hidden="true">
+        <span class="smoke__puff smoke__puff--tr">
+          <span class="smoke__wisp smoke__wisp--a"></span>
+          <span class="smoke__wisp smoke__wisp--b"></span>
+          <span class="smoke__wisp smoke__wisp--c"></span>
+        </span>
+        <span class="smoke__puff smoke__puff--bl">
+          <span class="smoke__wisp smoke__wisp--a"></span>
+          <span class="smoke__wisp smoke__wisp--b"></span>
+          <span class="smoke__wisp smoke__wisp--c"></span>
+        </span>
+      </div>
+
       <div class="pullquote__inner">
         <p class="pullquote__title"><span
           class="phrase">日本の食文化に、</span><br><span
           class="phrase">焼肉屋から火を灯す。</span></p>
 
+        <!-- 本文は「想い」のリード文と同じ組み（14px 相当・行間 2.8・字間 0.18em）
+             にしたぶん 1 行が長くなる。SP（本文幅 342px）では 1 文節 20 字前後で
+             頭打ちになるので、長い文節は .phrase を 2 つに割ってある。
+             <br> を入れていない切れ目は「PC では続けて 1 行、SP では折り返す」箇所。 -->
         <div class="pullquote__body">
           <p><span
-            class="phrase">日本には、和食をはじめとする飲食産業という、</span><br><span
+            class="phrase">日本には、</span><span
+            class="phrase">和食をはじめとする飲食産業という、</span><br><span
             class="phrase">世界に誇るべき文化があります。</span></p>
           <p><span
-            class="phrase">だからこそ、自分の仕事に誇りを持っていますし、</span><br><span
+            class="phrase">だからこそ、</span><span
+            class="phrase">自分の仕事に誇りを持っていますし、</span><br><span
             class="phrase">より多くの情熱ある若い世代が</span><br><span
             class="phrase">「飲食業で働きたい」と思えるよう、</span><br><span
             class="phrase">先頭に立って業界を牽引して</span><br><span
@@ -319,7 +350,8 @@
           <p><span
             class="phrase">その先には、飲食産業の発展が</span><br><span
             class="phrase">日本のGDP向上につながり、</span><br><span
-            class="phrase">ひいては経済成長を支える力になると信じています。</span></p>
+            class="phrase">ひいては経済成長を支える力になると</span><span
+            class="phrase">信じています。</span></p>
         </div>
       </div>
     </blockquote>
@@ -328,181 +360,13 @@
 </section>
 
 <!-- ============================================================
-     3. こだわり — COMMITMENT（肉・素材）
+     3. 固定背景の帯 — BANDS
+     見出しや説明を伴う「空間」セクションは廃止し、
+     全幅の帯（.kukan-band）だけを残している。
+     中身が帯だけなので、上下の余白はセクション側では持たせない
+     （帯の上の間隔は .kukan-band--1 の margin-top）。
      ============================================================ -->
-<section class="section section--kodawari" id="kodawari">
-
-  <!-- 背景の煙（装飾）。写真は使わず CSS のグラデーションで描いている。
-       右上・左の中ほど・右下の3か所。1 本は .smoke__wisp を 3 枚重ねたもので、
-       別々の周期で斜め上へ立ちのぼらせている
-       （詳細は style.css の「背景の煙」）。 -->
-  <div class="smoke" aria-hidden="true">
-    <span class="smoke__puff smoke__puff--tr">
-      <span class="smoke__wisp smoke__wisp--a"></span>
-      <span class="smoke__wisp smoke__wisp--b"></span>
-      <span class="smoke__wisp smoke__wisp--c"></span>
-    </span>
-    <span class="smoke__puff smoke__puff--bl">
-      <span class="smoke__wisp smoke__wisp--a"></span>
-      <span class="smoke__wisp smoke__wisp--b"></span>
-      <span class="smoke__wisp smoke__wisp--c"></span>
-    </span>
-    <span class="smoke__puff smoke__puff--br">
-      <span class="smoke__wisp smoke__wisp--a"></span>
-      <span class="smoke__wisp smoke__wisp--b"></span>
-      <span class="smoke__wisp smoke__wisp--c"></span>
-    </span>
-  </div>
-
-  <div class="container">
-
-    <header class="sec-head" data-reveal>
-      <p class="sec-head__en">Our Commitment</p>
-      <h2 class="sec-head__ja">こだわり</h2>
-    </header>
-
-    <!-- 肉について -->
-    <div class="media-row meat">
-      <figure class="media-row__media meat__media" data-reveal>
-        <picture>
-          <source srcset="assets/images/meat-main.webp" type="image/webp">
-          <img src="assets/images/meat-main.jpg" alt="美しく脂の入った徳島県産黒毛和牛" loading="lazy" decoding="async">
-        </picture>
-      </figure>
-      <div class="media-row__body meat__body" data-reveal data-reveal-delay="1">
-        <p class="sec-head__en">Wagyu Beef</p>
-        <h3 class="h3">徳島県産黒毛和牛、<br>その日いちばんを。</h3>
-        <dl class="speclist">
-          <div>
-            <dt>産地</dt>
-            <dd>徳島県産 黒毛和牛</dd>
-          </div>
-          <div>
-            <dt>主な銘柄</dt>
-            <dd>すだち牛 ／ 阿波華牛</dd>
-          </div>
-          <div>
-            <dt>仕入れ</dt>
-            <dd><span class="phrase">阿波華牛は<em>花補佐牧場指定</em>で</span><span
-              class="phrase">優先的な取引を</span><span
-              class="phrase">させていただいています</span></dd>
-          </div>
-        </dl>
-      </div>
-    </div>
-
-    <!-- 阿波華牛 -->
-    <div class="media-row media-row--rev awaka">
-      <div class="media-row__media awaka__media" data-reveal>
-        <picture>
-          <source srcset="assets/images/cattle-bw.webp" type="image/webp">
-          <img src="assets/images/cattle-bw.jpg" alt="牛舎で育てられる黒毛和牛" loading="lazy" decoding="async">
-        </picture>
-        <p class="awaka__label" aria-hidden="true"><span class="vert">阿波華牛</span></p>
-      </div>
-      <div class="media-row__body awaka__body" data-reveal data-reveal-delay="1">
-        <h3 class="h3">徳島の大自然が育んだ<br>県内外で人気のブランド牛</h3>
-        <p>徳島の水と空気、無添加飼料で約32ヶ月。<br>愛情深く育てられたブランド牛です。</p>
-        <p>甘い香りと、絹のようになめらかな口溶け。<br>胃もたれしにくい脂が特徴です。</p>
-        <!-- 文節ごとに .phrase で包み、語の途中で折り返さないようにしている。
-             span の間に空白を入れると半角スペースが出るため、タグ内側で改行 -->
-        <p class="awaka__note"><span
-          class="phrase">ここまで厳選された</span><span
-          class="phrase">阿波華牛を楽しめるのは、</span><span
-          class="phrase">当店だけです。</span></p>
-      </div>
-    </div>
-
-    <!-- 旨さの秘訣 -->
-    <div class="himitsu">
-      <header class="sec-head sec-head--sub" data-reveal>
-        <p class="sec-head__en">The Secret</p>
-        <h3 class="sec-head__ja">旨さの秘訣</h3>
-      </header>
-
-      <ul class="himitsu__grid">
-        <li class="hcard" data-reveal>
-          <div class="hcard__media">
-            <picture>
-              <source srcset="assets/images/meat-plate.webp" type="image/webp">
-              <img src="assets/images/meat-plate.jpg" alt="皿に盛られた霜降りの黒毛和牛" loading="lazy" decoding="async">
-            </picture>
-          </div>
-          <p class="hcard__num">01</p>
-            <h4>肉の北海様からの仕入れ</h4>
-            <p class="hcard__txt">肉の北海様の社長が、長年の経験と確かな目利きで厳選した阿波華牛。その中からさらに選び抜いたものだけを仕入れています。</p>
-        </li>
-
-        <li class="hcard" data-reveal data-reveal-delay="1">
-          <div class="hcard__media">
-            <picture>
-              <source srcset="assets/images/calf.webp" type="image/webp">
-              <img src="assets/images/calf.jpg" alt="牧場で育てられる黒毛和牛の子牛" loading="lazy" decoding="async">
-            </picture>
-          </div>
-          <p class="hcard__num">02</p>
-            <h4>厳選された良血統の子牛</h4>
-            <p class="hcard__txt">和牛の産地として知られる九州などから、花補佐さん自らが良血統の子牛を厳選。「満天白清」は農林水産大臣賞を受賞しています。</p>
-        </li>
-
-        <li class="hcard" data-reveal data-reveal-delay="2">
-          <div class="hcard__media">
-            <picture>
-              <source srcset="assets/images/barn.webp" type="image/webp">
-              <img src="assets/images/barn.jpg" alt="飼槽と積まれた藁が並ぶ牛舎" loading="lazy" decoding="async">
-            </picture>
-          </div>
-          <p class="hcard__num">03</p>
-            <h4>32ヶ月かけた長期肥育</h4>
-            <p class="hcard__txt">多くの農家が早出出荷を選ぶ中、花補佐牧場では約32ヶ月かけてじっくりと。価格に直結しないこだわりで、肉の旨味を深めています。</p>
-        </li>
-
-        <li class="hcard" data-reveal data-reveal-delay="3">
-          <div class="hcard__media">
-            <picture>
-              <source srcset="assets/images/sake.webp" type="image/webp">
-              <img src="assets/images/sake.jpg" alt="店内に並ぶ豊富なお酒" loading="lazy" decoding="async">
-            </picture>
-          </div>
-          <p class="hcard__num">04</p>
-            <h4>濃厚特製ダレと豊富なお酒</h4>
-            <p class="hcard__txt">この最高品質のお肉を、修行先から受け継いだ濃厚な特製ダレと豊富なお酒とともに、レトロな空間でお楽しみください。</p>
-        </li>
-      </ul>
-    </div>
-
-  </div>
-</section>
-
-<!-- ============================================================
-     4. 空間 — SPACE
-     ============================================================ -->
-<section class="section section--kukan" id="kukan">
-
-  <!-- 参考サイト sec11 相当：中央揃えの見出し＋説明＋幅広の中央画像 -->
-  <div class="container">
-    <header class="sec-head" data-reveal>
-      <p class="sec-head__en">Our Space</p>
-      <h2 class="sec-head__ja">空間</h2>
-    </header>
-
-    <!-- 中央揃えのため、狭い画面では「22席。」「さです。」だけが行に残りやすい。
-         .phrase で文節を包み、折り返し位置を文節の切れ目に限定している。 -->
-    <p class="kukan-info" data-reveal><span
-      class="phrase">カウンター8席と</span><span
-      class="phrase">テーブル席14席、</span><span
-      class="phrase">あわせて22席。</span><br><span
-      class="phrase">おひとりでも、</span><span
-      class="phrase">少人数のお集まりにも。</span><br><span
-      class="phrase">焼き台を囲む距離の近さが、</span><span
-      class="phrase">この店の心地よさです。</span></p>
-
-    <!-- 店内の見取り図。実席数（カウンター8席／テーブル14席）に合わせて作図。
-         インライン SVG にしているのは、ページの明朝体をそのまま使うため。 -->
-    <figure class="kukan-floor" data-reveal>
-<svg class="kukan-floor__svg" xmlns="http://www.w3.org/2000/svg" viewBox="-263 -64 655 286" role="img" aria-labelledby="floorT floorD"><title id="floorT">焼肉 福朗 北島本店の店内見取り図</title><desc id="floorD">奥に厨房とお手洗い、その手前に焼き台4口のカウンター8席と会計所。通路をはさんで、手前に4名席2卓（8席）と6名席1卓（6席）。入り口は手前の中央やや右で、あわせて22席。</desc><polygon points="0.0,0.0 368.0,120.0 128.8,198.0 -239.2,78.0" fill="#2b1613"/><polygon points="0.0,7.2 292.6,102.6 235.5,121.2 -57.0,25.8" fill="#1c100d"/><polygon points="299.9,105.0 357.0,123.6 299.9,142.2 242.9,123.6" fill="#241411"/><polygon points="0.0,-40.0 -11.0,-36.4 -11.0,3.6 0.0,0.0" fill="#351d11"/><polygon points="-11.0,-36.4 357.0,83.6 357.0,123.6 -11.0,3.6" fill="#22110b"/><polygon points="0.0,-40.0 368.0,80.0 357.0,83.6 -11.0,-36.4" fill="#4e2c19"/><polygon points="-11.0,-36.4 -239.2,38.0 -239.2,78.0 -11.0,3.6" fill="#351d11"/><polygon points="-239.2,38.0 -228.2,41.6 -228.2,81.6 -239.2,78.0" fill="#22110b"/><polygon points="-11.0,-36.4 0.0,-32.8 -228.2,41.6 -239.2,38.0" fill="#4e2c19"/><polygon points="292.6,72.6 244.7,88.2 244.7,118.2 292.6,102.6" fill="#351d11"/><polygon points="244.7,88.2 252.1,90.6 252.1,120.6 244.7,118.2" fill="#22110b"/><polygon points="292.6,72.6 299.9,75.0 252.1,90.6 244.7,88.2" fill="#4e2c19"/><polygon points="-47.8,-7.2 -57.0,-4.2 -57.0,25.8 -47.8,22.8" fill="#351d11"/><polygon points="-57.0,-4.2 235.5,91.2 235.5,121.2 -57.0,25.8" fill="#22110b"/><polygon points="-47.8,-7.2 244.7,88.2 235.5,91.2 -57.0,-4.2" fill="#4e2c19"/><polygon points="252.1,90.6 242.9,93.6 242.9,123.6 252.1,120.6" fill="#351d11"/><polygon points="242.9,93.6 299.9,112.2 299.9,142.2 242.9,123.6" fill="#22110b"/><polygon points="252.1,90.6 309.1,109.2 299.9,112.2 242.9,93.6" fill="#4e2c19"/><polygon points="-53.4,9.8 -77.3,17.6 -77.3,39.6 -53.4,31.8" fill="#5f3720"/><polygon points="-77.3,17.6 128.8,84.8 128.8,106.8 -77.3,39.6" fill="#3b2113"/><polygon points="-53.4,9.8 152.7,77.0 128.8,84.8 -77.3,17.6" fill="#8a5230"/><polygon points="-43.2,11.7 -56.1,15.9 -56.1,20.9 -43.2,16.7" fill="#4a3d34"/><polygon points="-56.1,15.9 -35.9,22.5 -35.9,27.5 -56.1,20.9" fill="#2e2620"/><polygon points="-43.2,11.7 -23.0,18.3 -35.9,22.5 -56.1,15.9" fill="#7a6a5c"/><polygon points="-43.2,13.2 -27.6,18.3 -35.9,21.0 -51.5,15.9" fill="#140e10"/><polygon points="8.3,28.5 -4.6,32.7 -4.6,37.7 8.3,33.5" fill="#4a3d34"/><polygon points="-4.6,32.7 15.6,39.3 15.6,44.3 -4.6,37.7" fill="#2e2620"/><polygon points="8.3,28.5 28.5,35.1 15.6,39.3 -4.6,32.7" fill="#7a6a5c"/><polygon points="8.3,30.0 23.9,35.1 15.6,37.8 0.0,32.7" fill="#140e10"/><polygon points="59.8,45.3 46.9,49.5 46.9,54.5 59.8,50.3" fill="#4a3d34"/><polygon points="46.9,49.5 67.2,56.1 67.2,61.1 46.9,54.5" fill="#2e2620"/><polygon points="59.8,45.3 80.0,51.9 67.2,56.1 46.9,49.5" fill="#7a6a5c"/><polygon points="59.8,46.8 75.4,51.9 67.2,54.6 51.5,49.5" fill="#140e10"/><polygon points="111.3,62.1 98.4,66.3 98.4,71.3 111.3,67.1" fill="#4a3d34"/><polygon points="98.4,66.3 118.7,72.9 118.7,77.9 98.4,71.3" fill="#2e2620"/><polygon points="111.3,62.1 131.6,68.7 118.7,72.9 98.4,66.3" fill="#7a6a5c"/><polygon points="111.3,63.6 127.0,68.7 118.7,71.4 103.0,66.3" fill="#140e10"/><polygon points="-68.1,51.0 -82.8,55.8 -82.8,45.8 -68.1,41.0" fill="#573320"/><polygon points="-68.1,38.0 -82.8,42.8 -82.8,45.8 -68.1,41.0" fill="#573320"/><polygon points="-82.8,33.2 -68.1,38.0 -82.8,42.8 -97.5,38.0" fill="#7a4a2c"/><polygon points="-97.5,38.0 -82.8,42.8 -82.8,28.8 -97.5,24.0" fill="#6b4027"/><polygon points="-44.2,58.8 -58.9,63.6 -58.9,53.6 -44.2,48.8" fill="#573320"/><polygon points="-44.2,45.8 -58.9,50.6 -58.9,53.6 -44.2,48.8" fill="#573320"/><polygon points="-58.9,41.0 -44.2,45.8 -58.9,50.6 -73.6,45.8" fill="#7a4a2c"/><polygon points="-73.6,45.8 -58.9,50.6 -58.9,36.6 -73.6,31.8" fill="#6b4027"/><polygon points="-16.6,67.8 -31.3,72.6 -31.3,62.6 -16.6,57.8" fill="#573320"/><polygon points="-16.6,54.8 -31.3,59.6 -31.3,62.6 -16.6,57.8" fill="#573320"/><polygon points="-31.3,50.0 -16.6,54.8 -31.3,59.6 -46.0,54.8" fill="#7a4a2c"/><polygon points="-46.0,54.8 -31.3,59.6 -31.3,45.6 -46.0,40.8" fill="#6b4027"/><polygon points="7.4,75.6 -7.4,80.4 -7.4,70.4 7.4,65.6" fill="#573320"/><polygon points="7.4,62.6 -7.4,67.4 -7.4,70.4 7.4,65.6" fill="#573320"/><polygon points="-7.4,57.8 7.4,62.6 -7.4,67.4 -22.1,62.6" fill="#7a4a2c"/><polygon points="-22.1,62.6 -7.4,67.4 -7.4,53.4 -22.1,48.6" fill="#6b4027"/><polygon points="35.0,84.6 20.2,89.4 20.2,79.4 35.0,74.6" fill="#573320"/><polygon points="35.0,71.6 20.2,76.4 20.2,79.4 35.0,74.6" fill="#573320"/><polygon points="20.2,66.8 35.0,71.6 20.2,76.4 5.5,71.6" fill="#7a4a2c"/><polygon points="5.5,71.6 20.2,76.4 20.2,62.4 5.5,57.6" fill="#6b4027"/><polygon points="58.9,92.4 44.2,97.2 44.2,87.2 58.9,82.4" fill="#573320"/><polygon points="58.9,79.4 44.2,84.2 44.2,87.2 58.9,82.4" fill="#573320"/><polygon points="44.2,74.6 58.9,79.4 44.2,84.2 29.4,79.4" fill="#7a4a2c"/><polygon points="29.4,79.4 44.2,84.2 44.2,70.2 29.4,65.4" fill="#6b4027"/><polygon points="86.5,101.4 71.8,106.2 71.8,96.2 86.5,91.4" fill="#573320"/><polygon points="86.5,88.4 71.8,93.2 71.8,96.2 86.5,91.4" fill="#573320"/><polygon points="71.8,83.6 86.5,88.4 71.8,93.2 57.0,88.4" fill="#7a4a2c"/><polygon points="57.0,88.4 71.8,93.2 71.8,79.2 57.0,74.4" fill="#6b4027"/><polygon points="110.4,109.2 95.7,114.0 95.7,104.0 110.4,99.2" fill="#573320"/><polygon points="110.4,96.2 95.7,101.0 95.7,104.0 110.4,99.2" fill="#573320"/><polygon points="95.7,91.4 110.4,96.2 95.7,101.0 81.0,96.2" fill="#7a4a2c"/><polygon points="81.0,96.2 95.7,101.0 95.7,87.0 81.0,82.2" fill="#6b4027"/><polygon points="165.6,70.8 141.7,78.6 141.7,108.6 165.6,100.8" fill="#5f3720"/><polygon points="141.7,78.6 178.5,90.6 178.5,120.6 141.7,108.6" fill="#3b2113"/><polygon points="165.6,70.8 202.4,82.8 178.5,90.6 141.7,78.6" fill="#8a5230"/><polygon points="-151.8,48.5 -166.5,53.3 -166.5,39.3 -151.8,34.5" fill="#6b4027"/><polygon points="-166.5,66.3 -151.8,71.1 -151.8,61.1 -166.5,56.3" fill="#573320"/><polygon points="-166.5,53.3 -151.8,58.1 -151.8,61.1 -166.5,56.3" fill="#573320"/><polygon points="-151.8,48.5 -137.1,53.3 -151.8,58.1 -166.5,53.3" fill="#7a4a2c"/><polygon points="-177.6,56.9 -192.3,61.7 -192.3,47.7 -177.6,42.9" fill="#6b4027"/><polygon points="-192.3,74.7 -177.6,79.5 -177.6,69.5 -192.3,64.7" fill="#573320"/><polygon points="-192.3,61.7 -177.6,66.5 -177.6,69.5 -192.3,64.7" fill="#573320"/><polygon points="-177.6,56.9 -162.8,61.7 -177.6,66.5 -192.3,61.7" fill="#7a4a2c"/><polygon points="-115.9,45.8 -173.0,64.4 -173.0,86.4 -115.9,67.8" fill="#5f3720"/><polygon points="-173.0,64.4 -138.0,75.8 -138.0,97.8 -173.0,86.4" fill="#3b2113"/><polygon points="-115.9,45.8 -81.0,57.2 -138.0,75.8 -173.0,64.4" fill="#8a5230"/><polygon points="-127.0,50.4 -143.5,55.8 -143.5,60.8 -127.0,55.4" fill="#4a3d34"/><polygon points="-143.5,55.8 -127.0,61.2 -127.0,66.2 -143.5,60.8" fill="#2e2620"/><polygon points="-127.0,50.4 -110.4,55.8 -127.0,61.2 -143.5,55.8" fill="#7a6a5c"/><polygon points="-127.0,51.9 -115.0,55.8 -127.0,59.7 -138.9,55.8" fill="#140e10"/><polygon points="-91.1,90.9 -76.4,95.7 -76.4,85.7 -91.1,80.9" fill="#573320"/><polygon points="-91.1,77.9 -76.4,82.7 -76.4,85.7 -91.1,80.9" fill="#573320"/><polygon points="-76.4,73.1 -61.6,77.9 -76.4,82.7 -91.1,77.9" fill="#7a4a2c"/><polygon points="-61.6,77.9 -76.4,82.7 -76.4,68.7 -61.6,63.9" fill="#6b4027"/><polygon points="-116.8,99.3 -102.1,104.1 -102.1,94.1 -116.8,89.3" fill="#573320"/><polygon points="-116.8,86.3 -102.1,91.1 -102.1,94.1 -116.8,89.3" fill="#573320"/><polygon points="-102.1,81.5 -87.4,86.3 -102.1,91.1 -116.8,86.3" fill="#7a4a2c"/><polygon points="-87.4,86.3 -102.1,91.1 -102.1,77.1 -87.4,72.3" fill="#6b4027"/><polygon points="-50.6,81.5 -65.3,86.3 -65.3,72.3 -50.6,67.5" fill="#6b4027"/><polygon points="-65.3,99.3 -50.6,104.1 -50.6,94.1 -65.3,89.3" fill="#573320"/><polygon points="-65.3,86.3 -50.6,91.1 -50.6,94.1 -65.3,89.3" fill="#573320"/><polygon points="-50.6,81.5 -35.9,86.3 -50.6,91.1 -65.3,86.3" fill="#7a4a2c"/><polygon points="-76.4,89.9 -91.1,94.7 -91.1,80.7 -76.4,75.9" fill="#6b4027"/><polygon points="-91.1,107.7 -76.4,112.5 -76.4,102.5 -91.1,97.7" fill="#573320"/><polygon points="-91.1,94.7 -76.4,99.5 -76.4,102.5 -91.1,97.7" fill="#573320"/><polygon points="-76.4,89.9 -61.6,94.7 -76.4,99.5 -91.1,94.7" fill="#7a4a2c"/><polygon points="-14.7,78.8 -71.8,97.4 -71.8,119.4 -14.7,100.8" fill="#5f3720"/><polygon points="-71.8,97.4 -36.8,108.8 -36.8,130.8 -71.8,119.4" fill="#3b2113"/><polygon points="-14.7,78.8 20.2,90.2 -36.8,108.8 -71.8,97.4" fill="#8a5230"/><polygon points="-25.8,83.4 -42.3,88.8 -42.3,93.8 -25.8,88.4" fill="#4a3d34"/><polygon points="-42.3,88.8 -25.8,94.2 -25.8,99.2 -42.3,93.8" fill="#2e2620"/><polygon points="-25.8,83.4 -9.2,88.8 -25.8,94.2 -42.3,88.8" fill="#7a6a5c"/><polygon points="-25.8,84.9 -13.8,88.8 -25.8,92.7 -37.7,88.8" fill="#140e10"/><polygon points="10.1,123.9 24.8,128.7 24.8,118.7 10.1,113.9" fill="#573320"/><polygon points="10.1,110.9 24.8,115.7 24.8,118.7 10.1,113.9" fill="#573320"/><polygon points="24.8,106.1 39.6,110.9 24.8,115.7 10.1,110.9" fill="#7a4a2c"/><polygon points="39.6,110.9 24.8,115.7 24.8,101.7 39.6,96.9" fill="#6b4027"/><polygon points="-15.6,132.3 -0.9,137.1 -0.9,127.1 -15.6,122.3" fill="#573320"/><polygon points="-15.6,119.3 -0.9,124.1 -0.9,127.1 -15.6,122.3" fill="#573320"/><polygon points="-0.9,114.5 13.8,119.3 -0.9,124.1 -15.6,119.3" fill="#7a4a2c"/><polygon points="13.8,119.3 -0.9,124.1 -0.9,110.1 13.8,105.3" fill="#6b4027"/><polygon points="126.0,122.3 111.3,127.1 111.3,113.1 126.0,108.3" fill="#6b4027"/><polygon points="111.3,140.1 126.0,144.9 126.0,134.9 111.3,130.1" fill="#573320"/><polygon points="111.3,127.1 126.0,131.9 126.0,134.9 111.3,130.1" fill="#573320"/><polygon points="126.0,122.3 140.8,127.1 126.0,131.9 111.3,127.1" fill="#7a4a2c"/><polygon points="99.4,131.0 84.6,135.8 84.6,121.8 99.4,117.0" fill="#6b4027"/><polygon points="84.6,148.8 99.4,153.6 99.4,143.6 84.6,138.8" fill="#573320"/><polygon points="84.6,135.8 99.4,140.6 99.4,143.6 84.6,138.8" fill="#573320"/><polygon points="99.4,131.0 114.1,135.8 99.4,140.6 84.6,135.8" fill="#7a4a2c"/><polygon points="72.7,139.7 58.0,144.5 58.0,130.5 72.7,125.7" fill="#6b4027"/><polygon points="58.0,157.5 72.7,162.3 72.7,152.3 58.0,147.5" fill="#573320"/><polygon points="58.0,144.5 72.7,149.3 72.7,152.3 58.0,147.5" fill="#573320"/><polygon points="72.7,139.7 87.4,144.5 72.7,149.3 58.0,144.5" fill="#7a4a2c"/><polygon points="160.1,120.2 79.1,146.6 79.1,168.6 160.1,142.2" fill="#5f3720"/><polygon points="79.1,146.6 114.1,158.0 114.1,180.0 79.1,168.6" fill="#3b2113"/><polygon points="160.1,120.2 195.0,131.6 114.1,158.0 79.1,146.6" fill="#8a5230"/><polygon points="137.1,128.7 120.5,134.1 120.5,139.1 137.1,133.7" fill="#4a3d34"/><polygon points="120.5,134.1 137.1,139.5 137.1,144.5 120.5,139.1" fill="#2e2620"/><polygon points="137.1,128.7 153.6,134.1 137.1,139.5 120.5,134.1" fill="#7a6a5c"/><polygon points="137.1,130.2 149.0,134.1 137.1,138.0 125.1,134.1" fill="#140e10"/><polygon points="186.8,164.7 201.5,169.5 201.5,159.5 186.8,154.7" fill="#573320"/><polygon points="186.8,151.7 201.5,156.5 201.5,159.5 186.8,154.7" fill="#573320"/><polygon points="201.5,146.9 216.2,151.7 201.5,156.5 186.8,151.7" fill="#7a4a2c"/><polygon points="216.2,151.7 201.5,156.5 201.5,142.5 216.2,137.7" fill="#6b4027"/><polygon points="160.1,173.4 174.8,178.2 174.8,168.2 160.1,163.4" fill="#573320"/><polygon points="160.1,160.4 174.8,165.2 174.8,168.2 160.1,163.4" fill="#573320"/><polygon points="174.8,155.6 189.5,160.4 174.8,165.2 160.1,160.4" fill="#7a4a2c"/><polygon points="189.5,160.4 174.8,165.2 174.8,151.2 189.5,146.4" fill="#6b4027"/><polygon points="133.4,182.1 148.1,186.9 148.1,176.9 133.4,172.1" fill="#573320"/><polygon points="133.4,169.1 148.1,173.9 148.1,176.9 133.4,172.1" fill="#573320"/><polygon points="148.1,164.3 162.8,169.1 148.1,173.9 133.4,169.1" fill="#7a4a2c"/><polygon points="162.8,169.1 148.1,173.9 148.1,159.9 162.8,155.1" fill="#6b4027"/><polygon points="25.8,140.4 59.8,151.5 23.0,163.5 -11.0,152.4" fill="#3d2219"/><text class="kukan-floor__t-kitchen" x="94" y="25" fill="#f3ece2" font-size="13" letter-spacing="5" text-anchor="middle" font-family="Shippori Mincho, Yu Mincho, serif">厨房</text><text class="kukan-floor__t-toilet" x="320" y="97" fill="#f3ece2" font-size="13" letter-spacing="5" text-anchor="middle" font-family="Shippori Mincho, Yu Mincho, serif">お手洗い</text><path class="kukan-floor__t-arrow" d="M-7.9 162.5 L24.4 151.9 M15.5 150.4 L24.4 151.9 L18.1 158.4" fill="none" stroke="#f3ece2" stroke-width="1" stroke-linejoin="round"/><text class="kukan-floor__t-entry" x="-15" y="185" fill="#f3ece2" font-size="13" letter-spacing="5" text-anchor="middle" font-family="Shippori Mincho, Yu Mincho, serif">入り口</text></svg>
-    </figure>
-  </div>
+<section class="section section--kukan" id="kukan" aria-label="店内・料理の写真">
 
   <!-- 参考サイト sec12（.bg-parallax）相当：
        background-attachment: fixed で写真を画面に固定し、
@@ -526,7 +390,7 @@
 </section>
 
 <!-- ============================================================
-     5. 店舗情報 — SHOPS（2店舗）
+     4. 店舗情報 — SHOPS（2店舗）
      ============================================================ -->
 <section class="section section--shops" id="shops">
   <div class="container">
@@ -605,7 +469,7 @@
 </section>
 
 <!-- ============================================================
-     6. お問い合わせ — CONTACT
+     5. お問い合わせ — CONTACT
      ============================================================ -->
 <section class="section section--contact" id="contact">
   <div class="container">
@@ -743,7 +607,7 @@
 </main>
 
 <!-- ============================================================
-     8. FOOTER
+     6. FOOTER
      ============================================================ -->
 <footer class="site-footer">
   <div class="container">
@@ -795,7 +659,6 @@
       <nav class="site-footer__nav" aria-label="フッターナビゲーション">
         <ul>
           <li><a href="#top">TOP</a></li>
-          <li><a href="#kodawari">こだわり</a></li>
           <li><a href="#shops">店舗情報</a></li>
           <li><a href="#contact">お問い合わせ</a></li>
         </ul>
@@ -814,10 +677,19 @@
      ヘッダー（110）とモーダル（120）より下に収まる。
      予約セクションを廃したため、リンク先は食べログの予約ページ。 -->
 <a class="reserve-rail" id="reserveRail" href="https://tabelog.com/tokushima/A3601/A360101/36008569/"
-   target="_blank" rel="noopener" data-reveal data-reveal-delay="2"
+   target="_blank" rel="noopener" data-reveal data-reveal-delay="2" data-reserve-open
    aria-haspopup="dialog" aria-controls="reserveModal" aria-expanded="false">
   <span class="vert">ご予約</span>
 </a>
+
+<!-- 徳島｜焼肉：ご予約と対になる画面右下の縦組みレール。
+     ご予約（.reserve-rail）と同じく position: fixed で全セクションを通して
+     追従させるため、ヒーローの中ではなく body 直下に置いている。
+     （.hero の中に残すと z-index: 0 のスタック文脈に閉じ込められ、
+       後続セクションの下に潜って見えなくなる） -->
+<p class="hero__rail hero__rail--right" data-reveal data-reveal-delay="2">
+  <span class="vert">徳島｜焼肉</span>
+</p>
 
 <!-- ご予約モーダル
      .reserve-rail をクリックすると開き、2 店舗のどちらを予約するかを選ばせる。

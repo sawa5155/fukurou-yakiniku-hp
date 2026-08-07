@@ -589,25 +589,19 @@ body.is-opening { overflow: hidden; }
   position: relative;
   z-index: 1;
 }
-.section--kodawari,
 .section--kukan,
 .section--shops,
 .section--contact { background: var(--c-bg); }
-
-/* こだわりセクション：背景に煙を敷くため、はみ出しを切って
-   中身を煙より前面に置く（参考サイト section03 と同じ構成）。 */
-.section--kodawari { overflow: hidden; }
-.section--kodawari > .container { position: relative; z-index: 1; }
 
 /* 本文の最後（お問い合わせ）とフッターのあいだだけ、間隔を広げる。
    セクション間の標準は --sec-gap（= 上下の --sec-py の合計）だが、
    ここはそれに --footer-lead を足す。 */
 .section--contact { padding-bottom: calc(var(--sec-py) + var(--footer-lead)); }
 
-/* 空間セクションは全幅スライドショーで終わるため、下端まで写真を密着させる
-   （参考サイト sec12 と同じ扱い）。その分の余白は次のセクション側で持たせ、
-   セクション間の間隔が他と揃うようにする。 */
-.section--kukan { padding-bottom: 0; }
+/* 帯のセクションは全幅の写真だけで、見出しも本文も持たない。
+   上下の余白はセクションでは持たず、帯の手前は .kukan-band--1 の
+   margin-top、帯の後ろは次のセクション側の padding-top で作る。 */
+.section--kukan { padding-block: 0; }
 .section--kukan + .section { padding-top: var(--sec-gap); }
 
 /* ---- 想いセクション：固定されたヒーロー写真の上へ重なり、徐々に暗転する ----
@@ -683,8 +677,7 @@ body.is-opening { overflow: hidden; }
        <p class="sec-head__lead">…</p>             … 補足文（任意）
      </header>
 
-   修飾子は2つだけ。
-     .sec-head--sub       … セクション内の中見出し（旨さの秘訣）。和文が一段小さい
+   修飾子はひとつだけ。
      .sec-head--on-media  … 写真の上に置く見出し（ご予約）。和文と補足文が白系    */
 .sec-head {
   margin-bottom: var(--head-gap);
@@ -714,29 +707,10 @@ body.is-opening { overflow: hidden; }
   line-height: var(--lh-loose);
 }
 
-/* 中見出し（セクション内の小分類） */
-.sec-head--sub .sec-head__ja { font-size: var(--fs-2xl); }
-
 /* 写真の上に置く見出し（ご予約）。欧文ラベルは他セクションと同じ淡金のままにし、
    和文と補足文だけ白系へ差し替える */
 .sec-head--on-media .sec-head__ja   { color: var(--c-on-media); }
 .sec-head--on-media .sec-head__lead { color: var(--c-on-media-2); }
-
-.h3 {
-  font-size: var(--fs-2xl);
-  font-weight: var(--fw-heading);
-  line-height: 1.9;
-  letter-spacing: var(--ls-ja-wide);
-  margin-bottom: var(--sp-6);
-}
-.num {
-  font-family: var(--ff-accent);
-  font-size: var(--fs-md);
-  font-style: italic;
-  letter-spacing: var(--ls-en-wide);
-  color: var(--c-accent-2);
-  margin-bottom: var(--sp-3);
-}
 
 /* ---- ボタン／テキストリンク ----
    参考サイトは塗りのボタンをほぼ使わず、罫線と矢印のテキストリンク。
@@ -1021,6 +995,39 @@ body.is-locked .site-header::after {
 .gnav__list a:hover .gnav__ja { color: var(--c-accent-2); }
 .gnav__list a:hover .gnav__en { color: var(--c-accent-2); }
 
+/* ドロワー内のご予約。リンクの一覧とは別の導線なので、
+   罫線のリストから少し離してボタンとして置く。 */
+.gnav__reserve { margin: var(--sp-7) 0 0; }
+.gnav__reserve-btn {
+  display: flex;
+  width: 100%;
+  /* 和文と欧文はリストの項目より近づけたいので、.btn の gap を詰める */
+  gap: var(--sp-2);
+  /* 和文＋欧文の 2 語が入るので、.btn の左右余白（--sp-6）では
+     SP のドロワー幅（16rem）に収まらず「ご予/約」と割れる。ここで詰める。 */
+  --btn-px: var(--sp-4);
+}
+/* 2 語とも折り返さない。flex の既定（shrink: 1）だと狭い幅で
+   和文が 2 行に割れるため、縮小も止めている。 */
+.gnav__reserve-btn > span { flex: none; white-space: nowrap; }
+/* 字間を空けたぶん、中身が右に寄って見えるのを戻す */
+.gnav__reserve-ja { margin-inline-start: var(--ls-ja-wide); }
+/* 欧文はリストの項目（.gnav__en）と同じ書式。あいだの「/」は装飾なので
+   疑似要素で出し、読み上げには乗せない。 */
+.gnav__reserve-en {
+  font-family: var(--ff-accent);
+  font-size: var(--fs-2xs);
+  font-style: italic;
+  letter-spacing: var(--ls-en);
+  opacity: .78;
+}
+.gnav__reserve-en::before {
+  content: "/";
+  margin-inline-end: .55em;
+  font-style: normal;
+  opacity: .7;
+}
+
 /* ------------------------------ ヒーロー --------------------------------
    中央に縦組みのキャッチ、左右に縦組みのレール。参考サイトの構成。      */
 /* ヒーロー自体は通常の流れ。見出しやレールは普通にスクロールして消える。
@@ -1109,10 +1116,13 @@ body.is-locked .site-header::after {
   margin-block-start: clamp(1.5rem, 4vw, 3.25rem);
 }
 
-/* 右のレール */
+/* ---- 徳島｜焼肉（画面右下に固定） --------------------------------------
+   ご予約（.reserve-rail）と対になるレール。ヒーローの中ではなく
+   body 直下に置き、position: fixed で全セクションを通して追従させる。
+   z-index はご予約とそろえて、ドロワー（--z-nav）より下・本文より上。 */
 .hero__rail {
-  position: absolute;
-  z-index: 3;
+  position: fixed;
+  z-index: 90;
   margin: 0;
   display: grid;
   justify-items: center;
@@ -1128,7 +1138,6 @@ body.is-locked .site-header::after {
 .hero__rail--right {
   inset-inline-end: var(--rail-inset);
   inset-block-end: clamp(2.25rem, 7vh, 4.25rem);
-  color: var(--c-on-media-2);
 }
 
 /* ---- ご予約（画面左下に固定） ------------------------------------------
@@ -1552,7 +1561,6 @@ body.is-reserve-open .nav-toggle {
 /* 3 か所の煙が揃ってのぼると作り物に見えるので、場所ごとにもずらす */
 .smoke__puff--tr { --puff-lag:  -5s; }
 .smoke__puff--bl { --puff-lag: -20s; }
-.smoke__puff--br { --puff-lag: -34s; }
 
 /* 斜め上へのぼる 1 周期。
    足元（translateY プラス・translateX プラス＝外寄り）で細く・透明 →
@@ -1598,67 +1606,27 @@ body.is-reserve-open .nav-toggle {
   .smoke__wisp--c { opacity: .56; transform: translate3d(-15%, -36%, 0) scale(1.30, 1.40); }
 }
 
-/* 3 か所の置き場所。
-   煙は「足元は外側・上へいくほど内側」に流れるので、右端の 2 本は
-   そのまま左上へのぼる。左端の 1 本だけ scaleX(-1) で鏡に映して
+/* 2 か所の置き場所。
+   煙は「足元は外側・上へいくほど内側」に流れるので、右の 1 本は
+   そのまま左上へのぼる。左の 1 本だけ scaleX(-1) で鏡に映して
    右上へのぼらせる（回転ではなく左右反転なので、ゆらぎ模様は回らない）。
    上下端に出る切り口は .smoke::before / .smoke::after の幕で地色に溶かす。 */
 /* 右上 */
 .smoke__puff--tr {
   inset-inline-end: calc(var(--smoke-size) * -.36);
-  inset-block-start: 14%;
+  inset-block-start: 6%;
 }
-/* 左の中ほど（左右反転して右上へのぼらせる） */
+/* 左下（左右反転して右上へのぼらせる）。
+   足元を少しだけ下へはみ出させると、帯の外から立ちのぼって見える。
+   出しすぎるとグラデーションがまだ濃いところで切られるので浅めに。
+   切り口自体は .smoke::after の幕が地色に溶かしている。 */
 .smoke__puff--bl {
   inset-inline-start: calc(var(--smoke-size) * -.40);
-  inset-block-start: 48%;
+  inset-block-end: calc(var(--puff-h) * -.14);
   transform: scaleX(-1);
-}
-/* 右下。下へのはみ出しの深さで足元の高さが決まる。
-   深くするほど下から立ちのぼって見えるが、出しすぎると
-   グラデーションがまだ濃いところで切られる。切り口自体は
-   .smoke::after の幕（下端 192px）が地色に溶かしている。 */
-.smoke__puff--br {
-  --smoke-size: clamp(26rem, 52vw, 54rem);
-  /* 足元（濃い芯は箱の横 62% あたり）が画面の右端に来る深さ。
-     ここを浅くすると煙が内側へ寄り、深くすると芯ごと画面外へ出る。 */
-  inset-inline-end: calc(var(--smoke-size) * -.42);
-  inset-block-end: calc(var(--puff-h) * -.38);
-  opacity: .88;
 }
 
 /* ------------------------------ 想い ------------------------------------ */
-/* ---- 画像とテキストの横並び --------------------------------------------
-   テキストが画像より高くならないよう、行の高さは
-   「テキストの実高さ」と「画像の最低高さ」の大きい方で決まり、
-   画像はその行いっぱいまで伸びる（＝常に画像 ≧ テキスト）。      */
-.media-row {
-  display: grid;
-  align-items: stretch;
-}
-/* 写真は絶対配置で高さ計算から外す。こうすると行の高さは
-   「テキストの高さ」か「--media-min-h」の大きい方だけで決まり、
-   縦長・横長どの写真でも枠いっぱいに収まる。 */
-.media-row__media {
-  margin: 0;
-  position: relative;
-  min-height: var(--media-min-h, clamp(17rem, 27vw, 27rem));
-  overflow: hidden;
-}
-.media-row__media img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(var(--img-brightness));
-}
-/* テキスト側は自身の高さのまま、縦中央に置く */
-.media-row__body { align-self: center; }
-
-/* 写真と本文を入れ替える */
-.media-row--rev .media-row__media { order: 2; }
-
 /* ---- 想い：参考サイト section01 のレイアウト ----------------------------
    実測（1440px / セクション内の位置）を12カラムに置き換えたもの。
 
@@ -1852,7 +1820,9 @@ body.is-reserve-open .nav-toggle {
   --quote-fade: 20%;
   position: relative;
   overflow: hidden;
-  margin: 0 0 var(--block-gap);
+  /* 想いセクションの最後の要素なので、下の余白はセクションの
+     padding-block（--sec-py）に任せる。 */
+  margin: 0;
   margin-inline: calc(50% - 50vw);
   padding: clamp(7rem, 17vw, 13rem) var(--gutter);
   display: grid;
@@ -1860,6 +1830,16 @@ body.is-reserve-open .nav-toggle {
   text-align: center;
   color: var(--c-on-media);
 }
+/* プルクオートの下（＝固定背景の帯の手前）の間隔。
+   標準のセクション間は「想いの padding-bottom（--sec-py）＋ 帯の margin-top
+   （--block-gap）」で決まるが、全面写真から全面写真へ続くところなので
+   他のセクション間ほど空けなくても切り替わりは分かる。少しだけ詰める。
+   --sec-py の値が PC と SP で違うので、詰める量も別に持たせている
+   （SP 側は 720px 以下のブロックを参照）。 */
+@media (min-width: 721px) {
+  .section--omoi { padding-bottom: calc(var(--sec-py) - clamp(2.75rem, 5.5vw, 6rem)); }
+}
+
 .pullquote__media { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
 /* 箱より縦に長く描いて、溢れた分を上下から落とす。
    これで「拡大」と「焦点の縦位置」を別々に決められる。
@@ -1921,215 +1901,42 @@ body.is-reserve-open .nav-toggle {
   }
 }
 
+/* 煙は写真と幕の上・文字の下に敷く。
+   .smoke 自身の z-index は 0 なので、ここで幕（__scrim = 1）と同じ 1 に上げる。
+   同値なら DOM で後ろにある煙が上に描かれ、文字（__inner = 2）は煙より前に残る。 */
+.pullquote .smoke {
+  z-index: 1;
+  /* 地色（黒）ではなく写真の上に screen で重なるぶん、こだわりセクションに
+     敷いていた頃より明るく出る。理念の文章より前に出ないよう濃さを落とす。 */
+  --smoke-opacity: .44;
+}
+
 .pullquote__inner { position: relative; z-index: 2; }
 
+/* ---- 文字の組みは「想い」のタイトル・リード文とまったく同じ ------------
+   .omoi__title / .omoi__paras p の値をそのまま使っている。
+   片方を触ったらもう片方も必ず合わせること（900px 以下の値も同様）。   */
 .pullquote__title {
-  margin: 0 0 clamp(1.75rem, 3.8vw, 2.75rem);
+  /* 見出し〜本文の間は .omoi__paras の margin-top と同じ値 */
+  margin: 0 0 clamp(2.5rem, 6vw, 5rem);
   font-family: var(--ff-heading);
-  font-size: var(--fs-3xl);
+  font-size: clamp(1.375rem, 1.05rem + 1.2vw, 2.25rem);
   font-weight: 600;                 /* 明朝の細さのままだと写真に負ける */
-  line-height: 1.6;
-  letter-spacing: var(--ls-ja-wide);
+  line-height: 1.9;
+  letter-spacing: .26em;
 }
-/* 本文は理念の説明なので、見出しより一段落として静かに読ませる */
 .pullquote__body p {
-  /* 段落間（1440px で 28px、SP で 18px） */
-  margin: 0 0 clamp(1.125rem, 2.6vw, 1.75rem);
-  color: var(--c-on-media-2);
+  margin: 0 0 clamp(1.75rem, 4vw, 3rem);
+  color: var(--c-ink);
   font-family: var(--ff-heading);
-  font-size: var(--fs-sm);
+  font-size: clamp(.9rem, 0.8rem + 0.4vw, .3rem);
   font-weight: 600;
-  line-height: 1.6;
-  letter-spacing: var(--ls-ja);
+  line-height: 2.8;
+  letter-spacing: var(--ls-ja-wide);
 }
 .pullquote__body p:last-child { margin-bottom: 0; }
-/* PC は全面写真の上に置くので 13px（--fs-sm）のままだと文字が写真に埋もれる。
-   ただし理念の文章なので --fs-lg（15–17px）まで上げると見出しに寄って騒がしい。
-   1px だけ足した --fs-md（14px）に留める。
-   いちばん長い行「ひいては経済成長を…信じています。」が 24 字＝336px で、
-   PC の本文幅には十分収まるので折り返しは起きない。
-   ※ 上の .pullquote__body p と同じ詳細度なので、必ずこの位置（後ろ）に置くこと。 */
-@media (min-width: 901px) {
-  .pullquote__body p {
-    font-size: var(--fs-md);
-  }
-}
 
-/* ------------------------------ こだわり -------------------------------- */
-/* ---- こだわりの横並び（参考サイト section03 の段違いレイアウト） --------
-   写真と本文を左右に置き、本文だけを一段下げて重心をずらす。
-   本文には padding-top が付くので行の高さは「本文＋段差」で決まり、
-   写真はその行いっぱいに伸びる。結果として写真は必ず本文より高い。   */
-.section--kodawari .media-row {
-  --media-stagger: clamp(2rem, 6vw, 6.5rem);
-  align-items: stretch;
-  gap: 0;
-}
-.section--kodawari .media-row__body {
-  align-self: start;
-  /* 上を大きく、下を少しだけ空けることで、本文が写真の縦幅の
-     内側に収まりながら重心が下へずれる（section03 と同じ見え方）。 */
-  padding-block: var(--media-stagger) calc(var(--media-stagger) * .45);
-  padding-inline-start: clamp(1.75rem, 5vw, 5.5rem);
-}
-/* 反転時は寄せる向きも入れ替える */
-.section--kodawari .media-row--rev .media-row__body {
-  padding-inline-start: 0;
-  padding-inline-end: clamp(1.75rem, 5vw, 5.5rem);
-}
-/* 写真は行いっぱいに伸ばす（本文より必ず高くなる） */
-
-.meat {
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
-  margin-bottom: var(--block-gap);
-}
-
-.speclist { display: grid; }
-.speclist > div {
-  display: grid;
-  grid-template-columns: 6.5em 1fr;
-  gap: var(--sp-5);
-  padding-block: var(--sp-5);
-  border-top: var(--line-w) solid var(--c-line-faint);
-}
-.speclist > div:last-child { border-bottom: var(--line-w) solid var(--c-line-faint); }
-.speclist dt {
-  font-size: var(--fs-2xs);
-  letter-spacing: var(--ls-ja-wide);
-  color: var(--c-ink-3);
-}
-.speclist dd { color: var(--c-ink); font-size: var(--fs-sm); line-height: var(--lh-snug); }
-.speclist em { font-style: normal; color: var(--c-accent-2); }
-
-/* 阿波華牛（写真を右側に置いて、直前の行と向きを互い違いにする） */
-.awaka {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
-  margin-bottom: var(--block-gap);
-}
-.awaka__media { position: relative; }
-.awaka__media img { filter: grayscale(1) brightness(.88) contrast(1.05); }
-.awaka__label {
-  position: absolute;
-  inset-block-start: clamp(1rem, 3vw, 2.25rem);
-  inset-inline-end: clamp(1rem, 3vw, 2.25rem);
-  margin: 0;
-  font-family: var(--ff-heading);
-  font-size: clamp(1.125rem, 0.95rem + 0.8vw, 1.625rem);
-  font-weight: var(--fw-heading);
-  letter-spacing: .3em;
-  color: var(--c-ink);
-}
-.awaka__body p { color: var(--c-ink-2); line-height: var(--lh-loose); }
-.awaka__note {
-  margin-top: var(--sp-7);
-  padding-top: var(--sp-6);
-  border-top: var(--line-w) solid var(--c-line);
-  color: var(--c-ink) !important;
-  font-family: var(--ff-heading);
-  font-size: var(--fs-lg);
-  line-height: 2.2;
-  letter-spacing: var(--ls-ja-wide);
-}
-
-/* 旨さの秘訣 — カードをやめ、罫線と余白だけで区切る */
-.himitsu__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: clamp(2rem, 4vw, 3.5rem) clamp(1.5rem, 3vw, 3rem);
-}
-.hcard { display: flex; flex-direction: column; }
-.hcard__media {
-  margin-bottom: var(--sp-5);
-}
-.hcard__media img {
-  width: 100%;
-  aspect-ratio: var(--ratio-photo);
-  object-fit: cover;
-  filter: brightness(var(--img-brightness));
-}
-.hcard__num {
-  margin: 0 0 var(--sp-3);
-  font-family: var(--ff-accent);
-  font-size: var(--fs-xs);
-  font-style: italic;
-  letter-spacing: var(--ls-en-wide);
-  color: var(--c-accent-2);
-}
-
-/* subgrid が使える環境では、写真／番号／見出し／本文の各行の高さを
-   4 枚で共有させ、見出し下の罫線を 1px の誤差もなく揃える。 */
-@supports (grid-template-rows: subgrid) {
-  /* カードが 1 列に積まれる幅では揃える意味がないので適用しない。
-     auto-fit / minmax(230px, 1fr) で 2 列に並び始めるのが概ね 540px から
-     なので、その帯も subgrid に含める（2 列でも下線が揃う）。 */
-  @media (min-width: 540px) {
-    /* row-gap がカード内の行間になるため、子の margin は解除する */
-    .himitsu__grid { row-gap: var(--sp-5); }
-    .hcard {
-      display: grid;
-      grid-template-rows: subgrid;
-      grid-row: span 4;
-    }
-    .hcard__media,
-    .hcard__num { margin-bottom: 0; }
-    /* 行の高さは subgrid が決めるので、見出しの最低高さ指定は不要 */
-    .hcard h4 { min-height: 0; margin-bottom: 0; }
-  }
-}
-/* 見出しは 1 行でも 2 行でも同じ高さを確保し、
-   4 枚すべての下線が同じ位置に揃うようにする。 */
-.hcard h4 {
-  --hcard-title-lines: 2;
-  --hcard-title-lh: 1.9;
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-heading);
-  line-height: var(--hcard-title-lh);
-  letter-spacing: var(--ls-ja-wide);
-  /* box-sizing: border-box なので padding-bottom も含めた高さを確保する */
-  min-height: calc(var(--hcard-title-lh) * var(--hcard-title-lines) * 1em + var(--sp-4));
-  margin-bottom: var(--sp-4);
-  padding-bottom: var(--sp-4);
-  border-bottom: var(--line-w) solid var(--c-line-faint);
-}
-.hcard__txt {
-  margin: 0;
-  font-size: var(--fs-xs);
-  line-height: 2.1;
-  color: var(--c-ink-2);
-}
-
-/* ------------------------------ 空間 ------------------------------------ */
-/* ---- 空間：店内の情報 ----------------------------------------------------
-   席数など事実の情報なので、見出しの補足文と同じ書式で静かに置く。 */
-.kukan-info {
-  max-width: 44em;
-  margin: 0 auto var(--head-gap);
-  color: var(--c-ink-2);
-  font-size: var(--fs-lg);
-  line-height: var(--lh-loose);
-  letter-spacing: var(--ls-ja);
-  text-align: center;
-}
-
-/* ---- sec11 相当：中央の幅広画像 -----------------------------------------
-   参考サイトの間取り図（.floor / 858×420）と同じ位置づけ。
-   見出し・説明・キーワードを中央に置いたあと、幅広の写真で締める。      */
-.kukan-floor {
-  margin: 0 auto;
-  max-width: 860px;
-  text-align: center;
-}
-.kukan-floor__svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.kukan-floor__cap {
-  margin-top: var(--sp-4);
-  font-size: var(--fs-2xs);
-  letter-spacing: var(--ls-ja-wide);
-  color: var(--c-ink-3);
-}
+/* --------------------------- 固定背景の帯 -------------------------------- */
 
 /* ---- sec12 相当：スクロールしても固定される全幅の一枚 -------------------
    参考サイトの .bg-parallax と同じ「窓」の見え方。
@@ -2652,9 +2459,6 @@ body.is-reserve-open .nav-toggle {
 @media (max-width: 900px) {
   :root { --nav-h: var(--nav-h-sm); --nav-pt: var(--nav-pt-sm); }
 
-  .meat,
-  .awaka { grid-template-columns: 1fr; --media-min-h: 0px; }
-
   /* 想い：1カラムに積み替える */
   .omoi { grid-template-columns: 1fr; row-gap: var(--sp-7); }
   .omoi__main,
@@ -2681,30 +2485,6 @@ body.is-reserve-open .nav-toggle {
     margin-top: var(--sp-5);
   }
   .omoi__paras { margin-top: 0; }
-  /* 1 カラムでは段差・重なり・寄せを解除する */
-  .section--kodawari .media-row { gap: var(--sp-7); }
-  .section--kodawari .media-row__media { margin-bottom: 0; }
-  .section--kodawari .media-row__body,
-  .section--kodawari .media-row--rev .media-row__body {
-    padding-top: 0;
-    padding-inline: 0;
-  }
-  .section--kodawari .media-row--rev .media-row__media { order: 0; }
-  /* 1 カラムでは画像の高さを比率で決める。
-     このとき align-items: stretch（.media-row）は必ず外すこと。
-     枠の中身は position: absolute の img だけなので中身由来の高さが 0 で、
-     stretch のままだと「行の高さ＝中身の高さ」を先に決める WebKit
-     （iOS Safari / macOS Safari）で行が 0 になり、aspect-ratio が
-     使われる前に枠ごと潰れて写真が消える。Chromium は aspect-ratio から
-     行の高さを求めるので潰れず、検証ツールでは再現しない。
-     枠が潰れるとセクションが約 517px 縮み、割合指定の煙（下の 8/41/94%）が
-     本文に対して 42〜486px ずれる。 */
-  .media-row__media {
-    min-height: 0;
-    aspect-ratio: var(--ratio-photo);
-    align-self: start;
-  }
-
   .shop:first-child { padding-inline-end: 0; }
   .shop + .shop { padding-inline-start: 0; border-inline-start: 0; }
 
@@ -2806,9 +2586,12 @@ body.is-reserve-open .nav-toggle {
      （営業時間は店名との差を保つため、さらに一段下） */
   .rcard__name  { font-size: clamp(1.125rem, 4.8vw, 1.375rem); }
   .rcard__hours { font-size: var(--fs-xs); }
+  .rcard__cta { min-width: min(14rem, 100%); }
   /* --btn-py は .btn--reserve が --sp-5（24px）に上書きしているので、
-     ここで戻して背の高さを詰める */
-  .rcard__cta { min-width: min(14rem, 100%); --btn-py: var(--sp-4); }
+     ここで戻して背の高さを詰める。
+     ドロワーのご予約も同じ背の高さに見せたいので、必ずセットで指定すること。 */
+  .rcard__cta,
+  .gnav__reserve-btn { --btn-py: var(--sp-4); }
   /* DOM 上は最初に置いてある（読み上げ・Tab の順序を先頭にするため）。
      見た目だけカードの下へ送る。 */
   .reserve-modal__close {
@@ -2901,7 +2684,6 @@ body.is-reserve-open .nav-toggle {
      dt/dd を縦積みにすると行数が倍になり、店舗情報だけで 450px を超える。
      見出し列を詰めれば 360px 幅でも 2 カラムが成立し、
      「項目：値」の対応も読み取りやすい。 */
-  .speclist > div { grid-template-columns: 4.5em 1fr; gap: var(--sp-4); }
   /* 行間は PC ほど広げない（縦に伸びすぎると 1 画面に収まる項目が減る） */
   .infolist > div { grid-template-columns: 5.5em 1fr; gap: var(--sp-4); padding-block: var(--sp-2); }
 
@@ -3075,66 +2857,48 @@ body.is-reserve-open .nav-toggle {
     min-height: 100lvh;
     align-content: center;
     padding-block: 4.5rem;
+    /* 直前の「想い 03」との間隔。SP は .omoi の margin-bottom が 4rem まで
+       詰まっているので、この帯の手前だけ広げて切り替わりをはっきりさせる
+       （PC は .omoi の 12rem がそのまま間隔になるため、ここでは触らない）。
+
+       ※ .omoi の margin-bottom と隣接して相殺されるため、実際の間隔は
+         両者の「大きい方」になる。4rem 以下を入れても何も変わらないので、
+         広げたい間隔そのものをここに書くこと。 */
+    margin-block-start: clamp(7.5rem, 25vw, 10.5rem);
   }
-  /* 本文だけ 13px に留める（--fs-sm は SP で 14px に上がる）。
-     いちばん長い行「ひいては経済成長を…信じています。」が 24 字あり、
-     14px だと 356px で本文幅 342px（390px − ガター 24px×2）に収まらず、
-     .phrase の内部で 1 字だけ折り返してしまうため。
-     文字を大きくしたいときは、この行の文節を 2 つに割って改行位置を作ること。 */
-  .pullquote__body p {
-    font-size: 0.8125rem;
+  /* 帯の手前も少し詰める（PC 側は .pullquote の直後の @media を参照）。
+     SP の --sec-py は 48px しかないので、詰める量は固定値で持たせている。 */
+  .section--omoi { padding-bottom: calc(var(--sec-py) - 2rem); }
+  /* 見出しは「想い」のタイトル（.omoi .omoi__title）と同じ組みにそろえる。
+     .omoi__paras の margin-top（var(--sp-5)）が見出し〜本文の間隔になるので、
+     ここの margin-bottom もその値に合わせる。 */
+  .pullquote__title {
+    margin-bottom: var(--sp-5);
+    font-size: clamp(1.625rem, 1.3rem + 1.5vw, 1.875rem);
+    letter-spacing: .19em;
+    line-height: 1.85;
   }
 
   /* ---- 背景の煙 ------------------------------------------------------------
-     SP は 1 カラムなので、写真がコンテナ全幅を占める帯では煙が裏に隠れる。
-     6 本を縦に散らしてあるので、どこかしらの帯には必ず顔を出す。
-     1 本を大きくするより、小さめのまま本数で見せるほうが破綻しない。 */
+     プルクオートは SP だと画面 1 枚ぶんの高さしかないので、煙も小ぶりにする。
+     置き場所（右上・左下）は割合指定なので、ここで動かす必要はない。 */
   .smoke {
-    --smoke-size: clamp(26rem, 112vw, 34rem);
+    --smoke-size: clamp(20rem, 86vw, 26rem);
     /* 帯が狭いぶん動きも見えにくいので、PC より少しゆっくりにする */
     --smoke-speed: .52;
   }
-  /* 実測した「写真が無い縦帯」に合わせて置き直す（390px / セクション高 3572px）
-       419–963   … Wagyu Beef のテキストと諸元表
-       1219–1852 … 阿波華牛のテキストと「旨さの秘訣」見出し
-     PC の 1% / 42% のままだと、上の 1 本が上端の幕に食われてしまう。 */
-  .smoke__puff--tr { inset-block-start: 14%; }
-  .smoke__puff--bl { inset-block-start: 44%; }
-  /* SP でも 3 枚そろえる。立ちのぼる動きは 3 枚を 1/3 周期ずつずらして
-     途切れないようにしているので、1 枚落とすと煙が消える瞬間ができる。
-     1 枚あたりの面積が PC の 1/4 ほどなので、9 層でも負荷は軽い。 */
 
-  /* 4:3 の写真 4 枚で 1,000px 超になるため、SP だけ 16:9 に */
-  .hcard__media img { aspect-ratio: var(--ratio-wide); }
-
-  /* リード文の行間 2.8 は狭い画面では開きすぎるので 2.5 に詰める。 */
-  .omoi__paras p { line-height: 2.5; }
+  /* リード文の行間 2.8 は狭い画面では開きすぎるので 2.5 に詰める。
+     プルクオートの本文も同じ組みなので、必ずセットで指定すること。 */
+  .omoi__paras p,
+  .pullquote__body p { line-height: 2.5; }
 
   /* 流し込みの本文は幅によって折り返し位置が変わるため .phrase では追えない。
      text-wrap: pretty は最終行が極端に短くなる折り返しを避ける指定で、
      未対応のブラウザでは単に無視される（進歩的強化）。 */
-  .hcard__txt,
-  .awaka__body p,
   .infolist dd,
-  .speclist dd,
   .sec-head__lead { text-wrap: pretty; }
 
-
-  /* ---- 見取り図 ----
-     637 の viewBox を 342px に縮めるとラベルが実効 7px になり読めない。
-     画面いっぱいまで広げたうえで、ラベルのユーザー単位を上げる。
-     ラベルはすべて図の内側〜下側にあり、viewBox の端に余裕があるので
-     以前のような「はみ出し避けに横へ逃がす」補正は要らない。 */
-  .kukan-floor {
-    max-width: none;
-    margin-inline: calc(var(--gutter) * -1);
-  }
-  /* ラベルは3つとも同じ大きさ（SVG 側の 13px を一律 20px に上げる）。
-     viewBox 655 を画面幅 390 で見ると実効 12px 程度になる。 */
-  .kukan-floor__t-kitchen,
-  .kukan-floor__t-toilet,
-  .kukan-floor__t-entry { font-size: 20px; letter-spacing: 6px; }
-  .kukan-floor__t-arrow { stroke-width: 1.6; }
 
 }
 
@@ -3169,12 +2933,6 @@ body.is-reserve-open .nav-toggle {
   .site-footer__nav li a { display: block; padding-block: 6px; }
   /* アイコンだけのリンクは 30px しか無いので、余白で 44px まで広げる */
   .fshop__sns a { padding: 7px; margin: -7px; }
-}
-
-/* カードが 1 列に積まれる幅。見出しの高さを 2 行分そろえる意味が無くなり、
-   1 行見出しの下に空白が残るだけなので解除する（2 列以上は subgrid が担当）。 */
-@media (max-width: 539px) {
-  .hcard h4 { min-height: 0; }
 }
 
 /* ロゴは画像 1 枚（.brand__img）になったため、狭い幅で一部だけ隠す
