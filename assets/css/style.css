@@ -299,8 +299,6 @@
   --c-line-strong: rgb(255 255 255 / .50);
   --c-line-faint:  rgb(255 255 255 / .20);
 
-  --img-brightness: .95;
-
   /* 背景テクスチャ（参考サイトは無地のため既定で無効） */
   --texture-opacity: 0;
   --texture-blend: soft-light;
@@ -328,7 +326,6 @@
   --c-line-strong: rgb(26 25 23 / .42);
   --c-line-faint:  rgb(26 25 23 / .10);
 
-  --img-brightness: 1;
   /* 煙は CSS で描いているので色を変えられる。明るい地色では
      白い煙が消えてしまうため、墨色にして multiply で重ねる。
      写真素材だった頃はここを --smoke-opacity: 0 にして隠していた。 */
@@ -366,7 +363,6 @@
   --c-line-strong: rgb(246 236 226 / .50);
   --c-line-faint:  rgb(246 236 226 / .20);
 
-  --img-brightness: .95;
   --smoke-opacity: .60;
 
   --texture-opacity: .18;
@@ -1678,7 +1674,6 @@ body.is-reserve-open .nav-toggle {
   width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
-  filter: brightness(var(--img-brightness));
 }
 /* 01 の素材（omoi-grill = 1400×935 の 3:2 横長）は PC の箱（4:5）より横長なので、
    切り取りは「横」に起きる。＝縦は常に全部見えていて object-position の Y は
@@ -1817,7 +1812,6 @@ body.is-reserve-open .nav-toggle {
   width: 100%;
   aspect-ratio: 3 / 2;
   object-fit: cover;
-  filter: brightness(var(--img-brightness));
 }
 
 /* ---- 想いの締め：全面写真の上に理念を置く帯 ----------------------------
@@ -2033,16 +2027,9 @@ body.is-reserve-open .nav-toggle {
   );
   background-position: center 58%;
 }
-/* 明るさの調整は filter ではなく重ねる幕で行う
-   （filter は包含ブロックを作り、中の fixed レイヤーを壊すため）。
-   ::after は生成上いちばん後ろの子なので、画像より前面に載る。 */
-.kukan-band::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: color-mix(in srgb, var(--c-bg) var(--band-scrim, 12%), transparent);
-  pointer-events: none;
-}
+/* 写真は撮ったままを出す。明るさを落とす幕（かつての .kukan-band::after）は
+   持たない。もし将来またここへ幕を重ねる場合、filter は使えない
+   （包含ブロックを作って中の fixed レイヤーを壊すため）。 */
 
 /* ------------------------------ 店舗情報 --------------------------------
    カードをやめ、縦の細い罫線で 2 店舗を分ける（参考サイトの予約ブロック風） */
@@ -2073,9 +2060,7 @@ body.is-reserve-open .nav-toggle {
   width: 100%;
   aspect-ratio: var(--ratio-wide);
   object-fit: cover;
-  filter: brightness(var(--img-brightness));
 }
-.shop--soon .shop__media img { filter: brightness(calc(var(--img-brightness) * .68)) saturate(.7); }
 
 /* 弐番館は開店前で外観写真が無いため、写真の代わりに置く「準備中」の面。
    aspect-ratio を写真と同じにしてあるので、2枚のカードの行の高さが揃う。 */
