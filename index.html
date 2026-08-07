@@ -145,18 +145,17 @@
      ============================================================ -->
 <section class="hero" id="top">
   <div class="hero__media">
-    <!-- 装飾用の背景動画（音声なし・ループ）。
+    <!-- 装飾用の背景動画（音声なし・ループ）。素材そのままを出すので
+         色調補正も上に重ねる幕も持たない（暗転は「想い」セクションから）。
          src は JS が設定する。回線が細い場合や「動きを減らす」設定のときは
          読み込まず、ポスター画像（動画の1フレーム）のまま表示される。
          JS が無効な環境でもポスターが出るため、絵が消えることはない。 -->
     <video class="hero__video" id="heroVideo"
            poster="assets/images/hero-fv.jpg"
            muted loop playsinline preload="none"
-           data-src-sm="assets/video/0801-960.mp4"
-           data-src-lg="assets/video/0801-1280.mp4"
+           data-src="assets/video/0801.mp4"
            aria-hidden="true"></video>
   </div>
-  <div class="hero__scrim" aria-hidden="true"></div>
 
   <!-- 中央の縦組みキャッチ -->
   <h1 class="hero__title" data-reveal>
@@ -184,7 +183,7 @@
     <div class="omoi">
 
       <figure class="omoi__main" data-reveal>
-        <!-- 原本は assets/images/fukurou_hp5.JPG（6016×4016・3.0MB）。
+        <!-- 原本は撮影データの fukurou_hp5.JPG（6016×4016・3.0MB）。
              そのままでは重いので 1400px 幅に落として書き出したものを使う。 -->
         <picture>
           <source srcset="assets/images/omoi-grill.webp" type="image/webp">
@@ -220,7 +219,7 @@
     <div class="omoi omoi--rev">
 
       <figure class="omoi__main" data-reveal>
-        <!-- 原本は assets/images/fukurou_hp32.JPG（4048×2702・1.9MB）。
+        <!-- 原本は撮影データの fukurou_hp32.JPG（4048×2702・1.9MB）。
              そのままでは重いので 1400px 幅に落として書き出したものを使う。 -->
         <picture>
           <source srcset="assets/images/omoi-wagyu.webp" type="image/webp">
@@ -229,7 +228,7 @@
       </figure>
 
       <figure class="omoi__sub" data-reveal>
-        <!-- 原本は assets/images/fukurou_hp50.JPG（5016×3348・2.5MB）。
+        <!-- 原本は撮影データの fukurou_hp50.JPG（5016×3348・2.5MB）。
              そのままでは重いので 1400px 幅に落として書き出したものを使う。 -->
         <picture>
           <source srcset="assets/images/omoi-table.webp" type="image/webp">
@@ -263,7 +262,7 @@
     <div class="omoi">
 
       <figure class="omoi__main" data-reveal>
-        <!-- 原本は assets/images/LINE_ALBUM_20260708_260715_14.jpg（1045×1567・374KB）。
+        <!-- 原本は撮影データの LINE_ALBUM_20260708_260715_14.jpg（1045×1567・374KB）。
              幅は 1045px のままで、書き出し直して軽くしたものを使う
              （他の写真と違い原本が小さいので 1400px には拡大しない）。 -->
         <picture>
@@ -300,7 +299,7 @@
          span の間に空白を入れると半角スペースが出るため、タグ内側で改行している。 -->
     <blockquote class="pullquote" data-reveal>
       <div class="pullquote__media" aria-hidden="true">
-        <!-- 原本は assets/images/fukurou_hp19.JPG（4494×3000・819KB）。
+        <!-- 原本は撮影データの fukurou_hp19.JPG（4494×3000・819KB）。
              全面に敷くので 2000px 幅に落として使う。 -->
         <picture>
           <source srcset="assets/images/omoi-quote.webp" type="image/webp">
@@ -377,13 +376,13 @@
        これで background-attachment: fixed と同じ「窓」の見え方になり、
        fixed 背景を正しく描画できない iOS Safari でも成立する。
        同じ帯を3枚並べ、地色をはさんで順に写真が現れるようにしている。 -->
-  <div class="kukan-band kukan-band--1" role="img" aria-label="焼き台の上で炭火にかけられた肉を焼く手元">
+  <div class="kukan-band kukan-band--1" role="img" aria-label="焼き台の上で肉をトングで返す手元と立ちのぼる煙">
     <div class="kukan-band__media" aria-hidden="true"></div>
   </div>
-  <div class="kukan-band kukan-band--2" role="img" aria-label="タレを敷いた皿に盛られた霜降りの焼肉">
+  <div class="kukan-band kukan-band--2" role="img" aria-label="白い大皿に並べられた厚切りの牛タン">
     <div class="kukan-band__media" aria-hidden="true"></div>
   </div>
-  <div class="kukan-band kukan-band--3" role="img" aria-label="白い大皿に並べられた厚切りの牛タン">
+  <div class="kukan-band kukan-band--3" role="img" aria-label="ごまと青ねぎを散らした牛そぼろのごはん">
     <div class="kukan-band__media" aria-hidden="true"></div>
   </div>
 

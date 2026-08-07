@@ -315,8 +315,7 @@
        ・「動きを減らす」設定（prefers-reduced-motion）
        ・データセーバーが有効（navigator.connection.saveData）
        ・回線が 2G / slow-2G
-     画面幅で 640 / 1280 の2種類を出し分ける（<source media> は
-     <video> では効かないため JS で選ぶ）。 */
+     元素材をそのまま流すため、書き出し違いの出し分けはしていない。 */
   const heroVideo = $('#heroVideo');
 
   if (heroVideo) {
@@ -325,8 +324,7 @@
     const skip = reduceMotion || conn.saveData === true || slow;
 
     if (!skip) {
-      const wide = window.matchMedia('(min-width: 900px)').matches;
-      heroVideo.src = wide ? heroVideo.dataset.srcLg : heroVideo.dataset.srcSm;
+      heroVideo.src = heroVideo.dataset.src;
       // 自動再生が拒否されてもポスターが残るだけなので、失敗は無視する
       heroVideo.play().catch(() => {});
     }

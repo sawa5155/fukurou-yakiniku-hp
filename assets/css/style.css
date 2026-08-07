@@ -151,6 +151,23 @@
      ここで少し送ってから文字を出すことで写真の上でも読めるようにする。
      （小さくすると写真がよく見えるが文字は読みにくくなる） */
   --veil-lead:   42vh;
+  /* 「その日、いちばんのお肉を。」＝本文が始まる位置までに、白文字が読める
+     濃さまで先に落とすための距離と濃さ。距離はセクションの padding-top
+     （--sec-py ＋ --veil-lead）に見出しの上余白ぶんを足してあるので、
+     本文の 1 行目は必ず --veil-read-op に達したところから始まる。
+     この幕は --veil-read を過ぎても濃さを保ち、そこから先は --veil-end の
+     全面暗転が引き継いで地色まで持っていく。
+
+     濃さは 0801.mp4 の実測から決めている。本文が乗る画面右側の帯を
+     全長 0.5 秒刻みで測ると、相対輝度は上位 1% でも 0.19、いちばん明るい
+     1 点（炎のハイライト）でも 0.37 しかない。地色は純黒なので、
+       ・上位 1% に対して 7:1（AAA）を確保するには 26%
+       ・最も明るい 1 点に対しても 7:1 を保つには 45%
+     が要る。動画を読み込まない環境で出るポスター（hero-fv.jpg）は
+     これより暗いので、45% あれば両方まかなえる。
+     これ以上濃くしても可読性は上がらず、映像が早く消えるだけ。 */
+  --veil-read:    calc(var(--sec-py) + var(--veil-lead) + 6rem);
+  --veil-read-op: 45%;
 
   /* ---- 角丸（参考サイトは全て直角） ------------------------------------ */
   --radius-none: 0px;
@@ -282,17 +299,7 @@
   --c-line-strong: rgb(255 255 255 / .50);
   --c-line-faint:  rgb(255 255 255 / .20);
 
-  /* 画像に重ねる幕 */
-  --scrim-top:    rgb(0 0 0 / .55);
-  --scrim-mid:    rgb(0 0 0 / .28);
-  --scrim-bottom: rgb(0 0 0 / .80);
   --img-brightness: .95;
-  /* ヒーローの FV 動画は素材のままの見え方で出す（1 ＝無変換）。
-     色調をいじると暗部の粒子が目立つため、明るさも彩度も触らない。
-     文字の可読性は .hero__scrim の中央ビネットだけで作っている
-     （明るいストック映像の頃は .62 まで落としていた）。 */
-  --hero-img-brightness: 1;
-  --hero-img-saturate: 1;
 
   /* 背景テクスチャ（参考サイトは無地のため既定で無効） */
   --texture-opacity: 0;
@@ -321,9 +328,6 @@
   --c-line-strong: rgb(26 25 23 / .42);
   --c-line-faint:  rgb(26 25 23 / .10);
 
-  --scrim-top:    rgb(20 18 16 / .48);
-  --scrim-mid:    rgb(20 18 16 / .24);
-  --scrim-bottom: rgb(20 18 16 / .72);
   --img-brightness: 1;
   /* 煙は CSS で描いているので色を変えられる。明るい地色では
      白い煙が消えてしまうため、墨色にして multiply で重ねる。
@@ -331,9 +335,6 @@
   --smoke-tint:    26 25 23;
   --smoke-blend:   multiply;
   --smoke-opacity: .26;
-  /* ヒーロー見出しは白固定。FV 動画は元から暗いので落としすぎない */
-  --hero-img-brightness: .85;
-  --hero-img-saturate: .95;
   /* 明るいテーマは本文が暗色なので、写真の上に文字が乗らないよう
      見出しが現れる前に地色へ到達させる（助走も短くする） */
   --veil-end: 20%;
@@ -365,13 +366,8 @@
   --c-line-strong: rgb(246 236 226 / .50);
   --c-line-faint:  rgb(246 236 226 / .20);
 
-  --scrim-top:    rgb(21 12 12 / .58);
-  --scrim-mid:    rgb(21 12 12 / .30);
-  --scrim-bottom: rgb(21 12 12 / .84);
   --img-brightness: .95;
   --smoke-opacity: .60;
-  --hero-img-brightness: .93;
-  --hero-img-saturate: 1;
 
   --texture-opacity: .18;
   --texture-blend: soft-light;
@@ -604,10 +600,22 @@ body.is-opening { overflow: hidden; }
 .section--kukan { padding-block: 0; }
 .section--kukan + .section { padding-top: var(--sec-gap); }
 
-/* ---- 想いセクション：固定されたヒーロー写真の上へ重なり、徐々に暗転する ----
-   ヒーローの写真は position: fixed で画面に残り、このセクションが上を流れる。
+/* ---- 想いセクション：固定されたヒーロー映像の上へ重なり、徐々に暗転する ----
+   ヒーローの映像は position: fixed で画面に残り、このセクションが上を流れる。
    背景グラデーションが「透明 → 地色」へ変わることで、
-   スクロールにつれて写真が黒へ沈んでいくように見える。
+   スクロールにつれて映像が黒へ沈んでいくように見える。
+
+   幕は 2 枚を重ねている（合成なので、見た目の濃さは 2 枚の合算）。
+
+     ① 可読の幕（--veil-read / --veil-read-op）
+        セクション上端から padding-top ぶんで --veil-read-op まで一気に落ち、
+        以降はその濃さを保つ。「その日、いちばんのお肉を。」から下の白文字が、
+        映像の明部に乗っても読めるのはこの 1 枚のおかげ。
+        ヒーロー側には幕を置かない（映像を素材のまま見せる）ので、
+        暗くする仕事はすべてここから始まる。
+
+     ② 全面暗転の幕（--veil-end）
+        ①の濃さを受け取って地色まで持っていく。以下の解説はこちらの話。
 
    ▼ 境目を見せないための工夫
      セクション上端で少しでも色が付いていると、その境界が
@@ -638,7 +646,9 @@ body.is-opening { overflow: hidden; }
 .section--omoi {
   padding-top: calc(var(--sec-py) + var(--veil-lead));
   background-color: transparent;
-  background-image: linear-gradient(
+  background-image:
+  /* ② 全面暗転の幕 */
+  linear-gradient(
     to bottom,
     transparent 0%,
     color-mix(in srgb, var(--c-bg) 1%,  transparent) calc(var(--veil-end) * 0.050),
@@ -656,6 +666,28 @@ body.is-opening { overflow: hidden; }
     color-mix(in srgb, var(--c-bg) 81%, transparent) calc(var(--veil-end) * 0.910),
     color-mix(in srgb, var(--c-bg) 92%, transparent) calc(var(--veil-end) * 0.960),
     var(--c-bg) var(--veil-end)
+  ),
+  /* ① 可読の幕。ヒーローの映像から本文へ渡すための一段目。
+     セクション上端（＝ヒーローとの境目）は必ず transparent から始め、
+     立ち上がりも 2% → 6% と抑えて、境界が横一本の線に見えないようにする。
+     最後の停止位置 --veil-read を過ぎた後は、最終色がそのまま下まで続く
+     （linear-gradient は最後の色で box の残りを埋める）ので、
+     以降の本文はどこでも --veil-read-op の濃さの上に乗る。
+     途中の % は --veil-read-op: 45% を終点として配分してある。
+     終点を変えるときは中間も同じ比率で引き直すこと。 */
+  linear-gradient(
+    to bottom,
+    transparent 0,
+    color-mix(in srgb, var(--c-bg)  1%, transparent) calc(var(--veil-read) * 0.12),
+    color-mix(in srgb, var(--c-bg)  3%, transparent) calc(var(--veil-read) * 0.24),
+    color-mix(in srgb, var(--c-bg)  7%, transparent) calc(var(--veil-read) * 0.36),
+    color-mix(in srgb, var(--c-bg) 12%, transparent) calc(var(--veil-read) * 0.47),
+    color-mix(in srgb, var(--c-bg) 18%, transparent) calc(var(--veil-read) * 0.57),
+    color-mix(in srgb, var(--c-bg) 25%, transparent) calc(var(--veil-read) * 0.67),
+    color-mix(in srgb, var(--c-bg) 32%, transparent) calc(var(--veil-read) * 0.76),
+    color-mix(in srgb, var(--c-bg) 38%, transparent) calc(var(--veil-read) * 0.85),
+    color-mix(in srgb, var(--c-bg) 42%, transparent) calc(var(--veil-read) * 0.93),
+    color-mix(in srgb, var(--c-bg) var(--veil-read-op), transparent) var(--veil-read)
   );
   background-repeat: no-repeat;
 }
@@ -1031,7 +1063,7 @@ body.is-locked .site-header::after {
 /* ------------------------------ ヒーロー --------------------------------
    中央に縦組みのキャッチ、左右に縦組みのレール。参考サイトの構成。      */
 /* ヒーロー自体は通常の流れ。見出しやレールは普通にスクロールして消える。
-   固定するのは「写真」と「その上に重ねる幕」だけ。 */
+   固定するのは「映像」だけ。 */
 .hero {
   position: relative;
   z-index: 0;
@@ -1041,15 +1073,13 @@ body.is-locked .site-header::after {
   place-items: center;
 }
 
-/* 写真を画面に貼り付けたままにし、後続セクションがその上を流れていく。
+/* 映像を画面に貼り付けたままにし、後続セクションがその上を流れていく。
    position: fixed なので祖先の overflow では切られない。 */
-.hero__media,
-.hero__scrim {
+.hero__media {
   position: fixed;
   inset: 0;
+  z-index: 0;
 }
-.hero__media { z-index: 0; }
-.hero__scrim { z-index: 1; }
 
 /* 動画とポスター画像のどちらも同じ扱いにする
    （object-fit は <video> の poster にも効く） */
@@ -1058,26 +1088,12 @@ body.is-locked .site-header::after {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* 映像には色調補正をかけず、素材そのままの明るさ・彩度で出す。
-     既定テーマ（sumi）は --hero-img-* が 1／1 なので実質無変換。
-     別テーマ（kinari / ebicha）だけ、配色に合わせて明るさと彩度を寄せる。
-     以前ここにあった暗部持ち上げ（SVG の #hero-lift）は、素材の粒子を
-     増幅して背景がザラつくため撤去した。 */
-  filter: brightness(var(--hero-img-brightness))
-          saturate(var(--hero-img-saturate));
-}
-/* 中央のビネットは縦組み見出しの下敷き。映像そのものを暗くする代わりに
-   こちらで可読性を作っているので、見出しの掛かる範囲だけ効かせて
-   周囲（皿や焼き台）は素の明るさで見せる。 */
-.hero__scrim {
-  background:
-    linear-gradient(to bottom, var(--scrim-top) 0%, transparent 30%, transparent 72%, var(--scrim-mid) 100%),
-    radial-gradient(46% 56% at 50% 46%, rgb(0 0 0 / .46), rgb(0 0 0 / .16) 58%, transparent 78%);
+  /* 素材そのままで出す。明るさ・彩度の補正も、上に重ねる幕も持たない。
+     暗転は「想い」セクションの背景（.section--omoi）だけが担当する。 */
 }
 
 /* 暗転しきったら固定レイヤーの描画を止めて負荷を下げる（JS が付与） */
-.hero.is-covered .hero__media,
-.hero.is-covered .hero__scrim { visibility: hidden; }
+.hero.is-covered .hero__media { visibility: hidden; }
 
 /* 縦組みでは inline 軸＝縦、block 軸＝右→左。
    flex を使うと row が縦方向になり列が折り返すため、素の block で組む。 */
@@ -1103,6 +1119,9 @@ body.is-locked .site-header::after {
   /* 縦組みでは inline 軸＝上下なので、text-align が上下方向の揃えになる。
      短い列（現代焼肉）が長い列（レトロが香る）の中央に来る。 */
   text-align: center;
+  /* 映像に幕を掛けなくなったので、可読性は文字側の落ち影だけで作る。
+     面ではなく影なので、背後の映像は素材のまま透けて見える。 */
+  text-shadow: 0 0 .5em rgb(0 0 0 / .55), 0 1px 3px rgb(0 0 0 / .45);
 }
 .hero__title span {
   display: block;
@@ -1128,6 +1147,8 @@ body.is-locked .site-header::after {
   justify-items: center;
   gap: var(--sp-5);
   color: var(--c-on-media);
+  /* ヒーローの幕を廃したので、映像の明部に乗っても読めるよう落ち影で締める */
+  text-shadow: 0 1px 4px rgb(0 0 0 / .55);
 }
 .hero__rail .vert {
   font-family: var(--ff-heading);
@@ -1154,6 +1175,8 @@ body.is-locked .site-header::after {
   color: var(--c-on-media);
   /* 背景は敷かない。padding は当たり判定（幅 44px 以上）の確保だけが目的。 */
   padding: var(--sp-4) 16px;
+  /* ヒーローの幕を廃したので、映像の明部に乗っても読めるよう落ち影で締める */
+  text-shadow: 0 1px 4px rgb(0 0 0 / .55);
 }
 .reserve-rail .vert {
   font-family: var(--ff-heading);
@@ -1973,21 +1996,34 @@ body.is-reserve-open .nav-toggle {
   background-position: center center;
   background-repeat: no-repeat;
 }
-/* 焼き台と手元。主題がやや下寄りなので上を多めに落とす。 */
+/* 写真は画面いっぱいに cover で敷かれるので、切り取られ方は画面比率で決まる。
+   PC（横長）では写真の横幅ぜんぶが、スマホ（縦長）では写真の高さぜんぶが
+   使われ、余った側が落ちる。つまり **PC の寄り具合は写真の横の写り込み量、
+   スマホの寄り具合は縦の写り込み量だけで決まり、1枚で両方を成立させるには
+   引きで撮った写真しか使えない**。
+
+   トリミングで寄せると逃げ場がなくなるので、写真は元の画角のまま使うこと。
+   background-position の % は「切り出す帯をどこに合わせるか」で、
+   写真の向きによって効く向きが変わる（横位置なら上下、縦位置なら PC 側の
+   上下だけ。縦位置はスマホでは縦が過不足なく収まるため効かない）。 */
+
+/* 1枚目：横位置。焼き台と手元が画面の広い範囲に散っているので中央のまま。 */
 .kukan-band--1 .kukan-band__media {
   background-image: url("../images/band-1.jpg");
   background-image: image-set(
     url("../images/band-1.webp") type("image/webp"),
     url("../images/band-1.jpg")  type("image/jpeg")
   );
-  background-position: center 58%;
 }
+/* 2枚目・3枚目：縦位置。PC では真ん中の帯だけが切り出されるので、
+   主題（皿・丼）が中央にくる高さに寄せている。 */
 .kukan-band--2 .kukan-band__media {
   background-image: url("../images/band-2.jpg");
   background-image: image-set(
     url("../images/band-2.webp") type("image/webp"),
     url("../images/band-2.jpg")  type("image/jpeg")
   );
+  background-position: center 62%;
 }
 .kukan-band--3 .kukan-band__media {
   background-image: url("../images/band-3.jpg");
@@ -1995,11 +2031,7 @@ body.is-reserve-open .nav-toggle {
     url("../images/band-3.webp") type("image/webp"),
     url("../images/band-3.jpg")  type("image/jpeg")
   );
-}
-/* cover は「画面の比率で中央を切る」ので、縦長の画面では横に細い帯だけが残る。
-   3枚とも主題は中央にあるため、縦長では中央に戻して主題を逃がさない。 */
-@media (max-aspect-ratio: 1 / 1) {
-  .kukan-band--1 .kukan-band__media { background-position: center center; }
+  background-position: center 58%;
 }
 /* 明るさの調整は filter ではなく重ねる幕で行う
    （filter は包含ブロックを作り、中の fixed レイヤーを壊すため）。
