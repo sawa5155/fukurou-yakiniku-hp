@@ -2026,7 +2026,7 @@ body.is-reserve-open .nav-toggle {
     url("../images/band-3.webp") type("image/webp"),
     url("../images/band-3.jpg")  type("image/jpeg")
   );
-  background-position: center 58%;
+  background-position: center 53%;
 }
 /* 写真は撮ったままを出す。明るさを落とす幕（かつての .kukan-band::after）は
    持たない。もし将来またここへ幕を重ねる場合、filter は使えない
