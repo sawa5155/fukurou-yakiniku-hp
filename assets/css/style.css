@@ -1930,25 +1930,26 @@ body.is-reserve-open .nav-toggle {
 
 .pullquote__inner { position: relative; z-index: 2; }
 
-/* ---- 文字の組みは「想い」のタイトル・リード文とまったく同じ ------------
-   .omoi__title / .omoi__paras p の値をそのまま使っている。
-   片方を触ったらもう片方も必ず合わせること（900px 以下の値も同様）。   */
+/* ---- 文字の組みは「想い」のタイトル・リード文がベース --------------------
+   もとは .omoi__title / .omoi__paras p の値をそのまま使っていたが、
+   ここは全面写真の上に文章 3 段を載せるため、そのままだと帯が伸びすぎる。
+   字送り（line-height）・文字サイズ・段落間だけを一段詰めてある。
+   書体・字間・太さは「想い」と共通なので、そちらを触るときは見比べること。 */
 .pullquote__title {
-  /* 見出し〜本文の間は .omoi__paras の margin-top と同じ値 */
-  margin: 0 0 clamp(2.5rem, 6vw, 5rem);
+  margin: 0 0 clamp(1.75rem, 4vw, 3.25rem);
   font-family: var(--ff-heading);
-  font-size: clamp(1.375rem, 1.05rem + 1.2vw, 2.25rem);
+  font-size: clamp(1.25rem, 0.95rem + 1.1vw, 2rem);
   font-weight: 600;                 /* 明朝の細さのままだと写真に負ける */
-  line-height: 1.9;
+  line-height: 1.7;
   letter-spacing: .26em;
 }
 .pullquote__body p {
-  margin: 0 0 clamp(1.75rem, 4vw, 3rem);
+  margin: 0 0 clamp(1.1rem, 2.5vw, 1.9rem);
   color: var(--c-ink);
   font-family: var(--ff-heading);
-  font-size: clamp(.9rem, 0.8rem + 0.4vw, .3rem);
+  font-size: clamp(.85rem, 0.8rem + 0.3vw, .875rem);
   font-weight: 600;
-  line-height: 2.8;
+  line-height: 2.3;
   letter-spacing: var(--ls-ja-wide);
 }
 .pullquote__body p:last-child { margin-bottom: 0; }
@@ -2886,14 +2887,14 @@ body.is-reserve-open .nav-toggle {
   /* 帯の手前も少し詰める（PC 側は .pullquote の直後の @media を参照）。
      SP の --sec-py は 48px しかないので、詰める量は固定値で持たせている。 */
   .section--omoi { padding-bottom: calc(var(--sec-py) - 2rem); }
-  /* 見出しは「想い」のタイトル（.omoi .omoi__title）と同じ組みにそろえる。
-     .omoi__paras の margin-top（var(--sp-5)）が見出し〜本文の間隔になるので、
-     ここの margin-bottom もその値に合わせる。 */
+  /* 見出しの組みは「想い」のタイトル（.omoi .omoi__title）がベースだが、
+     SP は帯が画面 1 枚ぶんしかないので、見出し〜本文の間隔（--sp-5）も
+     文字サイズ・行送りもひとまわり詰めている。 */
   .pullquote__title {
-    margin-bottom: var(--sp-5);
-    font-size: clamp(1.625rem, 1.3rem + 1.5vw, 1.875rem);
+    margin-bottom: calc(var(--sp-5) * .7);
+    font-size: clamp(1.45rem, 1.2rem + 1.3vw, 1.65rem);
     letter-spacing: .19em;
-    line-height: 1.85;
+    line-height: 1.7;
   }
 
   /* ---- 背景の煙 ------------------------------------------------------------
@@ -2905,10 +2906,10 @@ body.is-reserve-open .nav-toggle {
     --smoke-speed: .52;
   }
 
-  /* リード文の行間 2.8 は狭い画面では開きすぎるので 2.5 に詰める。
-     プルクオートの本文も同じ組みなので、必ずセットで指定すること。 */
-  .omoi__paras p,
-  .pullquote__body p { line-height: 2.5; }
+  /* リード文の行間 2.8 は狭い画面では開きすぎるので 2.5 に詰める。 */
+  .omoi__paras p { line-height: 2.5; }
+  /* プルクオートは画面 1 枚に収める帯なので、本文はさらに詰める。 */
+  .pullquote__body p { line-height: 2.15; }
 
   /* 流し込みの本文は幅によって折り返し位置が変わるため .phrase では追えない。
      text-wrap: pretty は最終行が極端に短くなる折り返しを避ける指定で、
