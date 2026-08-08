@@ -2002,7 +2002,7 @@ body.is-reserve-open .nav-toggle {
    写真の向きによって効く向きが変わる（横位置なら上下、縦位置なら PC 側の
    上下だけ。縦位置はスマホでは縦が過不足なく収まるため効かない）。 */
 
-/* 1枚目：横位置。焼き台と手元が画面の広い範囲に散っているので中央のまま。 */
+/* 3枚とも横位置。PC では写真のほぼ全体が入り、切られるのは上下わずか。 */
 .kukan-band--1 .kukan-band__media {
   background-image: url("../images/band-1.jpg");
   background-image: image-set(
@@ -2010,15 +2010,12 @@ body.is-reserve-open .nav-toggle {
     url("../images/band-1.jpg")  type("image/jpeg")
   );
 }
-/* 2枚目・3枚目：縦位置。PC では真ん中の帯だけが切り出されるので、
-   主題（皿・丼）が中央にくる高さに寄せている。 */
 .kukan-band--2 .kukan-band__media {
   background-image: url("../images/band-2.jpg");
   background-image: image-set(
     url("../images/band-2.webp") type("image/webp"),
     url("../images/band-2.jpg")  type("image/jpeg")
   );
-  background-position: center 62%;
 }
 .kukan-band--3 .kukan-band__media {
   background-image: url("../images/band-3.jpg");
@@ -2026,7 +2023,27 @@ body.is-reserve-open .nav-toggle {
     url("../images/band-3.webp") type("image/webp"),
     url("../images/band-3.jpg")  type("image/jpeg")
   );
-  background-position: center 53%;
+}
+/* 2枚目・3枚目は、縦長の画面では同じ料理を縦位置で撮ったカットに差し替える。
+   横位置のままだと縦長画面では中央の細い一本しか残らず、寄りすぎるため。
+   1枚目は焼き台と手元が画面の広い範囲に散っていて縦に切っても成立するので、
+   横位置のまま1枚で通す。切り替えは幅ではなく画面の比率で判定する。 */
+@media (max-aspect-ratio: 1 / 1) {
+  .kukan-band--2 .kukan-band__media {
+    background-image: url("../images/band-2-sp.jpg");
+    background-image: image-set(
+      url("../images/band-2-sp.webp") type("image/webp"),
+      url("../images/band-2-sp.jpg")  type("image/jpeg")
+    );
+  }
+  .kukan-band--3 .kukan-band__media {
+    background-image: url("../images/band-3-sp.jpg");
+    background-image: image-set(
+      url("../images/band-3-sp.webp") type("image/webp"),
+      url("../images/band-3-sp.jpg")  type("image/jpeg")
+    );
+    background-position: center 40%;
+  }
 }
 /* 写真は撮ったままを出す。明るさを落とす幕（かつての .kukan-band::after）は
    持たない。もし将来またここへ幕を重ねる場合、filter は使えない
