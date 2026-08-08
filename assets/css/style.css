@@ -2023,7 +2023,6 @@ body.is-reserve-open .nav-toggle {
     url("../images/band-3.webp") type("image/webp"),
     url("../images/band-3.jpg")  type("image/jpeg")
   );
-  background-position: center 40%;
 }
 /* 2枚目・3枚目は、縦長の画面では同じ料理を縦位置で撮ったカットに差し替える。
    横位置のままだと縦長画面では中央の細い一本しか残らず、寄りすぎるため。
