@@ -1106,7 +1106,9 @@ body.is-locked .site-header::after {
      font-weight を上げても合成太字になり、穂先の抜けが潰れて
      「筆で書いた線」に見えなくなる。400 のまま字面を大きくして見せる。 */
   font-family: var(--ff-brush);
-  font-size: calc(var(--fs-hero) * 1.15);
+  /* 1 列 4 文字（初志貫徹）なので、2 列組みだったときの --fs-hero 基準では
+     画面に対して小さく見える。列が 1 本しか無いぶん字面を大きく取る。 */
+  font-size: clamp(2.25rem, 4.3vw, 3.75rem);
   font-weight: 400;
   /* 毛筆は字面が不定形でそれ自体が余白を持つため、明朝 800 のときの
      0.3em ではバラけて 1 本の書に見えない。少し詰める。 */
@@ -2049,29 +2051,37 @@ body.is-reserve-open .nav-toggle {
    （包含ブロックを作って中の fixed レイヤーを壊すため）。 */
 
 /* ------------------------------ 店舗情報 --------------------------------
-   カードをやめ、縦の細い罫線で 2 店舗を分ける（参考サイトの予約ブロック風） */
+   カードをやめ、縦の細い罫線で 3 店舗を分ける（参考サイトの予約ブロック風）
+   SP は 1 カラムで縦積み。auto-fit は使わない（3 店舗だと中間幅で 2＋1 に
+   割れて、最後の 1 店舗だけが取り残された見た目になるため）。 */
 .shops {
+  /* 罫線の位置計算に使うので列の隙間は変数で持つ */
+  --shops-gap: clamp(1.75rem, 3.5vw, 4rem);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  /* 縦（1 カラムのとき）／横 の順。縦は 2 店舗の切れ目が分かる間隔を取る。 */
-  gap: clamp(6rem, 14vw, 8rem) clamp(4rem, 7vw, 6rem);
+  grid-template-columns: minmax(0, 1fr);
+  /* 縦（1 カラムのとき）／横 の順。縦は店舗の切れ目が分かる間隔を取る。 */
+  gap: clamp(6rem, 14vw, 8rem) var(--shops-gap);
 }
-/* 罫線を持つレイアウトでは列の隙間を padding だけで作る。
-   grid の column-gap を残すと罫線（= 右列の左端）が隙間の中央に来ず、
-   左店舗の余白が広く・右店舗が罫線寄りに見えてしまう。 */
 @media (min-width: 901px) {
-  .shops { column-gap: 0; }
+  .shops { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 .shop {
+  position: relative;
   display: flex;
   flex-direction: column;
 }
-/* 2 店舗を縦の細い罫線で分ける。
-   左右に同じ余白を持たせないと写真幅がズレて行が揃わない。 */
-.shop:first-child { padding-inline-end: clamp(3rem, 6vw, 5rem); }
-.shop + .shop {
-  padding-inline-start: clamp(3rem, 6vw, 5rem);
-  border-inline-start: var(--line-w) solid var(--c-line-faint);
+/* 店舗を縦の細い罫線で分ける。罫線は border ではなく列の隙間の中央に
+   絶対配置で置く。border＋padding で作ると、両隣に罫線が来る中央の列だけ
+   内容幅が狭くなり、写真の高さと情報の行が左右の店舗とズレてしまう。 */
+@media (min-width: 901px) {
+  .shop + .shop::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc(var(--shops-gap) / -2);
+    width: var(--line-w);
+    background: var(--c-line-faint);
+  }
 }
 .shop__media img {
   width: 100%;
@@ -2080,7 +2090,7 @@ body.is-reserve-open .nav-toggle {
 }
 
 /* 弐番館は開店前で外観写真が無いため、写真の代わりに置く「準備中」の面。
-   aspect-ratio を写真と同じにしてあるので、2枚のカードの行の高さが揃う。 */
+   aspect-ratio を写真と同じにしてあるので、3枚のカードの行の高さが揃う。 */
 .shop__soon {
   display: grid;
   place-items: center;
@@ -2120,7 +2130,9 @@ body.is-reserve-open .nav-toggle {
   line-height: 2.1;
 }
 .infolist dt { color: var(--c-ink-3); letter-spacing: var(--ls-ja); }
-.infolist dd { color: var(--c-ink-2); }
+/* 3 カラムの 1 列は 1000px 幅で 270px ほどしかない。@mimizuku_teisyokusakaba の
+   ような長い Instagram ID は 1 語で折り返せず、そのままだと罫線を越えてはみ出す。 */
+.infolist dd { color: var(--c-ink-2); overflow-wrap: anywhere; }
 /* 住所・電話・Instagram はリンク。既定では下線を出さず、ホバーで白い下線を引く。
    SP では「ホバー」が無いので、下の 720px 以下で常時下線に切り替えている。 */
 .infolist a {
@@ -2347,19 +2359,21 @@ body.is-reserve-open .nav-toggle {
   padding-block: clamp(3.5rem, 8vw, 5.5rem) var(--sp-6);
 }
 
-/* 2 店舗を左右に並べる。ロゴ → 店名（＋Instagram）→ 情報 の 3 段構成で、
+/* 3 店舗を横に並べる。ロゴ → 店名（＋Instagram）→ 情報 の 3 段構成で、
    店舗情報セクションと同じ内容を最小限の 4 項目に絞って載せている。 */
-/* 2 店舗でロゴの高さが違う（横長 ／ 正方形）ため、行を親側に持たせて
+/* 店舗ごとにロゴの高さが違う（横長 ／ 正方形 ／ 横長）ため、行を親側に持たせて
    subgrid で共有する。こうすると背の高い弐番館のロゴに合わせて行が伸びても、
-   店名と情報の行は左右で同じ高さから始まる。
+   店名と情報の行は 3 店舗で同じ高さから始まる。
    subgrid 未対応のブラウザでは各カラムが独立した grid として素直に積まれる。 */
 .site-footer__stores {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: auto auto auto;   /* ロゴ ／ 店名 ／ 情報 */
   /* 行の間隔は各ブロックの margin が持つので row-gap は 0。
      ここに gap を入れると 3 行すべての間に効いてロゴ〜店名〜情報が離れる。 */
-  column-gap: clamp(2.5rem, 7vw, 6rem);
+  /* 3 カラムでは 1 列が 1180/3 ＝ 約 330px しかないので、
+     2 店舗のときの clamp(2.5rem, 7vw, 6rem) より隙間を詰める。 */
+  column-gap: clamp(2rem, 4vw, 3.5rem);
   row-gap: 0;
   padding-bottom: clamp(3rem, 8vw, 5.5rem);
 }
@@ -2372,8 +2386,11 @@ body.is-reserve-open .nav-toggle {
   grid-template-rows: subgrid;
   /* 3 列目の 1fr は余りを吸収するためのダミー。これが無いと、2 列にまたがる
      ロゴ（本店 209px / 弐番館 160px）の幅を満たすために 1・2 列が広げられ、
-     店名と Instagram の間が column-gap 以上に開いてしまう。 */
-  grid-template-columns: max-content max-content minmax(0, 1fr);
+     店名と Instagram の間が column-gap 以上に開いてしまう。
+     店名の列は minmax(0, max-content)。3 カラムになって 1 列が約 330px と
+     狭くなったので、「定食酒場みみずく」のような長い店名でも折り返せるように
+     下限を 0 にしておく（素の max-content だと折り返さずカラムからはみ出す）。 */
+  grid-template-columns: minmax(0, max-content) max-content minmax(0, 1fr);
   grid-template-areas:
     "logo logo logo"
     "name sns  ."
@@ -2392,6 +2409,9 @@ body.is-reserve-open .nav-toggle {
    本店ロゴは画像の上下に余白を含むので、弐番館との差はこの数値より小さく見える。 */
 .fshop__logo--honten   img { height: clamp(80px, 7vw, 96px); }
 .fshop__logo--nibankan img { height: clamp(90px, 7.6vw, 105px); }
+/* みみずくは 2 行組みで横幅が本店ロゴの 1.3 倍あるため、高さを揃えると
+   だいぶ大きく見える。「みみずく」の字面が福朗の字面と近くなる高さにする。 */
+.fshop__logo--mimizuku img { height: clamp(66px, 5.6vw, 78px); }
 
 .fshop__name {
   grid-area: name;
@@ -2519,11 +2539,8 @@ body.is-reserve-open .nav-toggle {
     margin-top: var(--sp-5);
   }
   .omoi__paras { margin-top: 0; }
-  .shop:first-child { padding-inline-end: 0; }
-  .shop + .shop { padding-inline-start: 0; border-inline-start: 0; }
-
-  /* 2 店舗を縦に積む。1 店舗ぶんの情報が 4 行あるので、
-     店舗と店舗の間は左右のときより広く取って区切りを見せる。
+  /* 3 店舗を縦に積む。1 店舗ぶんの情報が 4 行あるので、
+     店舗と店舗の間は横並びのときより広く取って区切りを見せる。
      縦積みでは左右で行を揃える必要が無いので subgrid もやめる。 */
   .site-footer__stores {
     grid-template-columns: 1fr;
@@ -2705,7 +2722,7 @@ body.is-reserve-open .nav-toggle {
   }
 
   /* ヒーロー：レールは下端に、キャッチは中央のまま小さく */
-  .hero__title { font-size: clamp(2rem, 8.4vw, 2.75rem); max-height: 58vh; }
+  .hero__title { font-size: clamp(2.5rem, 11vw, 3.75rem); max-height: 58vh; }
   .hero__hairline { display: none; }
   .reserve-rail { inset-block-end: clamp(0.75rem, 2.5vh, 1.5rem); }
   .hero__rail--right { inset-block-end: clamp(1.5rem, 5vh, 2.5rem); }
