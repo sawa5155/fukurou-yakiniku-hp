@@ -583,11 +583,13 @@ body.is-opening { overflow: hidden; }
 }
 .section--kukan,
 .section--shops,
+.section--company,
 .section--contact { background: var(--c-bg); }
 
 /* 本文の最後（お問い合わせ）とフッターのあいだだけ、間隔を広げる。
    セクション間の標準は --sec-gap（= 上下の --sec-py の合計）だが、
-   ここはそれに --footer-lead を足す。 */
+   ここはそれに --footer-lead を足す。
+   ※ 本文の最後のセクションを入れ替えたら、この指定も移すこと。 */
 .section--contact { padding-bottom: calc(var(--sec-py) + var(--footer-lead)); }
 
 /* 帯のセクションは全幅の写真だけで、見出しも本文も持たない。
@@ -2153,6 +2155,70 @@ body.is-reserve-open .nav-toggle {
 }
 .shop__actions .btn--reserve { min-width: 15rem; }
 
+/* ------------------------------ 会社概要 --------------------------------
+   横罫だけの 1 カラムの表（縦罫は引かない）。罫線は上端・行間・下端
+   すべて同じ --c-line-faint。値は本文のゴシックではなく明朝で組み、
+   罫線を増やさずに項目名との差をつけている。                       */
+.ctable {
+  /* 幅は 48rem。1 カラムなので、これ以上広げると「50名」のような短い値の
+     右に空きが伸びるだけで、罫線ばかりが長くなる。 */
+  max-width: 48rem;
+  margin-inline: auto;
+  border-top: var(--line-w) solid var(--c-line-faint);
+}
+/* 1 項目の組み。既定（SP）は「項目名（上）／値（下）」の縦並び。
+   横並びにすると項目名の列ぶん値の幅が削られ、狭い画面では
+   住所や事業内容が途中で折り返してしまうため。 */
+.ctable__item {
+  display: grid;
+  gap: var(--sp-2);
+  padding-block: var(--sp-4);
+  border-bottom: var(--line-w) solid var(--c-line-faint);
+}
+/* 721px 以上は横並び。値の幅に余裕があるので、1 項目 1 行に収まる。 */
+@media (min-width: 721px) {
+  .ctable__item {
+    /* 項目名の列は「事業内容」「取引銀行」の 4 字が基準。
+       値の頭を全行で揃えたいので、内容に合わせず一定にしている。 */
+    grid-template-columns: 5.5em minmax(0, 1fr);
+    align-items: baseline;
+    /* 項目名と値のあいだ。画面が広いほど開き、PC（1440px）で約 56px。 */
+    gap: clamp(1rem, 4vw, 3.5rem);
+    padding-block: var(--sp-3);
+  }
+}
+
+/* 項目名は値の上に乗る小さな見出し。色を落とし、字間を空けて、
+   値より先に読ませない。 */
+.ctable dt {
+  color: var(--c-ink-3);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-ja-wide);
+  line-height: var(--lh-tight);
+}
+.ctable dd {
+  margin: 0;
+  font-family: var(--ff-heading);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-ja);
+  line-height: var(--lh-snug);
+  color: var(--c-ink);
+  /* 長い住所や英数字が行の幅を越えないように */
+  overflow-wrap: anywhere;
+}
+/* 住所・電話はリンク。下線の出し方は店舗情報（.infolist a）と揃える。 */
+.ctable a {
+  color: inherit;
+  border-bottom: var(--line-w) solid transparent;
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.ctable a:hover { border-bottom-color: #fff; }
+/* 事業内容・取引銀行は「／」で区切った並列。区切りの前で折り返ったときに
+   行頭が「／」で始まらないよう、区切りは .phrase の先頭に入れてある。 */
+.ctable dd .phrase + .phrase { margin-inline-start: -.15em; }
+/* SP の詰め方は下の @media (max-width: 720px) にまとめてある。 */
+
 /* ------------------------------ フォーム --------------------------------
    薄い面と枠線で 入力欄の位置がはっきり分かるようにしている。
    濃さは --panel-bg / --field-bg で調整可能。                          */
@@ -2740,6 +2806,13 @@ body.is-reserve-open .nav-toggle {
 
   /* SP はホバーが無いため、リンクの白い下線を常時表示してタップできると伝える */
   .infolist a { border-bottom-color: #fff; }
+
+  /* 会社概要：SP は文字を 1 段落とす（PC の 14px のままだと
+     342px の本文幅に対して大きく、住所が窮屈に見える） */
+  .ctable dt { font-size: var(--fs-2xs); }
+  .ctable dd { font-size: var(--fs-xs); }
+  /* SP はホバーが無いのでリンクの下線を常時表示（.infolist a と同じ扱い） */
+  .ctable a { border-bottom-color: #fff; }
 
   /* SP は指で押す面を確保したいので全幅に戻す */
   .shop__actions .btn--reserve { flex: 1; }

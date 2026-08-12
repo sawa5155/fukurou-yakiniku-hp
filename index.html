@@ -53,6 +53,10 @@
      内容は必ず画面に出ている店舗情報セクションと一致させること
      （食い違うと構造化データとして無効になる）。
      image / ドメインが確定したら、相対パスを絶対 URL に差し替えてください。
+
+     末尾の Organization は運営会社（会社概要セクションと一致）。
+     各店舗から parentOrganization で参照し、「3 店舗は同じ会社の店」と
+     読み取れるようにしている。
      ============================================================ -->
 <script type="application/ld+json">
 [
@@ -78,7 +82,8 @@
       "opens": "17:00", "closes": "22:00"
     }],
     "sameAs": ["https://www.instagram.com/fukurou_yakiniku/"],
-    "acceptsReservations": "https://tabelog.com/tokushima/A3601/A360101/36008569/"
+    "acceptsReservations": "https://tabelog.com/tokushima/A3601/A360101/36008569/",
+    "parentOrganization": { "@id": "#northsea" }
   },
   {
     "@context": "https://schema.org",
@@ -101,7 +106,8 @@
       "opens": "17:00", "closes": "22:00"
     }],
     "sameAs": ["https://www.instagram.com/fukurou_yakiniku_2nd/"],
-    "acceptsReservations": "https://tabelog.com/tokushima/A3601/A360101/36009508/"
+    "acceptsReservations": "https://tabelog.com/tokushima/A3601/A360101/36009508/",
+    "parentOrganization": { "@id": "#northsea" }
   },
   {
     "@context": "https://schema.org",
@@ -128,7 +134,27 @@
       "https://www.instagram.com/mimizuku_teisyokusakaba",
       "https://tabelog.com/tokushima/A3601/A360101/36009048/"
     ],
-    "acceptsReservations": false
+    "acceptsReservations": false,
+    "parentOrganization": { "@id": "#northsea" }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "#northsea",
+    "name": "株式会社NorthSea",
+    "alternateName": "NorthSea Inc.",
+    "foundingDate": "2023-11-08",
+    "telephone": "+81-88-612-8032",
+    "numberOfEmployees": { "@type": "QuantitativeValue", "value": 50 },
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "JP",
+      "addressRegion": "徳島県",
+      "addressLocality": "板野郡北島町",
+      "streetAddress": "高房字東中道32-7"
+    },
+    "employee": { "@type": "Person", "name": "安永 龍平" },
+    "knowsAbout": ["飲食店の経営", "飲食店コンサル", "SNSマーケティング"]
   }
 ]
 </script>
@@ -173,6 +199,7 @@
         <ul class="gnav__list">
           <li><a href="#top"      data-navlink><span class="gnav__ja">TOP</span><span class="gnav__en">Top</span></a></li>
           <li><a href="#shops"    data-navlink><span class="gnav__ja">店舗情報</span><span class="gnav__en">Shops</span></a></li>
+          <li><a href="#company"  data-navlink><span class="gnav__ja">会社概要</span><span class="gnav__en">Company</span></a></li>
           <li><a href="#contact"  data-navlink><span class="gnav__ja">お問い合わせ</span><span class="gnav__en">Contact</span></a></li>
         </ul>
 
@@ -545,13 +572,8 @@
             <div><dt>駐車場</dt><dd><span class="phrase">あり</span><span class="phrase">（共有駐車場2台）</span></dd></div>
             <div><dt>支払方法</dt><dd>現金</dd></div>
             <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/mimizuku_teisyokusakaba" target="_blank" rel="noopener">@mimizuku_teisyokusakaba</a></dd></div>
+            <div><dt>食べログ</dt><dd><a href="https://tabelog.com/tokushima/A3601/A360101/36009048/" target="_blank" rel="noopener">定食酒場みみずく</a></dd></div>
           </dl>
-
-          <div class="shop__actions">
-            <a class="btn btn--reserve" href="https://tabelog.com/tokushima/A3601/A360101/36009048/" target="_blank" rel="noopener">
-              <span>食べログはこちら</span>
-            </a>
-          </div>
         </div>
       </article>
 
@@ -560,7 +582,74 @@
 </section>
 
 <!-- ============================================================
-     5. お問い合わせ — CONTACT
+     5. 会社概要 — COMPANY
+     店舗情報のあと、お問い合わせの手前に置く。
+     「どの店か」を見たあとに「誰がやっているか」が来て、
+     そのまま採用・取材の問い合わせにつながる並び。
+
+     組みは横罫だけの 1 カラムの表（縦罫は引かない）。
+     罫線は上端・行間・下端すべて同じ色。値は本文のゴシックではなく
+     明朝で組み、罫線を増やさずに項目名との差をつけている。
+
+     行は data-reveal-delay を 0.5 刻みで振ってあり、上から順に立ち上がる。
+     刻みは 0.5（＝--reveal-step の半分・約 85ms）。1 刻みにすると
+     最後の行が 1.2 秒待たされ、出遅れて見える。
+
+     マークアップは表組みではなく <dl>。中身は「項目名と値の対」であって
+     行と列に意味のある表ではないため（読み上げも dt/dd の方が正しく伝わる）。
+     見た目だけ表にしている。
+
+     ※ 所在地・電話は北島本店と同じ（本店が本社）。
+       店舗情報側を直すときは、こちらと head の構造化データも揃えること。
+     ============================================================ -->
+<section class="section section--company" id="company">
+  <div class="container">
+
+    <header class="sec-head" data-reveal>
+      <p class="sec-head__en">Company</p>
+      <h2 class="sec-head__ja">会社概要</h2>
+    </header>
+
+    <dl class="ctable">
+      <div class="ctable__item" data-reveal data-reveal-delay="0">
+        <dt>会社名</dt>
+        <dd>株式会社NorthSea</dd>
+      </div>
+      <div class="ctable__item" data-reveal data-reveal-delay="0.5">
+        <dt>設立</dt>
+        <dd>2023年11月8日</dd>
+      </div>
+      <div class="ctable__item" data-reveal data-reveal-delay="1">
+        <dt>代表者</dt>
+        <dd>安永 龍平</dd>
+      </div>
+      <div class="ctable__item" data-reveal data-reveal-delay="1.5">
+        <dt>所在地</dt>
+        <dd><a href="https://maps.google.com/?q=徳島県板野郡北島町高房字東中道32-7" target="_blank" rel="noopener"><span class="phrase">徳島県板野郡北島町</span><span class="phrase">高房字東中道32-7</span></a></dd>
+      </div>
+      <div class="ctable__item" data-reveal data-reveal-delay="2">
+        <dt>電話番号</dt>
+        <dd><a href="tel:0886128032">088-612-8032</a></dd>
+      </div>
+      <div class="ctable__item" data-reveal data-reveal-delay="2.5">
+        <dt>従業員数</dt>
+        <dd>50名</dd>
+      </div>
+      <div class="ctable__item" data-reveal data-reveal-delay="3">
+        <dt>事業内容</dt>
+        <dd><span class="phrase">飲食店の経営</span><span class="phrase">／飲食店コンサル</span><span class="phrase">／SNSマーケティング</span></dd>
+      </div>
+      <div class="ctable__item" data-reveal data-reveal-delay="3.5">
+        <dt>取引銀行</dt>
+        <dd><span class="phrase">阿波銀行</span><span class="phrase">／徳島大正銀行</span></dd>
+      </div>
+    </dl>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     6. お問い合わせ — CONTACT
      ============================================================ -->
 <section class="section section--contact" id="contact">
   <div class="container">
@@ -695,7 +784,7 @@
 </main>
 
 <!-- ============================================================
-     6. FOOTER
+     7. FOOTER
      ============================================================ -->
 <footer class="site-footer">
   <div class="container">
@@ -767,6 +856,7 @@
         <ul>
           <li><a href="#top">TOP</a></li>
           <li><a href="#shops">店舗情報</a></li>
+          <li><a href="#company">会社概要</a></li>
           <li><a href="#contact">お問い合わせ</a></li>
         </ul>
       </nav>
