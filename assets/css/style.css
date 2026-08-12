@@ -2389,7 +2389,7 @@ body.is-reserve-open .nav-toggle {
 }
 
 .form__submit { margin-top: var(--sp-5); text-align: center; }
-.form__submit .btn { min-width: min(300px, 100%); }
+.form__submit .btn { width: 100%; }
 
 .form__status {
   margin: 0;
