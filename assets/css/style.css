@@ -249,6 +249,13 @@
      内訳は @keyframes の % で決まる（ロゴ 0-40% 出現／40-62% 保持／
      62-82% 退出、黒幕 62-100% 退出）。 */
   --opening-total: 2900ms;
+  /* ヒーローの見出し（.hero__title）を出しはじめる位置。
+     --opening-total に対する割合で、JS がこの値を読んでタイマーを張る。
+     黒幕が抜けきる 100% を待つと、幕が薄くなって「演出は終わった」と
+     見えたあとに 1 秒ほど遅れて文字が出てくるので、黒幕の退出
+     （62%〜100%）の途中から重ねて、幕が抜けた瞬間には出そろわせる。
+     小さくすると幕の裏で出はじめ、大きくすると幕が抜けてから出る。 */
+  --opening-hero-in: 70%;
 
   /* ---- 影（参考サイトは影を使わない） ---------------------------------- */
   --shadow-sm: none;
@@ -598,8 +605,9 @@ body.is-opening { overflow: hidden; }
 .section--contact { padding-bottom: calc(var(--sec-py) + var(--footer-lead)); }
 
 /* 帯のセクションは全幅の写真だけで、見出しも本文も持たない。
-   上下の余白はセクションでは持たず、帯の手前は .kukan-band--1 の
-   margin-top、帯の後ろは次のセクション側の padding-top で作る。 */
+   上下の余白はセクションでは持たず、帯の手前は先頭の帯
+   （.kukan-band--2）の margin-top、帯の後ろは次のセクション側の
+   padding-top で作る。 */
 .section--kukan { padding-block: 0; }
 .section--kukan + .section { padding-top: var(--sec-gap); }
 
@@ -1127,6 +1135,22 @@ body.is-locked .site-header::after {
   /* 映像に幕を掛けなくなったので、可読性は文字側の落ち影だけで作る。
      面ではなく影なので、背後の映像は素材のまま透けて見える。 */
   text-shadow: 0 0 .5em rgb(0 0 0 / .55), 0 1px 3px rgb(0 0 0 / .45);
+}
+/* 出現は「下からふわっと」ではなく、その場でのフェードだけにする。
+   持ち上げ（--reveal-y）とぼかし（--reveal-blur）を殺してある。
+
+   尺は本文の出現（--dur-slow = 1350ms）よりゆっくり取る。ここは黒幕の
+   退出と重なるぶん、本文と同じ速さだと幕が抜けるのとほぼ同時に出そろって
+   しまい、書としての立ち上がりが見えないため。
+
+   出はじめは JS が --opening-hero-in（黒幕の退出に重なる位置）で合図する
+   ので、黒幕が薄くなっていく間に 7 割ほどまで浮かび、幕が抜けたあとに
+   残りをゆっくり詰める。尺を変えても出はじめの時刻は動かない
+   （時刻は --opening-hero-in、速さはここ、で完全に別）。 */
+html.js .hero__title[data-reveal] {
+  --reveal-y: 0px;
+  --reveal-blur: 0px;
+  transition-duration: 1800ms;
 }
 .hero__title span {
   display: block;
@@ -1910,7 +1934,9 @@ body.is-reserve-open .nav-toggle {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: rgba(0, 0, 0, .65);
+  /* 肉の明るい部分に理念の文章が重なるので、写真を見せるより
+     読めることを優先して濃くしてある。 */
+  background: rgba(0, 0, 0, .78);
 }
 /* PC は箱（1440px 幅で 1440×823）が素材の 3:2 とほぼ同じ比のため、拡大なしでは
    ほとんど切り取りが起きず、肉が小さく収まってしまう。SP より強く寄せる。
@@ -1989,10 +2015,10 @@ body.is-reserve-open .nav-toggle {
   position: relative;
   clip-path: inset(0);
 }
-/* 余白は見取り図から1枚目に入るところだけ。帯どうしは隙間なく接する。
+/* 余白は見取り図から先頭の帯に入るところだけ。帯どうしは隙間なく接する。
    地色をはさまないことで、スクロールすると次の窓が下から前の写真に
    覆いかぶさってくるように見える。 */
-.kukan-band--1 { margin-top: var(--block-gap); }
+.kukan-band--2 { margin-top: var(--block-gap); }
 .kukan-band__media {
   position: fixed;
   inset: 0;
@@ -2011,14 +2037,7 @@ body.is-reserve-open .nav-toggle {
    写真の向きによって効く向きが変わる（横位置なら上下、縦位置なら PC 側の
    上下だけ。縦位置はスマホでは縦が過不足なく収まるため効かない）。 */
 
-/* 3枚とも横位置。PC では写真のほぼ全体が入り、切られるのは上下わずか。 */
-.kukan-band--1 .kukan-band__media {
-  background-image: url("../images/band-1.jpg");
-  background-image: image-set(
-    url("../images/band-1.webp") type("image/webp"),
-    url("../images/band-1.jpg")  type("image/jpeg")
-  );
-}
+/* 2枚とも横位置。PC では写真のほぼ全体が入り、切られるのは上下わずか。 */
 .kukan-band--2 .kukan-band__media {
   background-image: url("../images/band-2.jpg");
   background-image: image-set(
@@ -2033,10 +2052,9 @@ body.is-reserve-open .nav-toggle {
     url("../images/band-3.jpg")  type("image/jpeg")
   );
 }
-/* 2枚目・3枚目は、縦長の画面では同じ料理を縦位置で撮ったカットに差し替える。
+/* 縦長の画面では、同じ料理を縦位置で撮ったカットに差し替える。
    横位置のままだと縦長画面では中央の細い一本しか残らず、寄りすぎるため。
-   1枚目は焼き台と手元が画面の広い範囲に散っていて縦に切っても成立するので、
-   横位置のまま1枚で通す。切り替えは幅ではなく画面の比率で判定する。 */
+   切り替えは幅ではなく画面の比率で判定する。 */
 @media (max-aspect-ratio: 1 / 1) {
   .kukan-band--2 .kukan-band__media {
     background-image: url("../images/band-2-sp.jpg");

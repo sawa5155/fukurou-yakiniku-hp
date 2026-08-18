@@ -159,21 +159,36 @@
      （JS が落ちても forwards で必ず消えます）。ここでやるのは2点だけ。
 
        ・演出中はスクロールを止める
-       ・黒幕が抜けきってから、ヒーローの見出しとレールを出す
-         （黒幕の裏で先に出てしまうと「ファーストビューがフェードイン」に
-          ならず、幕が上がった瞬間に完成した状態で現れてしまう）
+       ・黒幕が上がるのに合わせて、ヒーローの見出しを出す
 
-     終了の合図は animationend。取りこぼすと黒幕の裏で固まるため、
-     尺 + 余裕のタイマーでも同じ後始末を呼ぶ二重の作りにしています。 */
+     合図は 2 つあり、役割が違います。
+
+       releaseHero()   見出しを出しはじめる合図。--opening-hero-in の時点。
+                       黒幕は 62%〜100% で退出するので、その途中から重ねる。
+                       animationend（＝黒幕が完全に消えた時点）まで待つと、
+                       幕が薄くなって「演出は終わった」と見えたあとに
+                       1 秒ほど遅れて文字が出てくる。
+       finishOpening() 後始末（スクロール解放）。合図は animationend。
+                       取りこぼすと黒幕の裏で固まるため、尺 + 余裕の
+                       タイマーでも同じ後始末を呼ぶ二重の作りにしています。 */
   const opening = $('#opening');
-  const openingDone = [];
+  const heroWaiting = [];
+  let heroReleased = false;
   let openingFinished = false;
+
+  const releaseHero = () => {
+    if (heroReleased) return;
+    heroReleased = true;
+    heroWaiting.forEach((fn) => fn());
+    heroWaiting.length = 0;
+  };
 
   const finishOpening = () => {
     if (openingFinished) return;
     openingFinished = true;
     document.body.classList.remove('is-opening');
-    openingDone.forEach((fn) => fn());
+    // タイマーを取りこぼしていても、幕が消えた時点では必ず出す
+    releaseHero();
   };
 
   const openingActive =
@@ -183,18 +198,32 @@
   if (openingActive) {
     document.body.classList.add('is-opening');
 
-    // CSS の --opening-total を読み、保険のタイマーに使う
-    const raw = getComputedStyle(document.documentElement)
-      .getPropertyValue('--opening-total').trim();
-    const total = /ms$/.test(raw) ? parseFloat(raw)
-                : /s$/.test(raw) ? parseFloat(raw) * 1000
-                : 2900;
+    // CSS の --opening-total を読み、見出しの合図と保険のタイマーに使う
+    const css = (name) => getComputedStyle(document.documentElement)
+      .getPropertyValue(name).trim();
+    const raw = css('--opening-total');
+    const parsed = /ms$/.test(raw) ? parseFloat(raw)
+                 : /s$/.test(raw) ? parseFloat(raw) * 1000
+                 : 2900;
+    const total = Number.isFinite(parsed) ? parsed : 2900;
+
+    /* 見出しを出しはじめる時刻。--opening-hero-in（黒幕の退出に重なる位置）。
+       すでに走っている黒幕のアニメーションから経過時間を引いているので、
+       スクリプトの実行がどれだけ遅れても幕とズレない。 */
+    const rawIn = css('--opening-hero-in');
+    const ratioIn = /%$/.test(rawIn) ? parseFloat(rawIn) / 100 : 0.7;
+    const veil = opening.getAnimations
+      ? opening.getAnimations().find((a) => a.animationName === 'opening-veil')
+      : null;
+    const elapsed = veil ? Number(veil.currentTime) || 0 : 0;
+    const heroAt = total * (Number.isFinite(ratioIn) ? ratioIn : 0.7) - elapsed;
+    window.setTimeout(releaseHero, Math.max(0, heroAt));
 
     // animationend は子（ロゴ）からも伝播してくるので、黒幕自身の分だけ拾う
     opening.addEventListener('animationend', (e) => {
       if (e.target === opening) finishOpening();
     });
-    window.setTimeout(finishOpening, (Number.isFinite(total) ? total : 2900) + 400);
+    window.setTimeout(finishOpening, total + 400);
   } else {
     finishOpening();
   }
@@ -210,17 +239,17 @@
     if (d) el.style.setProperty('--reveal-delay', d);
   });
 
-  // ヒーロー内の要素はオープニングが明けてから出す。
-  // 「徳島｜焼肉」（.hero__rail）は追従させるため body 直下に出してあるが、
-  // 見え方はファーストビューの一部なので、同じ扱いにする。
-  const isHeroReveal = (el) => Boolean(el.closest('.hero')) || el.matches('.hero__rail');
+  // ヒーロー内の要素は黒幕が上がるのに合わせて出す（releaseHero）。
+  // 「徳島｜焼肉」（.hero__rail）は出現アニメーションを持たない
+  // （data-reveal を付けていない）ので、ここには関わらない。
+  const isHeroReveal = (el) => Boolean(el.closest('.hero'));
 
   if (reduceMotion || !('IntersectionObserver' in window)) {
     revealTargets.forEach((el) => el.classList.add('is-in'));
   } else {
     const show = (el) => {
-      if (isHeroReveal(el) && !openingFinished) {
-        openingDone.push(() => el.classList.add('is-in'));
+      if (isHeroReveal(el) && !heroReleased) {
+        heroWaiting.push(() => el.classList.add('is-in'));
         return;
       }
       el.classList.add('is-in');
@@ -234,14 +263,14 @@
       });
     }, { rootMargin: '0px 0px -12% 0px', threshold: 0.06 });
 
-    /* 画面の隅に置いたレール（ご予約・産地）は交差判定に載せない。
+    /* 画面の隅に置いたレール（ご予約）は交差判定に載せない。
 
-       いずれも最初から画面内にいるので観測する意味が無いうえ、
+       最初から画面内にいるので観測する意味が無いうえ、
        下端に寄せてあるぶん rootMargin の除外帯（画面下 12%）に丸ごと
        入ってしまうことがあり、そうなると永久に is-in が付かず
        透明のままになる（＝ボタンが消えたように見える）。
-       出るタイミングは show() に任せる（ヒーロー内はオープニング明け）。 */
-    const isCornerRail = (el) => el.matches('.reserve-rail, .hero__rail');
+       出るタイミングは show() に任せる（ヒーロー内は黒幕の退出に合わせる）。 */
+    const isCornerRail = (el) => el.matches('.reserve-rail');
 
     revealTargets.forEach((el) => {
       if (isCornerRail(el)) show(el);

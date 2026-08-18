@@ -451,7 +451,7 @@
      見出しや説明を伴う「空間」セクションは廃止し、
      全幅の帯（.kukan-band）だけを残している。
      中身が帯だけなので、上下の余白はセクション側では持たせない
-     （帯の上の間隔は .kukan-band--1 の margin-top）。
+     （帯の上の間隔は先頭の帯 .kukan-band--2 の margin-top）。
      ============================================================ -->
 <section class="section section--kukan" id="kukan" aria-label="店内・料理の写真">
 
@@ -463,10 +463,7 @@
        外側の .kukan-band が clip-path でその矩形だけを切り抜く。
        これで background-attachment: fixed と同じ「窓」の見え方になり、
        fixed 背景を正しく描画できない iOS Safari でも成立する。
-       同じ帯を3枚並べ、地色をはさんで順に写真が現れるようにしている。 -->
-  <div class="kukan-band kukan-band--1" role="img" aria-label="焼き台の上で肉をトングで返す手元と立ちのぼる煙">
-    <div class="kukan-band__media" aria-hidden="true"></div>
-  </div>
+       同じ帯を2枚並べ、地色をはさんで順に写真が現れるようにしている。 -->
   <div class="kukan-band kukan-band--2" role="img" aria-label="白い大皿に並べられた厚切りの牛タン">
     <div class="kukan-band__media" aria-hidden="true"></div>
   </div>
@@ -884,7 +881,7 @@
      追従させるため、ヒーローの中ではなく body 直下に置いている。
      （.hero の中に残すと z-index: 0 のスタック文脈に閉じ込められ、
        後続セクションの下に潜って見えなくなる） -->
-<p class="hero__rail hero__rail--right" data-reveal data-reveal-delay="2">
+<p class="hero__rail hero__rail--right">
   <span class="vert">徳島｜焼肉</span>
 </p>
 
