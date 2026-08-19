@@ -157,6 +157,21 @@
   }
 ]
 </script>
+
+<!-- ============================================================
+     Google Analytics 4（測定ID: G-F83QD7BHJT）
+     async なので読み込みが描画を止めることはない。
+     「拡張計測機能」を有効にしているため、食べログの予約リンクや
+     Instagram への外部リンククリックは GA 側で自動計測される
+     （このページ側に追加のイベント記述は不要）。
+     ============================================================ -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F83QD7BHJT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F83QD7BHJT');
+</script>
 </head>
 
 <body>
