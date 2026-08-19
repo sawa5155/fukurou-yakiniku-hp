@@ -1018,9 +1018,6 @@ body.is-locked .site-header::after {
 .gnav__list a {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  /* パネル幅が狭いので、和文と欧文の間隔は詰めておく */
-  gap: var(--sp-3);
   padding-block: clamp(0.9rem, 2vw, 1.25rem);
 }
 .gnav__ja {
@@ -1029,18 +1026,9 @@ body.is-locked .site-header::after {
   font-weight: var(--fw-heading);
   letter-spacing: var(--ls-ja-wide);
   white-space: nowrap;
-}
-.gnav__en {
-  font-family: var(--ff-accent);
-  font-size: var(--fs-2xs);
-  font-style: italic;
-  letter-spacing: var(--ls-en);
-  color: var(--c-ink-3);
-  white-space: nowrap;
   transition: color var(--dur-fast) var(--ease);
 }
 .gnav__list a:hover .gnav__ja { color: var(--c-accent-2); }
-.gnav__list a:hover .gnav__en { color: var(--c-accent-2); }
 
 /* ドロワー内のご予約。リンクの一覧とは別の導線なので、
    罫線のリストから少し離してボタンとして置く。 */
@@ -1048,32 +1036,13 @@ body.is-locked .site-header::after {
 .gnav__reserve-btn {
   display: flex;
   width: 100%;
-  /* 和文と欧文はリストの項目より近づけたいので、.btn の gap を詰める */
-  gap: var(--sp-2);
-  /* 和文＋欧文の 2 語が入るので、.btn の左右余白（--sp-6）では
-     SP のドロワー幅（16rem）に収まらず「ご予/約」と割れる。ここで詰める。 */
+  /* SP のドロワー幅（16rem）でも「ご予/約」と割れないよう左右余白を詰める */
   --btn-px: var(--sp-4);
 }
-/* 2 語とも折り返さない。flex の既定（shrink: 1）だと狭い幅で
-   和文が 2 行に割れるため、縮小も止めている。 */
+/* flex の既定（shrink: 1）だと狭い幅で和文が 2 行に割れるため、縮小も止める */
 .gnav__reserve-btn > span { flex: none; white-space: nowrap; }
 /* 字間を空けたぶん、中身が右に寄って見えるのを戻す */
-.gnav__reserve-ja { margin-inline-start: var(--ls-ja-wide); }
-/* 欧文はリストの項目（.gnav__en）と同じ書式。あいだの「/」は装飾なので
-   疑似要素で出し、読み上げには乗せない。 */
-.gnav__reserve-en {
-  font-family: var(--ff-accent);
-  font-size: var(--fs-2xs);
-  font-style: italic;
-  letter-spacing: var(--ls-en);
-  opacity: .78;
-}
-.gnav__reserve-en::before {
-  content: "/";
-  margin-inline-end: .55em;
-  font-style: normal;
-  opacity: .7;
-}
+.gnav__reserve-ja { margin-inline-end: calc(var(--ls-ja-wide) * -1); }
 
 /* ------------------------------ ヒーロー --------------------------------
    中央に縦組みのキャッチ、左右に縦組みのレール。参考サイトの構成。      */
@@ -2588,8 +2557,11 @@ body.is-reserve-open .nav-toggle {
   gap: clamp(1rem, 1.8vw, 1.75rem);
 }
 .site-footer__nav a {
+  /* メインナビ（.gnav__ja）と同じ明朝。11px では --fw-heading（300）だと
+     細く沈むので、ウエイトだけ上げて濃さを合わせている。 */
+  font-family: var(--ff-heading);
   font-size: var(--fs-2xs);
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: var(--ls-ja-wide);
   color: var(--c-ink-2);
   transition: color var(--dur-fast) var(--ease);
