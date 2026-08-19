@@ -1,0 +1,81 @@
+# ============================================================
+# 焼肉 福朗（northsea2023.com）— ロリポップ！本番用
+#
+# ※ このファイルは「独自SSL（無料）」が有効化されたあとにアップロードすること。
+#    SSL 発行前に置くと https へのリダイレクトが失敗し、サイトが見られなくなる。
+# ============================================================
+
+DirectoryIndex index.html
+
+# ------------------------------------------------------------
+# URL の正規化
+# canonical は https://northsea2023.com/（www なし）に揃えている。
+# www あり / http でのアクセスは 301 で1本に寄せる。
+# 順番が重要：www 判定を先に、https 化を後に書くと
+# http://www → https://www → https:// で2回リダイレクトになる。
+# ------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # www あり → www なし（同時に https へ）
+  RewriteCond %{HTTP_HOST} ^www\.northsea2023\.com$ [NC]
+  RewriteRule ^(.*)$ https://northsea2023.com/$1 [R=301,L]
+
+  # http → https
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^(.*)$ https://northsea2023.com/$1 [R=301,L]
+</IfModule>
+
+# ------------------------------------------------------------
+# 文字コード / MIME
+# ------------------------------------------------------------
+AddDefaultCharset UTF-8
+
+<IfModule mod_mime.c>
+  AddType video/mp4                     .mp4
+  AddType image/webp                    .webp
+  AddType image/svg+xml                 .svg
+  AddType application/manifest+json     .webmanifest
+</IfModule>
+
+# ------------------------------------------------------------
+# 圧縮（動画・画像は既に圧縮済みなので対象外）
+# ------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE application/xml image/svg+xml
+</IfModule>
+
+# ------------------------------------------------------------
+# キャッシュ
+# 画像・動画・フォントはファイル名を変えない限り中身も変わらないので長く、
+# index.html は差し替えが即反映されないと困るのでキャッシュさせない。
+# ------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault                        "access plus 1 week"
+  ExpiresByType text/html               "access plus 0 seconds"
+  ExpiresByType text/css                "access plus 1 month"
+  ExpiresByType application/javascript  "access plus 1 month"
+  ExpiresByType image/jpeg              "access plus 1 year"
+  ExpiresByType image/png               "access plus 1 year"
+  ExpiresByType image/webp              "access plus 1 year"
+  ExpiresByType image/svg+xml           "access plus 1 year"
+  ExpiresByType video/mp4               "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ------------------------------------------------------------
+# 不要ファイルの露出防止
+# ------------------------------------------------------------
+<FilesMatch "^(\.DS_Store|\.gitignore|CNAME|\.nojekyll)$">
+  Require all denied
+</FilesMatch>

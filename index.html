@@ -6,23 +6,21 @@
 <title>焼肉 福朗｜徳島県産黒毛和牛と唯一無二の特製ダレ</title>
 <meta name="description" content="焼肉 福朗は、レトロが香る現代焼肉。徳島県産黒毛和牛「阿波華牛」「すだち牛」と、修行先から受け継いだ濃厚特製ダレを懐かしくも新しい空間でお楽しみください。徳島県板野郡北島町・徳島市庄町。">
 <meta name="keywords" content="焼肉,福朗,徳島,北島町,黒毛和牛,阿波華牛,すだち牛,肉の北海,焼肉 福朗 弐番館">
-<link rel="canonical" href="https://example.com/">
+<link rel="canonical" href="https://northsea2023.com/">
+
+<meta name="robots" content="index, follow, max-image-preview:large">
 
 <!-- ============================================================
-     ⚠️ 検証環境専用 — 本番公開時に必ず削除してください
-     この1行を残したまま本番公開すると、検索結果に一切出なくなります。
-     あわせてルートの robots.txt も削除してください。
-     ============================================================ -->
-<meta name="robots" content="noindex, nofollow">
-
-<!-- ============================================================
-     OG / Twitter — ドメイン確定後 URL を差し替えてください
+     OG / Twitter — SNS のクローラは相対パスを解決しないため
+     og:image / og:url は必ず絶対 URL で書く。
      ============================================================ -->
 <meta property="og:type" content="restaurant">
+<meta property="og:url" content="https://northsea2023.com/">
 <meta property="og:site_name" content="焼肉 福朗">
 <meta property="og:title" content="焼肉 福朗｜徳島県産黒毛和牛と唯一無二の特製ダレ">
 <meta property="og:description" content="レトロが香る現代焼肉。徳島県産黒毛和牛と濃厚特製ダレを、懐かしくも新しい空間で。">
-<meta property="og:image" content="assets/images/hero-fv.jpg">
+<meta property="og:image" content="https://northsea2023.com/assets/images/hero-fv.jpg">
+<meta property="og:image:alt" content="焼肉 福朗の店内と炭火で焼く徳島県産黒毛和牛">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#000000">
@@ -52,7 +50,7 @@
      どの情報がどの店のものか検索エンジンが判別できない。
      内容は必ず画面に出ている店舗情報セクションと一致させること
      （食い違うと構造化データとして無効になる）。
-     image / ドメインが確定したら、相対パスを絶対 URL に差し替えてください。
+     image は絶対 URL で書くこと（相対パスだと検索エンジンが解決できない）。
 
      末尾の Organization は運営会社（会社概要セクションと一致）。
      各店舗から parentOrganization で参照し、「3 店舗は同じ会社の店」と
@@ -64,7 +62,7 @@
     "@context": "https://schema.org",
     "@type": "Restaurant",
     "name": "焼肉 福朗 北島本店",
-    "image": "assets/images/shop-kitajima.jpg",
+    "image": "https://northsea2023.com/assets/images/shop-kitajima.jpg",
     "servesCuisine": "焼肉",
     "priceRange": "¥¥",
     "paymentAccepted": "現金, クレジットカード",
@@ -89,6 +87,7 @@
     "@context": "https://schema.org",
     "@type": "Restaurant",
     "name": "焼肉 福朗 弐番館",
+    "image": "https://northsea2023.com/assets/images/nibankan-plate.jpg",
     "servesCuisine": "焼肉",
     "priceRange": "¥¥",
     "paymentAccepted": "現金, クレジットカード",
@@ -113,7 +112,7 @@
     "@context": "https://schema.org",
     "@type": "Restaurant",
     "name": "定食酒場みみずく",
-    "image": "assets/images/shop-mimizuku.jpg",
+    "image": "https://northsea2023.com/assets/images/shop-mimizuku.jpg",
     "servesCuisine": "定食",
     "priceRange": "¥",
     "paymentAccepted": "現金",
@@ -177,7 +176,7 @@
      ============================================================ -->
 <div class="opening" id="opening" aria-hidden="true">
   <p class="opening__brand">
-    <img class="brand__img" src="assets/images/福朗本店ロゴ.png" alt="" width="842" height="595" decoding="async" fetchpriority="high">
+    <img class="brand__img" src="assets/images/logo-honten.png" alt="" width="842" height="595" decoding="async" fetchpriority="high">
   </p>
 </div>
 
@@ -190,7 +189,7 @@
   <div class="site-header__inner">
 
     <a class="brand" href="#top" aria-label="焼肉 福朗 トップへ">
-      <img class="brand__img" src="assets/images/福朗本店ロゴ.png" alt="" width="842" height="595" decoding="async">
+      <img class="brand__img" src="assets/images/logo-honten.png" alt="" width="842" height="595" decoding="async">
     </a>
 
     <!-- 参考サイトに合わせ、PC でもナビはハンバーガー内に格納 -->
@@ -241,7 +240,7 @@
     <video class="hero__video" id="heroVideo"
            poster="assets/images/hero-fv.jpg"
            muted loop playsinline preload="none"
-           data-src="assets/video/0801(5).mp4"
+           data-src="assets/video/hero.mp4"
            aria-hidden="true"></video>
   </div>
 
@@ -790,7 +789,7 @@
       <!-- 北島本店 -->
       <section class="fshop">
         <p class="fshop__logo fshop__logo--honten">
-          <img src="assets/images/福朗本店ロゴ.png" alt="上級品質 焼肉店 福朗" width="842" height="595" loading="lazy" decoding="async">
+          <img src="assets/images/logo-honten.png" alt="上級品質 焼肉店 福朗" width="842" height="595" loading="lazy" decoding="async">
         </p>
         <h2 class="fshop__name">北島本店</h2>
         <p class="fshop__sns">
@@ -809,7 +808,7 @@
       <!-- 弐番館 -->
       <section class="fshop">
         <p class="fshop__logo fshop__logo--nibankan">
-          <img src="assets/images/福朗弐番館ロゴ.png" alt="焼肉 福朗 弐番館" width="1654" height="1654" loading="lazy" decoding="async">
+          <img src="assets/images/logo-nibankan.png" alt="焼肉 福朗 弐番館" width="1654" height="1654" loading="lazy" decoding="async">
         </p>
         <h2 class="fshop__name">弐番館</h2>
         <p class="fshop__sns">
@@ -828,7 +827,7 @@
       <!-- 定食酒場みみずく -->
       <section class="fshop">
         <p class="fshop__logo fshop__logo--mimizuku">
-          <img src="assets/images/みみずくロゴ.png" alt="定食酒場みみずく" width="451" height="223" loading="lazy" decoding="async">
+          <img src="assets/images/logo-mimizuku.png" alt="定食酒場みみずく" width="451" height="223" loading="lazy" decoding="async">
         </p>
         <h2 class="fshop__name">定食酒場みみずく</h2>
         <p class="fshop__sns">
@@ -915,7 +914,7 @@
         <div class="rcard__body">
           <div class="rcard__head">
             <p class="rcard__logo rcard__logo--honten">
-              <img src="assets/images/福朗本店ロゴ.png" alt="" width="842" height="595" loading="lazy" decoding="async">
+              <img src="assets/images/logo-honten.png" alt="" width="842" height="595" loading="lazy" decoding="async">
             </p>
             <div class="rcard__id">
               <h3 class="rcard__name">北島本店</h3>
@@ -943,7 +942,7 @@
         <div class="rcard__body">
           <div class="rcard__head">
             <p class="rcard__logo rcard__logo--nibankan">
-              <img src="assets/images/福朗弐番館ロゴ.png" alt="" width="1654" height="1654" loading="lazy" decoding="async">
+              <img src="assets/images/logo-nibankan.png" alt="" width="1654" height="1654" loading="lazy" decoding="async">
             </p>
             <div class="rcard__id">
               <h3 class="rcard__name">弐番館</h3>
