@@ -46,6 +46,10 @@
   --ff-brush: "Yuji Syuku", "HGP行書体", "HG行書体",
               "Hiragino Mincho ProN", "Yu Mincho", serif;
 
+  /* セクション見出しの欧文ラベル専用。Futura 系のジオメトリックサンセリフ。
+     Futura は macOS/iOS のみのため、全 OS で同じ見え方になる Jost を先頭に置く。 */
+  --ff-label: "Jost", "Futura", "Century Gothic", var(--ff-sans);
+
   --ff-heading: var(--ff-serif);
   --ff-body:    var(--ff-sans);
   --ff-accent:  var(--ff-en);
@@ -715,7 +719,7 @@ body.is-opening { overflow: hidden; }
    余白・揃え方に統一している。
 
      <header class="sec-head">
-       <p class="sec-head__en">Our Commitment</p>  … 欧文ラベル（EB Garamond 斜体・淡金）
+       <p class="sec-head__en">Our Commitment</p>  … 欧文ラベル（Jost・大文字・淡金）
        <h2 class="sec-head__ja">こだわり</h2>       … 和文見出し（明朝・細め・下に細い罫線）
        <p class="sec-head__lead">…</p>             … 補足文（任意）
      </header>
@@ -728,11 +732,11 @@ body.is-opening { overflow: hidden; }
 }
 .sec-head__en {
   margin: 0 0 var(--sp-3);
-  font-family: var(--ff-accent);
+  font-family: var(--ff-label);
   font-size: var(--fs-xs);
-  font-style: italic;
-  font-weight: 400;
+  font-weight: 300;
   letter-spacing: var(--ls-en-wide);
+  text-transform: uppercase;
   color: var(--c-accent-2);
 }
 .sec-head__ja {
