@@ -240,7 +240,7 @@
     <video class="hero__video" id="heroVideo"
            poster="assets/images/hero-fv.jpg"
            muted loop playsinline preload="none"
-           data-src="assets/video/hero.mp4"
+           data-src="assets/video/hero.mp4?v=2"
            aria-hidden="true"></video>
   </div>
 
@@ -656,11 +656,12 @@
 
     <!-- ============================================================
          送信先の設定
-         action に送信先URL（Formspree / SSGフォーム / 自社PHP 等）を入れると
-         そのままPOST送信されます。空のままだと JS が
+         data-endpoint に送信先URLを入れるとそこへ POST されます。
+         現在は同じサーバ上の contact.php が受け取り、店舗宛の通知と
+         お客様宛の自動返信を送信します。空にすると JS が
          「送信先未設定」メッセージを表示します。
          ============================================================ -->
-    <form class="form" id="contactForm" data-endpoint="" novalidate data-reveal data-reveal-delay="1">
+    <form class="form" id="contactForm" data-endpoint="contact.php" novalidate data-reveal data-reveal-delay="1">
 
       <!-- ============================================================
            左列：短い入力欄（PC のみ 2 カラムの左側になる）

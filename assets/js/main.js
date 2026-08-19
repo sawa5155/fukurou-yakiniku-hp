@@ -552,7 +552,7 @@
         form.reset();
         $$('.field', form).forEach((f) => f.classList.remove('is-invalid'));
         $$('[data-err]', form).forEach((el) => { el.textContent = ''; });
-        setStatus('お問い合わせを受け付けました。3営業日以内にご返信いたします。', 'ok');
+        setStatus('お問い合わせを受け付けました。内容を確認のうえ、担当者よりご返信いたします。', 'ok');
       } catch (err) {
         setStatus(
           '送信に失敗しました。お手数ですが 088-612-8032 までお電話ください。',
